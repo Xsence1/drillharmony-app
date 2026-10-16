@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ru" data-theme="dark"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0f14"><meta name="format-detection" content="telephone=no">
+<title>Прогноз на долото · DrillHarmony</title>
+<script src="../../assets/j/b82b602a49.js"></script><script src="../../assets/j/8963aff236.js"></script>
+<link rel="stylesheet" href="../../fonts/fonts.css"><link rel="stylesheet" href="../../assets/c/17f53e8b82.css"><link rel="stylesheet" href="../../assets/c/b31b379876.css">
+<link rel="stylesheet" href="../../app/app.css"><script src="../../app/app.js"></script>
+</head><body class="in-app k-calc has-act" data-slug="projection" data-path="calculators/projection/" data-kind="calc" data-name="Прогноз на долото">
+<header class="abar"><a class="ib" href="../../index.html" data-back aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></a>
+<div class="ttl"><small>Траектория</small><span>Прогноз на долото</span></div><button class="ib star" type="button" aria-label="В избранное" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg></button>
+<button id="theme" type="button" hidden aria-hidden="true"></button></header>
+<main class="app-main">
+<div class="article">
+
+
+
+<div class="calc"><div class="cout"><div class="co key"><span>Зенит на долоте</span><b id="o_i">—</b><small>°</small></div><div class="co key"><span>Азимут на долоте</span><b id="o_a">—</b><small>°</small></div><div class="co"><span>ΔN, север</span><b id="o_n">—</b><small>м</small></div><div class="co"><span>ΔE, восток</span><b id="o_e">—</b><small>м</small></div><div class="co"><span>ΔTVD</span><b id="o_v">—</b><small>м</small></div><div class="co"><span>Угол искривления β</span><b id="o_b">—</b><small>°</small></div></div><div class="ci"><label data-u="°"><span data-u="°">Зенит замера</span><input id="i1" inputmode="decimal" value="20"/><small>°</small></label><label data-u="°"><span data-u="°">Азимут замера</span><input id="a1" inputmode="decimal" value="45"/><small>°</small></label><label data-u="°/10 м"><span data-u="°/10 м">Интенсивность</span><input id="dls" inputmode="decimal" value="1,5"/><small>°/10 м</small></label><label data-u="°"><span data-u="°">Toolface</span><input id="tf" inputmode="decimal" value="30"/><small>°</small></label><label data-u="м"><span data-u="м">Длина участка</span><input id="dl" inputmode="decimal" value="15"/><small>м</small></label></div></div>
+<div class="calc-act" hidden=""><button data-act="copy" type="button">Скопировать результат</button><button data-act="link" type="button">Поделиться</button><button data-act="reset" type="button">Сбросить</button></div>
+
+
+
+
+
+
+<details class="fold viz"><summary>Схема</summary><div class="fold-b"><section aria-label="3D-модель прогноза на долото" class="wx ia ia-calc" id="iv-pr"><canvas class="ia-cv" style="height:380px"></canvas><p class="ia-leg"><span><i style="background:var(--amber)"></i>прогноз при вашем toolface</span><span><i class="d"></i>для сравнения</span></p></section></div></details><details class="fold ref"><summary>Как считается</summary><div class="fold-b"><h1>Прогноз на долото по интенсивности и отклонителю</h1><p class="lead">Введите последний замер, ожидаемую интенсивность компоновки, toolface и расстояние от датчика до долота (или длину планируемого слайда).</p><h2>Как считается</h2><p>Ствол на участке считается дугой окружности (метод минимальной кривизны). Угол искривления β = интенсивность × длина / 10. Новое направление получается поворотом текущего на β в плоскости, заданной toolface; приращения координат считаются по формулам <a class="ext" href="https://drillharmony.com/articles/minimum-curvature/" rel="noopener">минимальной кривизны</a>.</p><p>Прогноз хорош настолько, насколько верно задана интенсивность компоновки: берите её по факту последних слайдов, а не по паспорту двигателя. Если ствол вертикальный, toolface считается магнитным (от севера).</p><p class="small muted calc-more">Расчёт справочный. Проектные решения принимаются по утверждённым методикам и программе на бурение.</p></div></details></div>
+<p class="src">На сайте: <a class="ext" href="https://drillharmony.com/calculators/projection/" rel="noopener">drillharmony.com/calculators/projection/</a></p>
+</main>
+<nav class="actbar" aria-label="Действия"><button type="button" data-a="prof"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M8 7h8M7 11h10M9 16h6"/></svg><span>Профиль</span></button><button type="button" data-a="reset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.6"/><path d="M4 4v4.6h4.6"/></svg><span>Сбросить</span></button><button type="button" data-a="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg><span>Копировать</span></button><button type="button" data-a="share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span>Поделиться</span></button><button type="button" data-a="save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>В историю</span></button></nav>
+<script src="../../assets/j/518f08db58.js"></script><script src="../../assets/j/54729b6f33.js"></script><script src="../../assets/j/1ec0dde8f1.js"></script><script src="../../assets/j/82ef5376c6.js"></script><script src="../../assets/j/aa31b9ed38.js"></script><script src="../../assets/j/c7b6858526.js"></script>
+</body></html>

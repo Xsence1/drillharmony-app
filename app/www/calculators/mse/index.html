@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ru" data-theme="dark"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0f14"><meta name="format-detection" content="telephone=no">
+<title>MSE — эффективность бурения · DrillHarmony</title>
+<script src="../../assets/j/b82b602a49.js"></script><script src="../../assets/j/8963aff236.js"></script>
+<link rel="stylesheet" href="../../fonts/fonts.css"><link rel="stylesheet" href="../../assets/c/17f53e8b82.css"><link rel="stylesheet" href="../../assets/c/b31b379876.css">
+<link rel="stylesheet" href="../../app/app.css"><script src="../../app/app.js"></script>
+</head><body class="in-app k-calc has-act" data-slug="mse" data-path="calculators/mse/" data-kind="calc" data-name="MSE — эффективность бурения">
+<header class="abar"><a class="ib" href="../../index.html" data-back aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></a>
+<div class="ttl"><small>Бурение и КНБК</small><span>MSE — эффективность бурения</span></div><button class="ib star" type="button" aria-label="В избранное" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg></button>
+<button id="theme" type="button" hidden aria-hidden="true"></button></header>
+<main class="app-main">
+<div class="article">
+
+
+
+<div class="calc" data-calc="mse"><div class="cout"><div class="co key"><span>MSE</span><b id="o_mse">—</b><small>МПа</small></div><div class="co key"><span>Эффективность</span><b id="o_eff">—</b><small>%</small></div><div class="co"><span>Осевая часть</span><b id="o_ax">—</b><small>МПа</small></div><div class="co"><span>Вращательная часть</span><b id="o_rot">—</b><small>МПа</small></div><div class="co"><span>Доля вращения</span><b id="o_share">—</b><small>%</small></div><div class="co verdict"><span>Вывод</span><b id="o_v">—</b><small></small></div></div><div class="ci"><label data-p="bit" data-u="мм"><span data-u="мм">Диаметр долота</span><input id="d" inputmode="decimal" value="215,9"/><small>мм</small></label><label data-u="т"><span data-u="т">Нагрузка на долото</span><input id="wob" inputmode="decimal" value="10"/><small>т</small></label><label data-u="об/мин"><span data-u="об/мин">Обороты долота</span><input id="rpm" inputmode="decimal" value="120"/><small>об/мин</small></label><label data-u="кН·м"><span data-u="кН·м">Момент на долоте</span><input id="tq" inputmode="decimal" value="6"/><small>кН·м</small></label><label data-u="м/ч"><span data-u="м/ч">Мех. скорость</span><input id="rop" inputmode="decimal" value="25"/><small>м/ч</small></label><label data-u="МПа"><span data-u="МПа">Прочность породы на забое</span><input id="ucs" inputmode="decimal" value="80"/><small>МПа</small></label></div></div>
+<div class="calc-act" hidden=""><button data-act="copy" type="button">Скопировать результат</button><button data-act="link" type="button">Поделиться</button><button data-act="reset" type="button">Сбросить</button></div>
+
+
+
+
+
+
+
+
+
+
+<details class="fold viz"><summary>Схема</summary><div class="fold-b"><section aria-label="Куда уходит энергия" class="wx ia ia-calc" id="iv-mse"><canvas aria-label="Куда уходит энергия" class="ia-cv flat" role="img" style="height:260px"></canvas></section></div></details><details class="fold ref"><summary>Как считается</summary><div class="fold-b"><h1>MSE: механическая удельная энергия и эффективность бурения</h1><p class="lead">MSE показывает, сколько энергии тратится на разрушение единицы объёма породы. Если MSE в несколько раз выше прочности породы, энергия уходит в вибрации, трение и сальник на долоте, а не в бурение.</p><h2>Формула</h2><div class="formula">MSE = WOB / A + 2π · N · T / (A · ROP)
+
+A   — площадь забоя, π·D²/4, м²
+WOB — нагрузка на долото, Н
+N   — обороты долота, об/с (ротор + ВЗД)
+T   — момент на долоте, Н·м
+ROP — механическая скорость, м/с</div><p>Это классическая формула Тиле (1965). Первое слагаемое описывает осевую часть, она обычно небольшая. Второе, вращательное, даёт почти всю MSE.</p><h2>Как пользоваться на буровой</h2><ul>
+<li><b>Смотрите на тренд, а не на одно число.</b> MSE выросла, а порода по ГК и шламу та же: долото стало работать хуже. Вибрации, сальник, износ, плохая очистка.</li>
+<li><b>Подбирайте режим.</b> Меняйте нагрузку и обороты ступенями и смотрите, при каком сочетании MSE ниже. Это и есть «оптимальный режим» для этой породы и этого долота.</li>
+<li><b>Момент берите на долоте.</b> С ВЗД берите момент двигателя по перепаду (калькулятор <a href="../../calculators/motor/index.html">ВЗД: момент и обороты</a>, обороты считайте как ротор плюс двигатель. Поверхностный момент включает трение колонны и завышает MSE.</li>
+<li><b>Эффективность 25–35 % на практике считается потолком.</b> Даже при хорошем режиме на разрушение породы уходит лишь треть энергии, поэтому MSE на буровой в 3–4 раза выше прочности. Тревожно, когда эффективность падает ниже 10–12 % или MSE резко растёт.</li>
+<li><b>Прочность нужна забойная, а не атмосферная.</b> Под давлением столба раствора порода прочнее, чем при испытании образца: берите оценку прочности в условиях забоя, если она есть у геологов.</li>
+</ul><p>Подробнее о вибрациях в статье <a class="ext" href="https://drillharmony.com/articles/vibration/" rel="noopener">Вибрации и stick-slip</a>, о MSE на практике в статье <a class="ext" href="https://drillharmony.com/articles/mse/" rel="noopener">MSE: как понять, что долото работает плохо</a>.</p><p class="small muted calc-more">Расчёт справочный. Проектные решения принимаются по утверждённым методикам и программе на бурение.</p></div></details></div>
+<p class="src">На сайте: <a class="ext" href="https://drillharmony.com/calculators/mse/" rel="noopener">drillharmony.com/calculators/mse/</a></p>
+</main>
+<nav class="actbar" aria-label="Действия"><button type="button" data-a="prof"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M8 7h8M7 11h10M9 16h6"/></svg><span>Профиль</span></button><button type="button" data-a="reset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.6"/><path d="M4 4v4.6h4.6"/></svg><span>Сбросить</span></button><button type="button" data-a="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg><span>Копировать</span></button><button type="button" data-a="share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span>Поделиться</span></button><button type="button" data-a="save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>В историю</span></button></nav>
+<script src="../../assets/j/518f08db58.js"></script><script src="../../assets/j/bfd7382c0a.js"></script><script src="../../assets/j/1ec0dde8f1.js"></script><script src="../../assets/j/82ef5376c6.js"></script><script src="../../assets/j/ccadc3f02b.js"></script><script src="../../assets/j/c7b6858526.js"></script>
+</body></html>

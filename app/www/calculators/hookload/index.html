@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ru" data-theme="dark"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0f14"><meta name="format-detection" content="telephone=no">
+<title>Вес на крюке и трение · DrillHarmony</title>
+<script src="../../assets/j/b82b602a49.js"></script><script src="../../assets/j/8963aff236.js"></script>
+<link rel="stylesheet" href="../../fonts/fonts.css"><link rel="stylesheet" href="../../assets/c/17f53e8b82.css"><link rel="stylesheet" href="../../assets/c/b31b379876.css">
+<link rel="stylesheet" href="../../app/app.css"><script src="../../app/app.js"></script>
+</head><body class="in-app k-calc has-act" data-slug="hookload" data-path="calculators/hookload/" data-kind="calc" data-name="Вес на крюке и трение">
+<header class="abar"><a class="ib" href="../../index.html" data-back aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></a>
+<div class="ttl"><small>Бурение и КНБК</small><span>Вес на крюке и трение</span></div><button class="ib star" type="button" aria-label="В избранное" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg></button>
+<button id="theme" type="button" hidden aria-hidden="true"></button></header>
+<main class="app-main">
+<div class="article">
+
+
+
+<div class="calc" data-calc="hook"><div class="cout"><div class="co key"><span>Подъём</span><b id="o_pu">—</b><small>т</small></div><div class="co key"><span>Спуск</span><b id="o_so">—</b><small>т</small></div><div class="co"><span>Вращение на весу</span><b id="o_rot">—</b><small>т</small></div><div class="co"><span>Затяжка</span><b id="o_dr">—</b><small>т</small></div><div class="co key"><span>Фактическое трение</span><b id="o_mu">—</b><small></small></div><div class="co verdict"><span>Вывод</span><b id="o_v">—</b><small></small></div></div><div class="ci"><label data-u="м"><span data-u="м">Глубина зарезки</span><input id="kop" inputmode="decimal" value="800"/><small>м</small></label><label data-u="°/30 м"><span data-u="°/30 м">Интенсивность набора</span><input id="bur" inputmode="decimal" value="3"/><small>°/30 м</small></label><label data-u="°"><span data-u="°">Зенит после набора</span><input id="inc" inputmode="decimal" value="60"/><small>°</small></label><label data-p="md" data-u="м"><span data-u="м">Глубина долота</span><input id="md" inputmode="decimal" value="3000"/><small>м</small></label><label data-p="dp_w" data-u="кг/м"><span data-u="кг/м">Вес 1 м труб в воздухе</span><input id="q" inputmode="decimal" value="31"/><small>кг/м</small></label><label data-p="rho" data-u="г/см³"><span data-u="г/см³">Плотность раствора</span><input id="rho" inputmode="decimal" value="1,18"/><small>г/см³</small></label><label><span>Коэффициент трения</span><input id="mu" inputmode="decimal" value="0,25"/><small></small></label><label data-u="т"><span data-u="т">Вес талевой системы</span><input id="blk" inputmode="decimal" value="25"/><small>т</small></label><label data-u="т"><span data-u="т">Факт: вес при подъёме</span><input id="pu" inputmode="decimal" value="0"/><small>т</small></label></div></div>
+<div class="calc-act" hidden=""><button data-act="copy" type="button">Скопировать результат</button><button data-act="link" type="button">Поделиться</button><button data-act="reset" type="button">Сбросить</button></div>
+
+
+
+
+
+
+
+
+
+
+<details class="fold viz"><summary>Схема</summary><div class="fold-b"><section aria-label="«Метла»" class="wx ia ia-calc" id="iv-hook"><canvas aria-label="«Метла»" class="ia-cv flat" role="img" style="height:380px"></canvas></section></div></details><details class="fold ref"><summary>Как считается</summary><div class="fold-b"><h1>Вес на крюке и фактическое трение («метла»)</h1><p class="lead">Расчётный вес на крюке при подъёме, спуске и вращении и фактический коэффициент трения по весу, который показал индикатор. Профиль: вертикаль, набор и наклонный участок.</p><h2>Как считается</h2><div class="formula">F(верх) = F(низ) + w · cos I · ΔL ± μ · N      + подъём, − спуск
+N = | F · ΔI + w · sin I · ΔL |                   прижатие к стенке
+w = q · g · (1 − ρр / ρст)                        вес метра труб в растворе</div><p>Модель мягкой нити по участкам 5 м. Вес талевой системы прибавляется к весу колонны. КНБК и замки не учитываются, для оценки трения по тренду этого достаточно.</p><h2>Как читать «метлу»</h2><ul>
+<li><b>Наносите точки на каждой свече:</b> вес при подъёме, при спуске и при вращении на весу. Точки ложатся вдоль одной из линий трения, это и есть фактическое трение.</li>
+<li><b>Смотрите на тренд.</b> Если точки подъёма уходят к линиям большего трения, растёт шламовая подушка, сальник или появились уступы.</li>
+<li><b>Спуск ниже расчётного</b>: колонна садится, проверьте ствол перед спуском обсадной колонны.</li>
+<li><b>Вращение даёт ориентир без трения.</b> Если вес при вращении «уехал» от расчёта, сначала проверьте вес труб и плотность раствора.</li>
+</ul><p>Подробно в статье <a class="ext" href="https://drillharmony.com/articles/broomstick/" rel="noopener">«Метла»: как читать вес на крюке</a>. О передаче нагрузки на долото написано в статье <a class="ext" href="https://drillharmony.com/articles/wob-loss/" rel="noopener">Нагрузка не доходит до долота</a>.</p><p class="small muted calc-more">Расчёт справочный. Проектные решения принимаются по утверждённым методикам и программе на бурение.</p></div></details></div>
+<p class="src">На сайте: <a class="ext" href="https://drillharmony.com/calculators/hookload/" rel="noopener">drillharmony.com/calculators/hookload/</a></p>
+</main>
+<nav class="actbar" aria-label="Действия"><button type="button" data-a="prof"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M8 7h8M7 11h10M9 16h6"/></svg><span>Профиль</span></button><button type="button" data-a="reset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.6"/><path d="M4 4v4.6h4.6"/></svg><span>Сбросить</span></button><button type="button" data-a="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg><span>Копировать</span></button><button type="button" data-a="share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span>Поделиться</span></button><button type="button" data-a="save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>В историю</span></button></nav>
+<script src="../../assets/j/518f08db58.js"></script><script src="../../assets/j/bfd7382c0a.js"></script><script src="../../assets/j/1ec0dde8f1.js"></script><script src="../../assets/j/82ef5376c6.js"></script><script src="../../assets/j/ccadc3f02b.js"></script><script src="../../assets/j/c7b6858526.js"></script>
+</body></html>

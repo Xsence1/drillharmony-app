@@ -1,0 +1,298 @@
+<p class="lead">WITSML — это общий язык, на котором программы бурения обмениваются данными о скважине: траекторией, каротажом, параметрами бурения, КНБК. Здесь он разобран с нуля: что такое объект и сервер, как выглядит XML и что в нём значит каждая строка, как называются кривые телесистемы, гамма-каротажа, УЭС и радиоактивного каротажа и как назначить свою мнемонику, если сервер назвал кривую по-своему.</p>
+<div class="tldr"><b>Коротко</b><ul>
+<li>WITSML хранит данные на <b>сервере</b> в виде <b>объектов</b>: well → wellbore → log, trajectory, mudLog, bhaRun. У каждого объекта есть идентификатор uid и единицы у каждого числа.</li>
+<li>Каротаж и параметры бурения лежат в объекте <b>log</b>: заголовок описывает кривые (мнемоника, единица), а данные идут строками через запятую.</li>
+<li>Мнемоники у разных компаний разные. Программа сопоставляет их со своими каналами по словарю синонимов, а то, что не распозналось, инженер назначает вручную.</li>
+<li>В версии 1.4.1.1 клиент сам опрашивает сервер (SOAP), в 2.x сервер отправляет новые значения потоком (ETP поверх WebSocket).</li>
+</ul></div>
+
+<h2>Зачем WITSML, если есть WITS</h2>
+<p>WITS 0 — это поток чисел по кабелю: «запись 8, параметр 23, значение 87,4». Приёмник должен заранее знать, что 0823 — это гамма, в каких она единицах и к какой глубине привязана. Если приёмник был выключен, данные за это время потеряны. Подробно о WITS рассказано в статье <a href="../../articles/wits-witsml/">WITS: поток с буровой</a>.</p>
+<p>WITSML устроен иначе. Представьте библиотеку вместо радиоэфира: данные не пролетают мимо, а складываются на сервер в «папки», которые называются объектами. У каждой папки есть карточка: что за скважина, какой ствол, какие кривые, в каких единицах, с какой по какую глубину. Любая программа в любой момент может прийти и взять то, что ей нужно, — хоть всё, хоть только новые строки после 2 751,2 м.</p>
+<div class="tablewrap tl"><table><thead><tr><th></th><th>WITS 0</th><th>WITSML</th></tr></thead><tbody>
+<tr><td>Что передаётся</td><td>Текущие значения</td><td>Объекты скважины с историей</td></tr>
+<tr><td>Как узнать смысл числа</td><td>По номеру записи и параметра из таблицы стандарта</td><td>По мнемонике и описанию кривой в самом объекте</td></tr>
+<tr><td>Единицы</td><td>Не передаются, согласуют заранее</td><td>У каждого числа или кривой атрибут uom</td></tr>
+<tr><td>Если приёмник был выключен</td><td>Данные потеряны</td><td>Данные на сервере, можно дозапросить</td></tr>
+<tr><td>Кто с кем</td><td>Станция → сборщик на буровой</td><td>Буровая ↔ офис ↔ заказчик ↔ сервисные компании</td></tr>
+</tbody></table></div>
+
+<h2>Принцип: сервер, клиент и объекты</h2>
+<p>В WITSML три участника:</p>
+<ol>
+<li><b>Сервер WITSML</b> — хранилище. Обычно стоит у сервисной компании, станции ГТИ или у заказчика.</li>
+<li><b>Клиент-писатель</b> — программа на буровой (станция ГТИ, телесистема, сборщик), которая дописывает в объекты новые данные.</li>
+<li><b>Клиент-читатель</b> — мониторинг, геонавигация, программа проектирования. Забирает данные и показывает инженеру.</li>
+</ol>
+<p>Данные разложены по дереву. Всё начинается со скважины, у скважины есть стволы, у ствола — объекты с данными:</p>
+<div class="formula">well          скважина: название, координаты устья, альтитуды, часовой пояс
+└─ wellbore   ствол: основной, боковой; ссылка на родительский ствол
+   ├─ trajectory      замеры инклинометрии
+   ├─ log             кривые по глубине или по времени: ГК, УЭС, нагрузка, обороты…
+   ├─ mudLog          шламограмма и газ
+   ├─ bhaRun, tubular рейс и состав КНБК
+   ├─ formationMarker отбивки пластов
+   ├─ message         события и сообщения с буровой
+   └─ opsReport       суточный рапорт</div>
+<p>Связь между объектами держится на идентификаторах: у скважины <code>uid</code>, у ствола <code>uid</code> и <code>uidWell</code>, у каротажа <code>uid</code>, <code>uidWellbore</code> и <code>uidWell</code>. По ним сервер понимает, что кривая ГК относится к стволу 2 скважины 1205, а не к соседней.</p>
+<p>Объекты log, trajectory и mudLog называются <b>растущими</b>: пока идёт бурение, к ним дописываются новые строки и станции. Клиенту не нужно каждый раз забирать весь объект: он просит «всё, что глубже последней полученной точки».</p>
+
+<h2>Интерактивная лаборатория: планшет, приборы и мнемоники</h2>
+<p>Модель бурит горизонтальный участок: слайды чередуются с ротором, ствол проходит газовую шапку, нефтенасыщенный песчаник, глинистый прослой и плотный известняк. Сервер отдаёт кривые так, как их назвала «сервисная компания». Ваша задача — убедиться, что программа правильно поняла, какая кривая что значит.</p>
+<section class="wx wl" id="wl" aria-label="Лаборатория WITSML: планшет, приборы и мнемоники">
+<div class="wx-top"><div class="eyebrow">Интерактивная модель · учебные данные</div><b>Сервер WITSML → программа инженера ННБ</b><p>Выберите источник и шаблон. На вкладке «Мнемоники» назначьте кривые, которые не распознались, — планшет и приборы сразу покажут результат. Настройки сохраняются в браузере.</p></div>
+<div class="wl-ctl">
+<label>Источник <select id="wl-src" aria-label="Источник данных"></select></label>
+<label>Шаблон <select id="wl-tpl" aria-label="Шаблон планшета"></select></label>
+<button type="button" class="wx-b pri" id="wl-play" aria-pressed="true">Пауза</button>
+<span class="wx-spd">Бурение <button type="button" data-spd="1">×1</button><button type="button" data-spd="4" class="on">×4</button><button type="button" data-spd="15">×15</button></span>
+</div>
+<div class="wx-tabs wl-tabs" role="tablist"><button type="button" class="on" role="tab" aria-selected="true" data-t="wl-p1">Планшет</button><button type="button" role="tab" aria-selected="false" data-t="wl-p2">Приборы</button><button type="button" role="tab" aria-selected="false" data-t="wl-p3">Мнемоники</button><button type="button" role="tab" aria-selected="false" data-t="wl-p4">Шаблоны</button><button type="button" role="tab" aria-selected="false" data-t="wl-p5">XML</button></div>
+<div class="wl-pane" id="wl-p1">
+<div class="wl-ctl"><span class="wx-spd">Окно <button type="button" data-win="40">40 м</button><button type="button" data-win="60" class="on">60 м</button><button type="button" data-win="150">150 м</button></span><span class="wl-ro" id="wl-ro">Наведите на планшет, и он покажет значения на глубине.</span></div>
+<div class="wl-plw"><canvas id="wl-cv" role="img" aria-label="Планшет по глубине: дорожки кривых выбранного шаблона, долото и датчики"></canvas></div>
+<p class="wx-leg"><span class="k1" style="background:rgba(245,200,70,.5)"></span>песчаник по ГК (меньше 70 API) <span class="k2" style="background:rgba(255,90,70,.6)"></span>перекрытие нейтрон — плотность: газ <span class="k3" style="background:#f5a524"></span>слайд на дорожке глубин</p>
+<p class="ia-hint wl-mob">На телефоне планшет прокручивается вбок.</p>
+<p class="ia-hint">Каждая кривая нарисована на глубине своего датчика: ГК отстаёт от долота на 14,5 м, УЭС — на 12,9 м, инклинометр — на 16,2 м, нейтронный и плотностной — на 19,8 м. Поэтому кривые обрываются выше долота на разную высоту.</p>
+</div>
+<div class="wl-pane" id="wl-p2" hidden>
+<p>Приборы показывают последнее значение кривой без анимации, как цифровое табло. Подпись над числом: мнемоника на сервере → канал программы. Нажмите на прибор, и появится справка.</p>
+<div class="wl-gauges" id="wl-gauges"></div>
+<p class="wl-gi" id="wl-gi"></p>
+</div>
+<div class="wl-pane" id="wl-p3" hidden>
+<p>Слева — как кривая называется на сервере и что написано в её описании. Справа — каким каналом её считает программа. «Авто» — распознано по словарю синонимов, «вручную» — назначили вы. Попробуйте источник «сервисная компания А»: кривые <code>RES_1</code> и <code>RES_2</code> по названию не понять — подсказка в описании.</p>
+<div class="wl-ctl"><label class="wx-hold"><input type="checkbox" id="wl-learn" checked> запоминать мои назначения как синонимы</label><button type="button" class="wx-b" id="wl-mapreset">Сбросить назначения</button><button type="button" class="wx-b" id="wl-export">Скачать таблицу (JSON)</button></div>
+<div class="wl-map tablewrap" id="wl-map"></div>
+<p class="wl-sum" id="wl-mapsum"></p>
+<h3>Справочник мнемоник</h3>
+<p>Каналы программы и частые синонимы. Добавьте синоним, под которым кривая приходит с вашей станции, и в следующий раз она распознается сама.</p>
+<input type="search" id="wl-q" class="wl-q" placeholder="Поиск: GR, плотность, toolface…" aria-label="Поиск по мнемоникам">
+<div class="wl-ref" id="wl-ref"></div>
+</div>
+<div class="wl-pane" id="wl-p4" hidden>
+<p>Шаблон — это набор дорожек планшета и приборов под задачу. Выберите кривые: до трёх на дорожку и до восьми приборов. Любое изменение сохраняется как «Мой шаблон».</p>
+<div id="wl-ed"></div>
+</div>
+<div class="wl-pane" id="wl-p5" hidden>
+<p>Так выглядит на сервере объект log с кривыми текущего шаблона, с теми мнемониками и единицами, которые отдаёт выбранный источник. Последние три строки данных обновляются с бурением.</p>
+<pre class="wx-xml wl-xml" id="wl-xml"></pre>
+</div>
+</section>
+
+<h2>Как устроен код WITSML: разбор XML по строкам</h2>
+<p>Данные WITSML — это текст в формате XML. Каждое значение лежит между открывающим и закрывающим тегом: <code>&lt;md&gt;2451.36&lt;/md&gt;</code>. Атрибуты внутри тега уточняют смысл: <code>uom="m"</code> — единица измерения, <code>uid="…"</code> — идентификатор. Строки, заключённые в <code>&lt;!-- … --&gt;</code>, — комментарии: сервер и программы их пропускают. Ниже — пример версии 1.4.1.1, комментарии добавлены для объяснения.</p>
+<h3>Скважина и ствол</h3>
+<div class="formula wl-code">&lt;!-- Корневой элемент — во множественном числе, даже если скважина одна --&gt;
+&lt;wells xmlns="http://www.witsml.org/schemas/1series" version="1.4.1.1"&gt;
+  &lt;well uid="W-1205"&gt;                    &lt;!-- uid — уникальный ключ скважины на сервере --&gt;
+    &lt;name&gt;Учебная 1205&lt;/name&gt;
+    &lt;field&gt;Учебное месторождение&lt;/field&gt;
+    &lt;timeZone&gt;+05:00&lt;/timeZone&gt;          &lt;!-- время в объектах — с часовым поясом --&gt;
+    &lt;statusWell&gt;drilling&lt;/statusWell&gt;
+  &lt;/well&gt;
+&lt;/wells&gt;
+
+&lt;wellbores xmlns="http://www.witsml.org/schemas/1series" version="1.4.1.1"&gt;
+  &lt;wellbore uidWell="W-1205" uid="WB-1205-2"&gt;  &lt;!-- ствол знает, к какой скважине относится --&gt;
+    &lt;nameWell&gt;Учебная 1205&lt;/nameWell&gt;
+    &lt;name&gt;1205 ствол 2&lt;/name&gt;
+    &lt;parentWellbore uidRef="WB-1205-1"&gt;1205 ствол 1&lt;/parentWellbore&gt;  &lt;!-- боковой ствол --&gt;
+    &lt;md uom="m"&gt;2781.4&lt;/md&gt;                &lt;!-- текущий забой по стволу --&gt;
+  &lt;/wellbore&gt;
+&lt;/wellbores&gt;</div>
+<h3>Траектория: замеры инклинометрии</h3>
+<div class="formula wl-code">&lt;!-- Да, «trajectorys» — так в стандарте, с ошибкой во множественном числе --&gt;
+&lt;trajectorys xmlns="http://www.witsml.org/schemas/1series" version="1.4.1.1"&gt;
+  &lt;trajectory uidWell="W-1205" uidWellbore="WB-1205-2" uid="TRAJ-MWD"&gt;
+    &lt;nameWell&gt;Учебная 1205&lt;/nameWell&gt;
+    &lt;nameWellbore&gt;1205 ствол 2&lt;/nameWellbore&gt;
+    &lt;name&gt;MWD замеры&lt;/name&gt;
+    &lt;mdMn uom="m"&gt;0&lt;/mdMn&gt;                  &lt;!-- диапазон глубин в объекте: минимум --&gt;
+    &lt;mdMx uom="m"&gt;2765.2&lt;/mdMx&gt;               &lt;!-- и максимум; клиент сравнивает с тем, что уже получил --&gt;
+    &lt;aziRef&gt;grid north&lt;/aziRef&gt;              &lt;!-- от какого севера азимуты: истинный, магнитный, сетка --&gt;
+    &lt;trajectoryStation uid="ST-118"&gt;        &lt;!-- одна станция = один замер --&gt;
+      &lt;typeTrajStation&gt;MWD&lt;/typeTrajStation&gt;
+      &lt;md uom="m"&gt;2765.2&lt;/md&gt;                &lt;!-- глубина замера по стволу --&gt;
+      &lt;tvd uom="m"&gt;2289.4&lt;/tvd&gt;              &lt;!-- по вертикали — посчитал отправитель --&gt;
+      &lt;incl uom="dega"&gt;88.62&lt;/incl&gt;          &lt;!-- dega — градусы угла --&gt;
+      &lt;azi uom="dega"&gt;145.31&lt;/azi&gt;
+      &lt;dispNs uom="m"&gt;-512.7&lt;/dispNs&gt;        &lt;!-- смещения от устья: север — юг --&gt;
+      &lt;dispEw uom="m"&gt;361.9&lt;/dispEw&gt;         &lt;!-- восток — запад --&gt;
+      &lt;dls uom="dega/30m"&gt;1.84&lt;/dls&gt;         &lt;!-- интенсивность, °/30 м --&gt;
+    &lt;/trajectoryStation&gt;
+    &lt;!-- следующие замеры дописываются новыми trajectoryStation --&gt;
+  &lt;/trajectory&gt;
+&lt;/trajectorys&gt;</div>
+<p>Обратите внимание: координаты и вертикаль в замере посчитал отправитель, своим методом и от своей точки привязки. Программа геонавигации и проектирования обычно пересчитывает траекторию сама методом <a href="../../articles/minimum-curvature/">минимальной кривизны</a>, а присланные значения использует для сверки.</p>
+<h3>Каротаж и параметры бурения: объект log</h3>
+<div class="formula wl-code">&lt;logs xmlns="http://www.witsml.org/schemas/1series" version="1.4.1.1"&gt;
+  &lt;log uidWell="W-1205" uidWellbore="WB-1205-2" uid="LOG-RT-MWD"&gt;
+    &lt;nameWell&gt;Учебная 1205&lt;/nameWell&gt;
+    &lt;nameWellbore&gt;1205 ствол 2&lt;/nameWellbore&gt;
+    &lt;name&gt;MWD реальное время&lt;/name&gt;
+    &lt;indexType&gt;measured depth&lt;/indexType&gt;    &lt;!-- индекс — глубина; бывает date time --&gt;
+    &lt;startIndex uom="m"&gt;2500.00&lt;/startIndex&gt;
+    &lt;endIndex uom="m"&gt;2766.75&lt;/endIndex&gt;      &lt;!-- последняя глубина в объекте --&gt;
+    &lt;direction&gt;increasing&lt;/direction&gt;        &lt;!-- индекс растёт сверху вниз --&gt;
+    &lt;indexCurve&gt;DEPT&lt;/indexCurve&gt;             &lt;!-- какая кривая — индекс --&gt;
+    &lt;nullValue&gt;-999.25&lt;/nullValue&gt;            &lt;!-- так помечено «значения нет» --&gt;
+
+    &lt;!-- Описание каждой кривой: «карточка» --&gt;
+    &lt;logCurveInfo uid="GR"&gt;
+      &lt;mnemonic&gt;GR&lt;/mnemonic&gt;                 &lt;!-- короткое имя кривой --&gt;
+      &lt;unit&gt;gAPI&lt;/unit&gt;                       &lt;!-- единицы API для гамма-каротажа --&gt;
+      &lt;curveDescription&gt;Gamma ray, corrected&lt;/curveDescription&gt;
+      &lt;sensorOffset uom="m"&gt;14.5&lt;/sensorOffset&gt;  &lt;!-- датчик на 14,5 м выше долота --&gt;
+      &lt;typeLogData&gt;double&lt;/typeLogData&gt;      &lt;!-- число с плавающей точкой --&gt;
+    &lt;/logCurveInfo&gt;
+    &lt;logCurveInfo uid="RPD"&gt;
+      &lt;mnemonic&gt;RPD&lt;/mnemonic&gt;
+      &lt;unit&gt;ohm.m&lt;/unit&gt;
+      &lt;curveDescription&gt;Phase resistivity, deep&lt;/curveDescription&gt;
+      &lt;typeLogData&gt;double&lt;/typeLogData&gt;
+    &lt;/logCurveInfo&gt;
+
+    &lt;!-- Сами данные: по строке на глубину, значения через запятую --&gt;
+    &lt;logData&gt;
+      &lt;mnemonicList&gt;DEPT,GR,RPD&lt;/mnemonicList&gt;   &lt;!-- порядок колонок --&gt;
+      &lt;unitList&gt;m,gAPI,ohm.m&lt;/unitList&gt;
+      &lt;data&gt;2766.50,41.2,44.8&lt;/data&gt;
+      &lt;data&gt;2766.75,-999.25,45.1&lt;/data&gt;      &lt;!-- ГК ещё не дошёл: пусто --&gt;
+    &lt;/logData&gt;
+  &lt;/log&gt;
+&lt;/logs&gt;</div>
+<p>Как это читать: строка <code>2766.50,41.2,44.8</code> по списку <code>DEPT,GR,RPD</code> означает «на глубине 2 766,50 м гамма 41,2 API, глубокое сопротивление 44,8 Ом·м». Если поменять порядок в mnemonicList, поменяется и смысл колонок. Поэтому строку всегда разбирают по этому списку, а не по номеру колонки.</p>
+<p>В версии 1.3.1.1 списка mnemonicList внутри logData нет: порядок колонок задаётся порядком logCurveInfo и полем columnIndex. Программа, которая работает с обеими версиями, должна понимать оба варианта.</p>
+
+<h3>Запрос к серверу: GetFromStore</h3>
+<p>Клиент спрашивает сервер не командой «дай каротаж», а шаблоном объекта. Заполненные поля работают как фильтр, пустые теги означают «верни это поле». Ниже клиент просит только новые строки ГК и УЭС глубже 2 766,50 м:</p>
+<div class="formula wl-code">&lt;!-- Запрос (QueryIn) функции WMLS_GetFromStore, тип объекта: log --&gt;
+&lt;logs xmlns="http://www.witsml.org/schemas/1series" version="1.4.1.1"&gt;
+  &lt;log uidWell="W-1205" uidWellbore="WB-1205-2" uid="LOG-RT-MWD"&gt;  &lt;!-- какой объект --&gt;
+    &lt;startIndex uom="m"&gt;2766.50&lt;/startIndex&gt;  &lt;!-- с какой глубины: последняя полученная --&gt;
+    &lt;logCurveInfo&gt;&lt;mnemonic&gt;DEPT&lt;/mnemonic&gt;&lt;/logCurveInfo&gt;
+    &lt;logCurveInfo&gt;&lt;mnemonic&gt;GR&lt;/mnemonic&gt;&lt;/logCurveInfo&gt;   &lt;!-- нужны только эти кривые --&gt;
+    &lt;logCurveInfo&gt;&lt;mnemonic&gt;RPD&lt;/mnemonic&gt;&lt;/logCurveInfo&gt;
+    &lt;logData&gt;&lt;data/&gt;&lt;/logData&gt;            &lt;!-- пустой тег: «верни строки данных» --&gt;
+  &lt;/log&gt;
+&lt;/logs&gt;
+&lt;!-- OptionsIn: returnElements=data-only — только данные, без заголовка --&gt;</div>
+<p>Сервер отвечает тем же объектом, в котором заполнены запрошенные поля. Клиент запоминает новый endIndex и в следующий раз спрашивает с него. В WITSML 2.x вместо такого опроса клиент один раз подписывается на каналы по протоколу ETP, и сервер сам присылает новые значения, как только они появились.</p>
+
+<h3>Как программа разбирает logData</h3>
+<p>Пример на Python без библиотек WITSML, только со стандартным модулем XML. Он показывает главное: читать колонки по mnemonicList, отбрасывать nullValue и переводить единицы.</p>
+<div class="formula wl-code"><span class="cm"># Разбор logData из ответа WITSML 1.4.1.1 (учебный пример DrillHarmony)</span>
+import xml.etree.ElementTree as ET
+
+NS = {"w": "http://www.witsml.org/schemas/1series"}      <span class="cm"># пространство имён 1.4.1.1</span>
+ALIASES = {"GR": ["GR", "GRC", "GAMMA_API", "GK"],        <span class="cm"># свой словарь синонимов</span>
+           "RPD": ["RPD", "RES_DEEP", "UES_D"]}
+TO_SI = {"%": 0.01, "kg/m3": 0.001}                         <span class="cm"># перевод в единицы программы</span>
+
+def parse_log(xml_text):
+    log = ET.fromstring(xml_text).find("w:log", NS)
+    null = float(log.findtext("w:nullValue", "-999.25", NS))  <span class="cm"># чем помечено «нет данных»</span>
+    ld = log.find("w:logData", NS)
+    mnems = ld.findtext("w:mnemonicList", "", NS).split(",")  <span class="cm"># порядок колонок</span>
+    units = ld.findtext("w:unitList", "", NS).split(",")
+    channel = {}                                             <span class="cm"># колонка → канал программы</span>
+    for i, m in enumerate(mnems):
+        for key, names in ALIASES.items():
+            if m.upper() in names:
+                channel[i] = key
+    rows = []
+    for d in ld.findall("w:data", NS):
+        vals = d.text.split(",")
+        row = {"DEPT": float(vals[0])}                      <span class="cm"># первая колонка — индекс</span>
+        for i, key in channel.items():
+            v = float(vals[i]) if vals[i] != "" else null
+            if v == null:                                    <span class="cm"># пусто — пропускаем, не рисуем 0</span>
+                continue
+            row[key] = v * TO_SI.get(units[i], 1.0)
+        rows.append(row)
+    return rows</div>
+<p>То же самое делает лаборатория выше на вкладке «Мнемоники»: словарь синонимов распознаёт кривые, а то, что не распозналось, инженер назначает руками.</p>
+
+<h2>Мнемоники ННБ: основные кривые</h2>
+<p>Мнемоника — короткое имя кривой, обычно 2–8 латинских букв. Единого обязательного списка нет: стандарт WITSML требует, чтобы мнемоника была уникальной в объекте, но не говорит, как называть гамму. Ниже собраны типичные имена из файлов LAS и с серверов WITSML. На вашей станции они могут называться иначе, поэтому в лаборатории есть справочник, куда можно добавить свой синоним.</p>
+<h3>Параметры бурения (станция ГТИ)</h3>
+<div class="tablewrap tl"><table><thead><tr><th>Мнемоника</th><th>Что это</th><th>Единица WITSML</th><th>Частые синонимы</th></tr></thead><tbody>
+<tr><td>DEPT, DMEA</td><td>Глубина забоя по стволу — индекс</td><td>m</td><td>MD, DEPTH, GLUB</td></tr>
+<tr><td>BDEP, DBTM</td><td>Глубина долота</td><td>m</td><td>BITDEPTH, GLUB_DOL</td></tr>
+<tr><td>ROP</td><td>Механическая скорость</td><td>m/h</td><td>ROPA, MSP</td></tr>
+<tr><td>WOB</td><td>Нагрузка на долото</td><td>t, kN</td><td>WOBA, SWOB, NAGR</td></tr>
+<tr><td>RPM</td><td>Обороты ротора или СВП</td><td>rpm</td><td>RPMA, SRPM, OBOR</td></tr>
+<tr><td>TQ</td><td>Момент на роторе</td><td>kN.m</td><td>TQA, TORQ, MOM</td></tr>
+<tr><td>SPP</td><td>Давление на стояке</td><td>MPa</td><td>SPPA, DAVL</td></tr>
+<tr><td>FLWI</td><td>Расход на входе</td><td>L/s</td><td>MFIA, FLOW, RASH</td></tr>
+<tr><td>HKLD</td><td>Вес на крюке</td><td>t, kN</td><td>HKLA, HOOK, VES</td></tr>
+</tbody></table></div>
+<h3>Телесистема: инклинометрия, ориентирование, механика</h3>
+<div class="tablewrap tl"><table><thead><tr><th>Мнемоника</th><th>Что это</th><th>Единица</th><th>Частые синонимы</th></tr></thead><tbody>
+<tr><td>INC</td><td>Зенитный угол</td><td>dega</td><td>INCL, SINC, ZEN</td></tr>
+<tr><td>AZI</td><td>Азимут (с поправками)</td><td>dega</td><td>AZIM, SAZC, AZ</td></tr>
+<tr><td>GTF</td><td>Гравитационный toolface — от верхней стенки</td><td>dega</td><td>TFG, SGTF, UGOL_UST</td></tr>
+<tr><td>MTF</td><td>Магнитный toolface — от севера, на малых зенитах</td><td>dega</td><td>TFM, SMTF</td></tr>
+<tr><td>DLS</td><td>Интенсивность искривления</td><td>dega/30m</td><td>SDLS, DOGLEG, INT</td></tr>
+<tr><td>GX…GZ, BX…BZ</td><td>Сырые оси акселерометров и магнитометров</td><td>m/s2 или g; nT</td><td>AX…AZ, MX…MZ</td></tr>
+<tr><td>GTOT, BTOT, DIP</td><td>Полное поле тяжести и магнитное, магнитное наклонение — для контроля замера</td><td>g, nT, dega</td><td>GT, BT, MDIP</td></tr>
+<tr><td>TEMP</td><td>Температура в приборе</td><td>degC</td><td>TEMPDH, TMP</td></tr>
+<tr><td>SHK, VIBL, SSLP</td><td>Удары, поперечные вибрации, stick-slip</td><td>g, g, %</td><td>SHOCK, LATVIB, SSI</td></tr>
+<tr><td>PULSE, DQ</td><td>Амплитуда импульса и качество декодирования</td><td>kPa, %</td><td>PAMP, DECQ</td></tr>
+</tbody></table></div>
+<p>Как связаны сырые оси и замер, можно посчитать в калькуляторах <a href="../../calculators/raw-survey/">замер по сырым осям</a> и <a href="../../calculators/survey-axes/">оси по замеру</a>; как проверять замер по GTOT, BTOT и DIP, рассказано в статье <a href="../../articles/magnetic-qc/">Магнитные помехи и контроль замеров</a>.</p>
+<h3>Гамма-каротаж и сопротивление</h3>
+<div class="tablewrap tl"><table><thead><tr><th>Мнемоника</th><th>Что это</th><th>Единица</th><th>Как читать</th></tr></thead><tbody>
+<tr><td>GR, GRC</td><td>Гамма-каротаж, с поправкой за скважину</td><td>gAPI</td><td>Глины — высокие значения, чистые песчаники и карбонаты — низкие</td></tr>
+<tr><td>GRU, GRD</td><td>Азимутальный ГК: верхний и нижний сектор</td><td>gAPI</td><td>Верх растёт раньше низа — ствол подходит к глине сверху</td></tr>
+<tr><td>RPD, RPS</td><td>Сопротивление по сдвигу фазы: дальний и ближний зонд</td><td>ohm.m</td><td>Дальний зонд видит дальше от ствола и раньше «чувствует» границу пласта</td></tr>
+<tr><td>RAD, RAS</td><td>Сопротивление по затуханию</td><td>ohm.m</td><td>Глубже фазового, но менее чёткое по вертикали</td></tr>
+<tr><td>RT, RXO</td><td>Истинное сопротивление пласта и промытой зоны</td><td>ohm.m</td><td>Обычно после обработки, в реальном времени редко</td></tr>
+</tbody></table></div>
+<h3>Радиоактивный каротаж: нейтронный и плотностной</h3>
+<div class="tablewrap tl"><table><thead><tr><th>Мнемоника</th><th>Что это</th><th>Единица</th><th>Как читать</th></tr></thead><tbody>
+<tr><td>NPHI</td><td>Нейтронная пористость (по водородосодержанию), ННК</td><td>v/v или %</td><td>Шкала справа налево: 0,45 → −0,15. Глины и вода — высокие значения, газ — низкие</td></tr>
+<tr><td>RHOB</td><td>Объёмная плотность, ГГК-П</td><td>g/cm3</td><td>Шкала 1,95 → 2,95. Газ и высокая пористость снижают плотность</td></tr>
+<tr><td>DRHO</td><td>Поправка плотности за глинистую корку и зазор</td><td>g/cm3</td><td>Больше ±0,05 — плотности в этом интервале не доверяют</td></tr>
+<tr><td>PEF</td><td>Фотоэлектрический индекс — литология</td><td>b/e</td><td>Песчаник ~1,8, доломит ~3,1, известняк ~5,1</td></tr>
+<tr><td>CALI</td><td>Каверномер плотностного прибора</td><td>mm</td><td>Каверна — плотность и нейтрон искажены</td></tr>
+</tbody></table></div>
+<p>Классический приём: нейтрон и плотность рисуют на одной дорожке в совместимых шкалах. Если кривая плотности уходит левее нейтронной, это перекрытие, и в песчанике оно почти всегда означает газ. В лаборатории выберите шаблон «Радиоактивный каротаж»: в верхней части коллектора перекрытие закрашено красным.</p>
+
+<h2>Единицы: на чём ломается чаще всего</h2>
+<p>В WITSML у каждой кривой своя единица в атрибуте <code>uom</code> или в unitList. Это удобно, но программа обязана единицы читать и переводить. Частые ловушки:</p>
+<ul>
+<li><b>Пористость в процентах.</b> NPHI = 21 в процентах соответствует 0,21 в долях. Если не перевести, кривая уйдёт за шкалу. В лаборатории это источник «сервисная компания А».</li>
+<li><b>Плотность в kg/m3.</b> 2 310 kg/m3 = 2,31 g/cm3.</li>
+<li><b>Футы и метры.</b> Глубина в футах при метровом проекте сдвигает всё в 3,28 раза. Проверяйте в первый же час.</li>
+<li><b>Градусы.</b> В WITSML 1.4.1.1 градусы угла записываются как <code>dega</code>, а не <code>deg</code>.</li>
+<li><b>Нагрузка и вес.</b> На одной буровой WOB может прийти в тоннах, на другой в кН. 10 т ≈ 98 кН.</li>
+</ul>
+
+<h2>Типичные ошибки при подключении</h2>
+<ul>
+<li><b>Не та версия.</b> Сервер 1.3.1.1, а клиент шлёт запрос 1.4.1.1 с другим пространством имён. Сервер ответит ошибкой или пустым результатом. Сначала запросите GetCap: там список версий и объектов, которые сервер поддерживает.</li>
+<li><b>Несколько log на один ствол.</b> Реальное время, память прибора, данные по времени и по глубине лежат в разных объектах. Договоритесь, какой log основной, иначе программа покажет «дыры».</li>
+<li><b>nullValue принят за число.</b> −999.25 на гамма-каротаже ломает корреляцию и автошкалу.</li>
+<li><b>Глубина долота вместо глубины датчика.</b> Если отправитель не учёл смещение датчика, кривая съезжает на 10–20 м. Если учёл, а программа вычла ещё раз, она съедет в другую сторону.</li>
+<li><b>Повторы строк.</b> После обрыва связи сборщик может дописать уже отправленный интервал. Правило: строка с той же глубиной заменяет старую.</li>
+<li><b>Время без часового пояса.</b> В WITSML время записывается в формате ISO 8601 со смещением, например <code>2026-10-15T09:35:12+05:00</code>. Без смещения журнал операций и каротаж по времени разъедутся.</li>
+</ul>
+
+<h2>Опрос и поток: версии 1.3.1.1, 1.4.1.1 и 2.0</h2>
+<p>Модель ниже показывает те же данные как объекты на сервере: дерево объектов, запросы GetFromStore и разницу между опросом сервера и потоком ETP.</p>
+@@WM@@
+
+<h2>Чек-лист: подключаем сервер WITSML</h2>
+<ol>
+<li>Адрес сервера, логин и пароль, версия (GetCap).</li>
+<li>Список скважин и стволов: uid нужной скважины и ствола.</li>
+<li>Какие log есть на стволе, какой из них — реальное время, какой — память.</li>
+<li>Таблица мнемоник: кривая → что это → единица → глубина датчика учтена или нет.</li>
+<li>Как помечены пустые значения (nullValue).</li>
+<li>Интервал опроса: 15–30 с для замеров, 1–5 с для toolface в слайде; или подписка ETP.</li>
+<li>Кто и как дозаписывает данные после обрыва связи.</li>
+</ol>
+<div class="note"><b>Tempo</b> принимает WITS со станции ГТИ через сборщик на буровой и выдаёт данные по WITSML для мониторинга, <a href="../../etude/">Etude</a> и сторонних систем. Таблицу мнемоник настраивают один раз на подключение. <a href="../../tempo/">Подробнее о Tempo</a>.</div>
+<p class="small muted">Источники: открытые описания стандартов WITS и WITSML консорциума Energistics (energistics.org), справочник мнемоник LAS Канадского общества каротажа (CWLS). Примеры XML, мнемоники в примерах «сервисной компании» и модель — учебные и составлены DrillHarmony.</p>

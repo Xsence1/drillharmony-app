@@ -1,0 +1,1 @@
+window.calc=function(){if(!1===window.dhOK)return;const n=N("rho"),o=N("p"),t=N("tvd"),d=t>0,c=(n,o,t)=>document.getElementById(n).textContent=d?F(o,t):"—";c("o_k",n+o/(.00981*t),3),c("o_pp",.00981*n*t+o,2),c("o_d",o/(.00981*t),3)},window.calc();

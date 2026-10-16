@@ -1,0 +1,28 @@
+{
+  "appId": "com.drillharmony.app",
+  "appName": "DrillHarmony",
+  "webDir": "www",
+  "backgroundColor": "#0a0f14",
+  "android": {
+    "backgroundColor": "#0a0f14",
+    "allowMixedContent": false
+  },
+  "ios": {
+    "backgroundColor": "#0a0f14",
+    "contentInset": "never",
+    "scrollEnabled": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 600,
+      "launchAutoHide": true,
+      "backgroundColor": "#0a0f14",
+      "showSpinner": false
+    },
+    "SystemBars": {
+      "insetsHandling": "css",
+      "initialViewportFitValueHint": "cover",
+      "style": "DARK"
+    }
+  }
+}

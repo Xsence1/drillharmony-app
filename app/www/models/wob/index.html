@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ru" data-theme="dark"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0f14"><meta name="format-detection" content="telephone=no">
+<title>Сколько из разгрузки дойдёт до долота · DrillHarmony</title>
+<script src="../../assets/j/b82b602a49.js"></script><script src="../../assets/j/8963aff236.js"></script>
+<link rel="stylesheet" href="../../fonts/fonts.css"><link rel="stylesheet" href="../../assets/c/17f53e8b82.css"><link rel="stylesheet" href="../../assets/c/b31b379876.css"><link rel="stylesheet" href="../../assets/c/53fecde9f7.css">
+<link rel="stylesheet" href="../../app/app.css"><script src="../../app/app.js"></script>
+</head><body class="in-app k-model" data-slug="m-wob" data-path="articles/weight-transfer/#ia-wob" data-kind="model" data-name="Сколько из разгрузки дойдёт до долота">
+<header class="abar"><a class="ib" href="../../index.html" data-back aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></a>
+<div class="ttl"><small>Модели</small><span>Сколько из разгрузки дойдёт до долота</span></div><button class="ib star" type="button" aria-label="В избранное" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg></button>
+<button id="theme" type="button" hidden aria-hidden="true"></button></header>
+<main class="app-main">
+<article class="article"><section aria-label="Интерактивная модель: передача нагрузки на долото" class="wx ia" id="ia-wob">
+<div class="wx-top"><p class="hint">Задайте разгрузку по индикатору, длину горизонтали и трение. Колонна окрашена по осевой силе: голубой цвет означает растяжение, оранжевый сжатие, красный спиральный изгиб. Справа видно, сколько нагрузки реально получает долото.</p></div>
+<div class="ia-grid"><canvas aria-label="3D-вид ствола и колонны, окрашенной по осевой силе" class="ia-cv" id="wb-cv"></canvas>
+<div class="ia-side">
+<label class="ia-sl">Разгрузка по индикатору<output></output><input data-d="1" data-u=" т" id="wb-ind" max="40" min="0" step="0.5" type="range" value="12"/></label>
+<label class="ia-sl">Длина горизонтали<output></output><input data-u=" м" id="wb-lat" max="2500" min="200" step="50" type="range" value="1200"/></label>
+<label class="ia-sl">Коэффициент трения<output></output><input data-d="2" id="wb-mu" max="0.45" min="0.12" step="0.01" type="range" value="0.3"/></label>
+<label class="ia-sl">Интенсивность набора<output></output><input data-d="1" data-u="°/30 м" id="wb-bur" max="6" min="1.5" step="0.5" type="range" value="3"/></label>
+<label class="ia-sl">Плотность раствора<output></output><input data-d="2" data-u=" г/см³" id="wb-mud" max="1.6" min="1.0" step="0.02" type="range" value="1.16"/></label>
+<div class="ia-btns"><button class="wx-b on" data-m="slide" type="button">Слайд</button><button class="wx-b" data-m="osc" type="button">Слайд + осциллятор</button><button class="wx-b" data-m="rot" type="button">Ротор</button></div>
+<label class="wx-hold"><input id="wb-lub" type="checkbox"/> смазочная пачка (μ − 0,06)</label>
+<label class="ia-sl">Ноль индикатора<select id="wb-zero" style="grid-column:1/-1"><option selected="" value="so">при подаче вниз без вращения</option><option value="rot">при вращении на весу</option></select></label>
+<label class="wx-hold"><input id="wb-heavy" type="checkbox"/> ТБТ в вертикали, а не за КНБК</label>
+</div></div>
+<p class="ia-leg"><span><i style="background:#5ec8d8"></i>растяжение</span><span><i style="background:var(--amber)"></i>сжатие</span><span style="color:var(--bad,#ff8a6b)"><i style="background:var(--bad,#ff8a6b)"></i>спиральный изгиб</span></p>
+<p class="ia-note" id="wb-msg"></p>
+<div class="ia-outs"><div class="ia-o"><span>По индикатору</span><b id="wb-o-ind">—</b><small>т</small></div><div class="ia-o key"><span>На долоте</span><b id="wb-o-wob">—</b><small>т</small></div><div class="ia-o"><span>Потеряно на трение</span><b id="wb-o-loss">—</b><small>т</small></div><div class="ia-o"><span>Доходит</span><b id="wb-o-eff">—</b><small>%</small></div><div class="ia-o"><span>Нейтральная точка</span><b id="wb-o-np">—</b><small>м по стволу</small></div><div class="ia-o"><span>В спиральном изгибе</span><b id="wb-o-hel">—</b><small>м</small></div><div class="ia-o"><span>Перепад на ВЗД, оценка</span><b id="wb-o-dp">—</b><small>МПа</small></div></div>
+<canvas aria-label="Графики: осевая сила по стволу и кривая передачи нагрузки" class="ia-cv flat wb-ch" id="wb-ch" role="img" style="height:300px;margin-top:12px"></canvas>
+<p class="ia-hint">Модель мягкой нити: колонна считается гибкой нитью, лежащей на стенке, трение пропорционально прижатию. Сверху добавлено прижатие спирали при продольном изгибе. Колонна: КНБК 60 м, ТБТ 150 м, СБТ 127 мм, ствол 215,9 мм, вертикаль до 1 500 м. Перепад на ВЗД оценён грубо, 0,22 МПа на тонну, у вашего двигателя смотрите характеристику. Ноль индикатора можно выбрать: при подаче вниз (трение спуска уже вычтено) или при вращении на весу. Во втором случае индикатор врёт сильнее.</p>
+</section></article>
+<p class="src">На сайте: <a class="ext" href="https://drillharmony.com/articles/weight-transfer/#ia-wob" rel="noopener">drillharmony.com/articles/weight-transfer/#ia-wob</a></p>
+</main>
+
+<script src="../../assets/j/2d6f05688a.js"></script><script src="../../assets/j/82ef5376c6.js"></script><script src="../../assets/j/c9626ab6f5.js"></script><script src="../../assets/j/c7b6858526.js"></script>
+</body></html>

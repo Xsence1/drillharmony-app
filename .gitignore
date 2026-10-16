@@ -1,0 +1,5 @@
+app/node_modules/
+app/android/
+app/ios/
+__pycache__/
+*.pyc

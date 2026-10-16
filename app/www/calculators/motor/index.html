@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ru" data-theme="dark"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0f14"><meta name="format-detection" content="telephone=no">
+<title>ВЗД: момент и обороты · DrillHarmony</title>
+<script src="../../assets/j/b82b602a49.js"></script><script src="../../assets/j/8963aff236.js"></script>
+<link rel="stylesheet" href="../../fonts/fonts.css"><link rel="stylesheet" href="../../assets/c/17f53e8b82.css"><link rel="stylesheet" href="../../assets/c/b31b379876.css">
+<link rel="stylesheet" href="../../app/app.css"><script src="../../app/app.js"></script>
+</head><body class="in-app k-calc has-act" data-slug="motor" data-path="calculators/motor/" data-kind="calc" data-name="ВЗД: момент и обороты">
+<header class="abar"><a class="ib" href="../../index.html" data-back aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></a>
+<div class="ttl"><small>Бурение и КНБК</small><span>ВЗД: момент и обороты</span></div><button class="ib star" type="button" aria-label="В избранное" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg></button>
+<button id="theme" type="button" hidden aria-hidden="true"></button></header>
+<main class="app-main">
+<div class="article">
+
+
+
+<div class="calc" data-calc="motor"><div class="cout"><div class="co key"><span>Момент на долоте</span><b id="o_t">—</b><small>кН·м</small></div><div class="co key"><span>Обороты долота</span><b id="o_bit">—</b><small>об/мин</small></div><div class="co"><span>Рабочий перепад</span><b id="o_diff">—</b><small>МПа</small></div><div class="co"><span>Загрузка ВЗД</span><b id="o_load">—</b><small>%</small></div><div class="co"><span>Обороты ВЗД</span><b id="o_rpm">—</b><small>об/мин</small></div><div class="co"><span>Нагрузка по моменту, оценка</span><b id="o_wob">—</b><small>т</small></div><div class="co verdict"><span>Вывод</span><b id="o_v">—</b><small></small></div></div><div class="ci"><label data-u="МПа"><span data-u="МПа">Давление на холостом</span><input id="dp0" inputmode="decimal" value="16"/><small>МПа</small></label><label data-u="МПа"><span data-u="МПа">Давление под нагрузкой</span><input id="dp" inputmode="decimal" value="19"/><small>МПа</small></label><label data-u="МПа"><span data-u="МПа">Паспортный перепад при макс. моменте</span><input id="dmax" inputmode="decimal" value="5"/><small>МПа</small></label><label data-u="кН·м"><span data-u="кН·м">Паспортный макс. момент</span><input id="tmax" inputmode="decimal" value="12"/><small>кН·м</small></label><label data-u="об/мин"><span data-u="об/мин">Обороты ВЗД на холостом</span><input id="rpm0" inputmode="decimal" value="160"/><small>об/мин</small></label><label data-u="об/мин"><span data-u="об/мин">Обороты ротора</span><input id="srpm" inputmode="decimal" value="0"/><small>об/мин</small></label><label><span>Агрессивность долота μ</span><input id="mub" inputmode="decimal" value="0,8"/><small></small></label><label data-p="bit" data-u="мм"><span data-u="мм">Диаметр долота</span><input id="d" inputmode="decimal" value="215,9"/><small>мм</small></label></div></div>
+<div class="calc-act" hidden=""><button data-act="copy" type="button">Скопировать результат</button><button data-act="link" type="button">Поделиться</button><button data-act="reset" type="button">Сбросить</button></div>
+
+
+
+
+
+
+
+
+
+
+<details class="fold viz"><summary>Схема</summary><div class="fold-b"><section aria-label="Характеристика двигателя" class="wx ia ia-calc" id="iv-motor"><canvas aria-label="Характеристика двигателя" class="ia-cv flat" role="img" style="height:320px"></canvas></section></div></details><details class="fold ref"><summary>Как считается</summary><div class="fold-b"><h1>ВЗД: момент и обороты по перепаду</h1><p class="lead">В слайде нагрузку на долото надёжнее всего показывает перепад давления на ВЗД. По нему и паспорту двигателя калькулятор оценит момент, обороты и запас до срыва.</p><h2>Как считается</h2><div class="formula">Рабочий перепад  Δp = P(под нагрузкой) − P(холостой)
+Момент           T = Tmax · Δp / Δpmax
+Обороты          n ≈ n0 · (1 − 0,28 · (Δp/Δpmax)^1,6)    упрощённая форма кривой
+Нагрузка, оценка WOB ≈ 3 · T / (μ · D)</div><p>Момент двигателя прямо пропорционален перепаду, так устроена винтовая пара. Форма кривой оборотов у каждого двигателя своя: точные данные смотрите в паспорте и характеристике производителя при вашем расходе. Коэффициент μ («агрессивность» долота) зависит от типа долота и породы: у PDC обычно около 0,5–1,2, у шарошечных 0,15–0,3. Точнее его подбирают по факту: сравните оценку с нагрузкой по индикатору при вращении, когда трение колонны мало.</p><h2>Как пользоваться</h2><ul>
+<li><b>Холостой перепад меряйте на весу</b>, при том же расходе, перед постановкой на забой. Он растёт с глубиной и плотностью раствора, поэтому перемеряйте его после каждого наращивания.</li>
+<li><b>Держите загрузку 50–80 %.</b> Выше быстрее изнашивается статор и ближе срыв; ниже нагрузка не доходит до долота.</li>
+<li><b>Срыв видно по стояку:</b> давление резко выросло и не падает, механическая скорость упала до нуля. Снимите нагрузку, не наращивая давление.</li>
+</ul><p>Подробно в статье <a class="ext" href="https://drillharmony.com/articles/motor-curve/" rel="noopener">Характеристика ВЗД и срыв двигателя</a>.</p><p class="small muted calc-more">Расчёт справочный. Проектные решения принимаются по утверждённым методикам и программе на бурение.</p></div></details></div>
+<p class="src">На сайте: <a class="ext" href="https://drillharmony.com/calculators/motor/" rel="noopener">drillharmony.com/calculators/motor/</a></p>
+</main>
+<nav class="actbar" aria-label="Действия"><button type="button" data-a="prof"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M8 7h8M7 11h10M9 16h6"/></svg><span>Профиль</span></button><button type="button" data-a="reset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.6"/><path d="M4 4v4.6h4.6"/></svg><span>Сбросить</span></button><button type="button" data-a="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg><span>Копировать</span></button><button type="button" data-a="share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span>Поделиться</span></button><button type="button" data-a="save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>В историю</span></button></nav>
+<script src="../../assets/j/518f08db58.js"></script><script src="../../assets/j/bfd7382c0a.js"></script><script src="../../assets/j/1ec0dde8f1.js"></script><script src="../../assets/j/82ef5376c6.js"></script><script src="../../assets/j/ccadc3f02b.js"></script><script src="../../assets/j/c7b6858526.js"></script>
+</body></html>

@@ -1,0 +1,1 @@
+(()=>{const e=document.getElementById("tvideo");if(!e||!window.fetch)return;const t=e.querySelector("source").src;fetch(t,{method:"HEAD"}).then(t=>{t.ok||(e.removeAttribute("controls"),e.closest("figure").classList.add("soon"),e.closest("figure").querySelector(".tvid-soon").hidden=!1)}).catch(()=>{})})();

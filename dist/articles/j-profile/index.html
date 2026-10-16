@@ -1,0 +1,100 @@
+<!doctype html>
+<!-- DrillHarmony · © ИП Шайсламова А. В. · drillharmony.com · Материалы сайта защищены авторским правом. Копирование без письменного разрешения правообладателя запрещено. -->
+<html lang="ru" data-theme="dark"><head><meta charset="utf-8"><script src="../../assets/j/b82b602a49.js"></script><meta name="author" content="DrillHarmony, ИП Шайсламова А. В."><meta name="copyright" content="© ИП Шайсламова А. В., drillharmony.com"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Расчёт J-профиля скважины: радиус, набор угла и отход | DrillHarmony</title>
+<meta name="description" content="Как рассчитать J-профиль наклонно-направленной скважины: радиус искривления по интенсивности °/10 м, длина набора, отход и глубина по стволу. Прямая и обратная задача с примерами.">
+<link rel="canonical" href="https://drillharmony.com/articles/j-profile/">
+<meta property="og:type" content="website"><meta property="og:locale" content="ru_RU"><meta property="og:site_name" content="DrillHarmony.com">
+<meta property="og:url" content="https://drillharmony.com/articles/j-profile/"><meta property="og:title" content="Расчёт J-профиля скважины: радиус, набор угла и отход | DrillHarmony"><meta property="og:description" content="Как рассчитать J-профиль наклонно-направленной скважины: радиус искривления по интенсивности °/10 м, длина набора, отход и глубина по стволу. Прямая и обратная задача с примерами.">
+<meta property="og:image" content="https://drillharmony.com/og/article-j.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../../favicon.ico" sizes="any"><link rel="icon" href="../../favicon.svg" type="image/svg+xml"><link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="../../apple-touch-icon.png"><meta name="theme-color" content="#080d10">
+<link rel="stylesheet" href="../../fonts/fonts.css"><link rel="stylesheet" href="../../assets/c/17f53e8b82.css"><link rel="stylesheet" href="../../assets/c/b31b379876.css">
+<script src="../../assets/j/8963aff236.js"></script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://drillharmony.com/#org", "name": "DrillHarmony", "url": "https://drillharmony.com/", "logo": "https://drillharmony.com/icon-512.png", "email": "info@drillharmony.com"}, {"@type": "Article", "headline": "Расчёт J-профиля скважины", "description": "Как рассчитать J-профиль наклонно-направленной скважины: радиус искривления по интенсивности °/10 м, длина набора, отход и глубина по стволу. Прямая и обратная задача с примерами.", "inLanguage": "ru", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "author": {"@id": "https://drillharmony.com/#org"}, "publisher": {"@id": "https://drillharmony.com/#org"}, "mainEntityOfPage": "https://drillharmony.com/articles/j-profile/", "image": "https://drillharmony.com/og/article-j.png"}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "DrillHarmony", "item": "https://drillharmony.com/"}, {"@type": "ListItem", "position": 2, "name": "Статьи", "item": "https://drillharmony.com/articles/"}, {"@type": "ListItem", "position": 3, "name": "Расчёт J-профиля скважины", "item": "https://drillharmony.com/articles/j-profile/"}]}]}</script>
+</head><body>
+<header class="top"><div class="w"><a class="mark" href="../../" aria-label="DrillHarmony — на главную"><svg viewBox="0 0 28 28" width="26" height="26" aria-hidden="true"><g stroke="currentColor" stroke-width="1.2" opacity=".45"><path d="M2 6h24M2 10h24M2 14h24"/></g><path d="M7 3v8c0 5 3 9 8 11.5 2.5 1.2 5 1.8 8 1.8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><circle cx="23.5" cy="24.3" r="2.6" fill="currentColor"/></svg> DrillHarmony</a>
+<nav class="nav"><a href="../../etude/">Etude</a><a href="../../tempo/">Tempo</a><a href="../../slidex/">SlideX</a><a href="../../articles/" aria-current="page">Статьи</a><a href="../../calculators/">Калькуляторы</a><button class="tgl" id="theme" type="button" aria-label="Переключить тему" title="Светлая / тёмная тема"><svg class="moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="currentColor"/></svg><svg class="sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg></button></nav></div></header>
+<nav class="crumbs w" aria-label="Навигация"><a href="../../">DrillHarmony</a> / <a href="../../articles/">Статьи</a> / Расчёт J-профиля скважины</nav>
+<main>
+<div class="w artwrap"><aside class="anav-wrap"><details class="anav" open><summary>Все статьи</summary><nav aria-label="Статьи"><div class="ang"><div class="ang-h">Траектория</div><a href="../../articles/minimum-curvature/">Метод минимальной кривизны</a><a href="../../articles/j-profile/" aria-current="page">Расчёт J-профиля</a><a href="../../articles/dogleg-severity/">Интенсивность искривления</a><a href="../../articles/azimuth-declination/">Азимуты и магнитное склонение</a><a href="../../articles/separation-factor/">Коэффициент разделения SF</a><a href="../../articles/magnetic-qc/">Магнитные помехи и контроль замеров</a><a href="../../articles/geosteering/">Геонавигация</a><a href="../../articles/landing/">Посадка горизонтали</a><a href="../../articles/gyro/">Гироскоп: когда обязателен</a><a href="../../articles/sidetrack/">Боковой ствол и зарезка</a></div><div class="ang"><div class="ang-h">Ориентирование и КНБК</div><a href="../../articles/toolface/">Отклонитель и реактивный момент</a><a href="../../articles/bha-build/">КНБК для набора кривизны</a><a href="../../articles/rss-vs-motor/">РУС или ВЗД</a><a href="../../articles/weight-transfer/">Передача нагрузки в слайде</a><a href="../../articles/wob-loss/">Нагрузка не доходит до долота</a><a href="../../articles/slide-hacks/">Лайфхаки слайда</a><a href="../../articles/motor-curve/">Характеристика ВЗД и срыв</a></div><div class="ang"><div class="ang-h">Бурение, долото, колонна</div><a href="../../articles/mse/">MSE: эффективность бурения</a><a href="../../articles/bit-hydraulics/">Гидравлика долота</a><a href="../../articles/broomstick/">«Метла»: вес на крюке</a><a href="../../articles/casing-run/">Спуск колонны в горизонталь</a></div><div class="ang"><div class="ang-h">Гидравлика и осложнения</div><a href="../../articles/ecd/">ЭЦП</a><a href="../../articles/hole-cleaning/">Очистка ствола</a><a href="../../articles/kick/">ГНВП и глушение</a><a href="../../articles/stuck-pipe/">Прихват колонны</a><a href="../../articles/vibration/">Вибрации и stick-slip</a><a href="../../articles/mwd-telemetry/">Сбои телесистемы</a></div><div class="ang"><div class="ang-h">Данные, программы, обучение</div><a href="../../articles/wits-witsml/">WITS: поток с буровой</a><a href="../../articles/witsml/">WITSML с нуля</a><a href="../../articles/migration/">Переход на новое ПО</a><a href="../../articles/ai-well-planning/">ИИ в проектировании</a><a href="../../articles/nnb-training/">Обучение инженеров ННБ</a><a href="../../articles/reporting/">Отчётность инженера ННБ</a><a href="../../articles/interview/">Вопросы на собеседовании</a><a href="../../articles/glossary/">Словарь терминов</a><a href="../../articles/dictionary/">Словарь RU–EN</a></div><div class="ang ang-more"><a href="../../articles/">Все статьи</a><a href="../../calculators/">Калькуляторы</a></div></nav></details></aside>
+<article class="article">
+<div class="eyebrow">Статьи · траектории</div>
+<h1>Расчёт J-профиля скважины</h1>
+<p class="lead">J-профиль — самый простой наклонно-направленный профиль: вертикальный участок, участок набора зенитного угла и прямолинейный наклонный участок до цели. На нём удобно разобрать базовые расчёты, из которых складываются и более сложные профили.</p>
+<div class="tldr"><b>Коротко</b><ul><li>J-профиль — это вертикаль, участок набора угла и прямой наклонный участок до цели.</li><li>Зная глубину зарезки, интенсивность и угол, можно заранее посчитать, где закончится набор и какой будет отход на цели.</li><li>Обратная задача: какой нужен угол, чтобы попасть в цель с заданным отходом. Если решения нет, при такой интенсивности в цель не попасть.</li></ul><div class="tldr-act"><button type="button" class="fx-all" aria-pressed="false">Подробнее на формулах</button></div></div>
+<section class="wx ia" id="ia-jp" aria-label="Интерактивная 3D-модель J-профиля">
+<div class="wx-top"><div class="eyebrow">Интерактивная 3D-модель</div><b>J-профиль: от зарезки до цели</b><p>Задайте точку зарезки, интенсивность и угол или отход цели, и модель сама подберёт угол. Кнопка «Пробурить» проведёт долото по профилю.</p></div>
+<div class="wx-tabs"><button type="button" class="on" data-m="th">Знаю угол</button><button type="button" data-m="x">Знаю отход цели</button></div>
+<div class="ia-grid"><canvas class="ia-cv" aria-label="3D-вид J-профиля: вертикаль, набор, тангенциальный участок и цель"></canvas>
+<div class="ia-side">
+<label class="ia-sl">Зарезка (KOP)<output></output><input type="range" id="jp-kop" min="100" max="1500" step="10" value="500" data-u=" м"></label>
+<label class="ia-sl">Интенсивность<output></output><input type="range" id="jp-i" min=".5" max="4" step=".1" value="1.5" data-u="°/10 м" data-d="1"></label>
+<label class="ia-sl" id="jp-thw">Угол набора<output></output><input type="range" id="jp-th" min="5" max="80" step=".5" value="35" data-u="°" data-d="1"></label>
+<label class="ia-sl" id="jp-xw" hidden>Отход цели<output></output><input type="range" id="jp-x" min="100" max="2500" step="10" value="1200" data-u=" м"></label>
+<label class="ia-sl">Вертикальная глубина цели<output></output><input type="range" id="jp-tvd" min="800" max="3500" step="10" value="2000" data-u=" м"></label>
+<label class="ia-sl">Азимут профиля<output></output><input type="range" id="jp-az" min="0" max="359" step="1" value="60" data-u="°"></label>
+<button type="button" class="wx-b pri" id="jp-go">Пробурить</button>
+</div></div>
+<p class="ia-leg"><span><i style="background:var(--ink)"></i>вертикаль</span><span><i style="background:var(--amber)"></i>набор угла — дуга радиусом R</span><span style="color:#5ec8d8"><i style="background:#5ec8d8"></i>тангенциальный участок</span><span>пунктир — проекция на поверхность</span></p>
+<p class="ia-note" id="jp-err" hidden></p>
+<div class="ia-outs"><div class="ia-o key"><span>Угол набора</span><b id="jp-o-th">—</b><small>°</small></div><div class="ia-o key"><span>Отход на цели</span><b id="jp-o-ht">—</b><small>м</small></div><div class="ia-o"><span>Радиус R</span><b id="jp-o-r">—</b><small>м</small></div><div class="ia-o"><span>Длина набора</span><b id="jp-o-lb">—</b><small>м</small></div><div class="ia-o"><span>TVD конца набора</span><b id="jp-o-tb">—</b><small>м</small></div><div class="ia-o"><span>Отход в конце набора</span><b id="jp-o-hb">—</b><small>м</small></div><div class="ia-o"><span>Тангенциальный участок</span><b id="jp-o-lt">—</b><small>м</small></div><div class="ia-o"><span>Глубина по стволу на цели</span><b id="jp-o-md">—</b><small>м</small></div></div>
+</section>
+
+<h2>Радиус искривления</h2>
+<p>Интенсивность искривления i задают в градусах на 10 м. Участок набора с постоянной интенсивностью — дуга окружности радиусом:</p>
+<details class="fx"><summary>Показать формулу</summary><div class="formula">R = 180 · 10 / (π · i) ≈ 573 / i,  м</div></details>
+<p>Длина участка набора до угла θ:</p>
+<details class="fx"><summary>Показать формулу</summary><div class="formula">Lнаб = θ / i · 10</div></details>
+<h2>Координаты конца набора</h2>
+<p>От точки зарезки (глубина KOP) до конца набора ствол проходит по дуге:</p>
+<details class="fx"><summary>Показать формулу</summary><div class="formula">TVDнаб = KOP + R · sin θ
+Отходнаб = R · (1 − cos θ)</div></details>
+<p>На прямолинейном участке до глубины цели TVDц:</p>
+<details class="fx"><summary>Показать формулу</summary><div class="formula">Lтанг = (TVDц − TVDнаб) / cos θ
+Отход = Отходнаб + (TVDц − TVDнаб) · tg θ</div></details>
+<h2>Пример: прямой расчёт</h2>
+<p>Зарезка на 500 м, интенсивность 1,5°/10 м, набор до 35°, цель на вертикальной глубине 2000 м.</p>
+<div class="tablewrap"><table><thead><tr><th>Величина</th><th>Значение</th></tr></thead><tbody><tr><td>Радиус R</td><td>382,0 м</td></tr><tr><td>Длина набора</td><td>233,3 м</td></tr><tr><td>TVD конца набора</td><td>719,1 м</td></tr><tr><td>Отход в конце набора</td><td>69,1 м</td></tr><tr><td>Длина тангенциального участка</td><td>1563,7 м</td></tr><tr><td>Отход на цели</td><td><b>966,0 м</b></td></tr><tr><td>Глубина по стволу на цели</td><td><b>2297,0 м</b></td></tr></tbody></table></div>
+<h2>Обратная задача: угол под заданный отход</h2>
+<p>На практике отход и глубина цели известны, а угол нужно найти. Обозначим x — отход цели, y = TVDц − KOP. Из условия, что ствол после дуги идёт по касательной прямо в цель, получается квадратное уравнение относительно tg(θ/2):</p>
+<details class="fx"><summary>Показать формулу</summary><div class="formula">(2R − x) · t² − 2y · t + x = 0,   t = tg(θ/2)
+θ = 2 · arctg[(y − √(y² − x · (2R − x))) / (2R − x)]</div></details>
+<p>Для отхода 1200 м при той же зарезке и интенсивности получаем θ = <b>41,52°</b>. Если подкоренное выражение отрицательно, при такой интенсивности в цель не попасть: нужно поднять точку зарезки или увеличить интенсивность.</p>
+<h2>Что учитывают в реальном проекте</h2>
+<ul><li>Интенсивность, которую реально даст КНБК в данных породах, а не только желаемую.</li>
+<li>Ограничения по нагрузкам и моменту: большой угол на длинном тангенциальном участке увеличивает трение.</li>
+<li>Сближения с соседними стволами: профиль подбирают вместе с антиколлизией.</li>
+<li>Допуски на попадание в цель и прогноз отклонения по факту бурения.</li></ul>
+<div class="note"><b>В Etude</b> типовые профили J, S и горизонтальные строятся решателем «на цель», а <a href="../../etude/">автоподбор</a> перебирает сотни вариантов с учётом SF, интенсивности и момента.</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<section class="rel" aria-label="Связанные материалы"><h2>Связанные материалы</h2><div class="rel-g"><a href="../../tools/trajectory/"><small>Инструмент</small>Траектория из таблицы в 3D</a><a href="../../calculators/dogleg/"><small>Калькулятор</small>Перевод интенсивности</a><a href="../../calculators/landing/"><small>Калькулятор</small>Посадка на цель</a><a href="../../articles/minimum-curvature/"><small>Статья</small>Метод минимальной кривизны</a><a href="../../articles/landing/"><small>Статья</small>Посадка горизонтали</a><a href="../../tests/#trajectory"><small>Тест</small>Траектория и замеры</a><a class="prod" href="../../etude/"><small>Программа</small>Etude — проектирование траекторий и расчёты</a></div></section>
+<nav class="apn" aria-label="Соседние статьи"><a class="prev" href="../../articles/minimum-curvature/"><small>Предыдущая</small>Метод минимальной кривизны</a><a class="next" href="../../articles/dogleg-severity/"><small>Следующая</small>Интенсивность искривления</a></nav>
+</article></div>
+<script src="../../assets/j/4431636cc5.js"></script>
+<div class="w"><div class="cta"><div><h2>Профили и автоподбор в Etude</h2><p>Траектории, сближения, нагрузки, гидравлика и колонны в одном проекте, прямо в браузере.</p></div><div class="btns"><a class="btn pri" href="../../etude/">Подробнее об Etude</a></div></div></div>
+<script src="../../assets/j/2d6f05688a.js"></script>
+<script src="../../assets/j/82ef5376c6.js" data-ia="dh3d"></script>
+<script src="../../assets/j/6c5bb26072.js" data-ia="ia-jp"></script>
+</main>
+<footer><div class="w">
+<div><b style="color:var(--ink)">DrillHarmony</b> · Etude · Tempo · SlideX<br>ИП Шайсламова Анастасия Васильевна · ИНН 780445570608 · <a href="../../privacy.html">Политика обработки персональных данных</a><br>© 2026 DrillHarmony. Материалы сайта защищены авторским правом. При цитировании нужна ссылка на drillharmony.com.</div>
+<div><a href="mailto:info@drillharmony.com">info@drillharmony.com</a></div>
+</div></footer>
+<script src="../../assets/j/c7b6858526.js"></script>
+<script src="../../assets/j/c2d704c603.js" defer></script>
+</body></html>

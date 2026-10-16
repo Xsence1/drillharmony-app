@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ru" data-theme="dark"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0f14"><meta name="format-detection" content="telephone=no">
+<title>Просмотр LAS · DrillHarmony</title>
+<script src="../../assets/j/b82b602a49.js"></script><script src="../../assets/j/8963aff236.js"></script>
+<link rel="stylesheet" href="../../fonts/fonts.css"><link rel="stylesheet" href="../../assets/c/17f53e8b82.css"><link rel="stylesheet" href="../../assets/c/b31b379876.css"><link rel="stylesheet" href="../../assets/c/53fecde9f7.css"><link rel="stylesheet" href="../../assets/c/6e1a386c5f.css"><link rel="stylesheet" href="../../assets/c/37061930c4.css">
+<link rel="stylesheet" href="../../app/app.css"><script src="../../app/app.js"></script>
+</head><body class="in-app k-tool" data-slug="las-viewer" data-path="tools/las-viewer/" data-kind="tool" data-name="Просмотр LAS">
+<header class="abar"><a class="ib" href="../../index.html" data-back aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></a>
+<div class="ttl"><small>Инструменты</small><span>Просмотр LAS</span></div><button class="ib star" type="button" aria-label="В избранное" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg></button>
+<button id="theme" type="button" hidden aria-hidden="true"></button></header>
+<main class="app-main">
+<article class="article">
+
+<h1 class="vh">Просмотр LAS онлайн</h1>
+<p class="lead hint">Откройте файл LAS прямо в приложении: планшет с ГК, сопротивлением, нейтроном и плотностью, свои дорожки и шкалы, значения на любой глубине и картинка для отчёта. Файл не загружается на сервер, всё читается на вашем устройстве.</p>
+<section aria-label="Просмотр LAS-файла" class="wx lv" id="lv">
+<div class="lv-drop" id="lv-drop"><b>Откройте LAS-файл</b><span>или</span><label class="btn pri lv-pick">Выбрать файл<input hidden="" id="lv-file" type="file"/></label><button class="btn" id="lv-sample" type="button">Открыть учебный пример</button><small>LAS 1.2 и 2.0, кодировки UTF-8 и Windows-1251. Файл остаётся у вас.</small></div>
+<p class="lv-msg" id="lv-msg"></p>
+<div hidden="" id="lv-work">
+<div class="wl-ctl"><span class="wx-spd">Окно <button data-span="20" type="button">20 м</button><button data-span="50" type="button">50 м</button><button data-span="150" type="button">150 м</button><button data-span="all" type="button">весь</button></span><span class="wl-ro" id="lv-range"></span><button class="wx-b" id="lv-png" type="button">Сохранить картинку</button></div>
+<p class="wl-ro" id="lv-ro">Наведите на планшет, чтобы увидеть значения. Колесо прокручивает, Ctrl + колесо меняет масштаб, перетаскивание сдвигает.</p>
+<div class="wl-plw lv-plw"><canvas aria-label="Планшет каротажа из LAS-файла" id="lv-cv" role="img"></canvas></div>
+<h3>Дорожки</h3><p class="ia-hint">Кривые распознаются по мнемоникам автоматически: ГК, сопротивление, нейтрон, плотность, PEF, каверномер. Кривые и шкалы можно поменять, до трёх кривых на дорожку.</p>
+<div class="wl-edt" id="lv-ed"></div>
+<h3>Кривые в файле</h3><div class="wl-map tablewrap" id="lv-tab"></div>
+</div>
+</section>
+<h2>Что такое LAS</h2>
+<p>LAS (Log ASCII Standard) — открытый текстовый формат каротажа, который поддерживает Канадское общество каротажа (CWLS). Файл состоит из секций: ~V — версия, ~W — скважина и диапазон глубин, ~C — список кривых с единицами, ~P — параметры, ~A — сами данные столбцами.</p>
+<div class="formula">~Curve information
+ DEPT.M      : Measured depth        ← мнемоника.единица : описание
+ GR  .GAPI   : Gamma ray
+~A
+ 2400.0   105.3                      ← значения в порядке ~C</div>
+<ul>
+<li><b>NULL</b> в секции ~W задаёт значение «нет данных», обычно −999.25. Просмотрщик его не рисует.</li>
+<li><b>WRAP YES</b> означает, что строка данных разбита на несколько строк файла. Просмотрщик читает и такие файлы.</li>
+<li><b>Кодировка.</b> Российские программы часто пишут LAS в Windows-1251, названия скважин и описания кривых откроются правильно.</li>
+</ul>
+<p>Как называются кривые телесистемы и каротажа и как их сопоставлять, рассказано в статье <a class="ext" href="https://drillharmony.com/articles/witsml/" rel="noopener">WITSML с нуля</a>, раздел «Мнемоники ННБ».</p>
+<div class="note"><b>Каротаж в реальном времени</b> со станций ГТИ и телесистем, а не из файлов, смотрят в <a class="ext" href="https://drillharmony.com/tempo/" rel="noopener">Tempo</a>.</div>
+</article>
+<p class="src">На сайте: <a class="ext" href="https://drillharmony.com/tools/las-viewer/" rel="noopener">drillharmony.com/tools/las-viewer/</a></p>
+</main>
+
+<script src="../../assets/j/d4cb0249e5.js"></script><script src="../../assets/j/c7b6858526.js"></script>
+</body></html>

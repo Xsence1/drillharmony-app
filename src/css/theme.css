@@ -1,0 +1,187 @@
+/* DrillHarmony — общий стиль 2026-10: шрифт Inter, шапка с действиями, кнопки,
+   мобильное меню, поиск. Подключается на всех страницах после основного CSS. */
+:root {
+  --display: "Inter", "Segoe UI", Arial, sans-serif;
+  --body: "Inter", "Segoe UI", Arial, sans-serif;
+  --amber: #f5a524;
+  --amber2: #ffbe4d;
+  --accent-ink: #1a1203;
+  --radius: 16px;
+}
+:root[data-theme=light] { --amber: #c26f06; --amber2: #e08a12; }
+body { font-family: var(--body); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+h1, h2, h3, h4 { font-family: var(--display); font-weight: 800; letter-spacing: -.022em; }
+h3 { font-weight: 700; letter-spacing: -.012em; }
+.article h1 { font-weight: 800; letter-spacing: -.03em; line-height: 1.08; }
+.article h2 { font-weight: 800; letter-spacing: -.02em; }
+.eyebrow { font: 700 11.5px var(--body); letter-spacing: .14em; color: var(--amber); display: flex; align-items: center; gap: 10px; }
+.eyebrow::before { content: ""; width: 3px; height: 14px; border-radius: 2px; background: var(--amber); flex: none; }
+img, video, canvas, svg, iframe { max-width: 100%; }
+canvas { box-sizing: border-box; }
+.article, .article * { min-width: 0; }
+.wx, .ia, .calc, .tablewrap, .formula { max-width: 100%; }
+
+/* ---------- шапка ---------- */
+.top { background: color-mix(in srgb, var(--bg) 78%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--line) 80%, transparent); }
+.top .w { padding-block: 0; min-height: 66px; gap: 18px; }
+.mark { font-family: var(--body) !important; font-weight: 800 !important; letter-spacing: -.02em; font-size: 21px !important; }
+.mark svg { color: var(--amber); }
+.nav { gap: 4px; font-size: 14.5px; align-self: stretch; }
+.nav > a { position: relative; display: flex; align-items: center; padding: 0 14px; height: 100%; color: color-mix(in srgb, var(--ink) 78%, var(--muted)); font-weight: 500; transition: color .15s; }
+.nav > a:hover { color: var(--ink); }
+.nav > a[aria-current], .nav > a.on { color: var(--ink); font-weight: 600; }
+.nav > a[aria-current]::after, .nav > a.on::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: -1px; height: 2px; border-radius: 2px; background: var(--amber); }
+.nav .tgl { align-self: center; }
+.hact { display: flex; align-items: center; gap: 10px; margin-left: 14px; padding-left: 16px; border-left: 1px solid var(--line); align-self: center; }
+.hact .tgl { background: transparent; }
+.hbtn { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 20px; border-radius: 999px; font: 600 14px var(--body); text-decoration: none; white-space: nowrap; border: 1px solid color-mix(in srgb, var(--ink) 26%, transparent); color: var(--ink); background: transparent; cursor: pointer; transition: border-color .15s, background .15s, color .15s; }
+.hbtn:hover { border-color: var(--amber); color: var(--amber); }
+.hbtn.pri { background: var(--amber); border-color: transparent; color: var(--accent-ink); }
+.hbtn.pri:hover { background: var(--amber2); color: var(--accent-ink); }
+.hbtn svg { flex: none; }
+.login { position: relative; }
+.login-m { position: absolute; right: 0; top: calc(100% + 8px); min-width: 230px; padding: 6px; border-radius: 14px; border: 1px solid var(--line); background: var(--panel); box-shadow: 0 24px 60px -24px rgba(0, 0, 0, .6); z-index: 20; }
+.login-m a { display: grid; gap: 1px; padding: 10px 12px; border-radius: 10px; color: var(--ink); text-decoration: none; font-weight: 600; font-size: 14px; }
+.login-m a small { color: var(--muted); font-weight: 400; font-size: 12px; }
+.login-m a:hover { background: color-mix(in srgb, var(--amber) 12%, transparent); }
+.burger { display: none !important; }
+.mnav { position: absolute; left: 0; right: 0; top: 100%; display: grid; gap: 2px; padding: 10px 16px 16px; background: var(--bg); border-bottom: 1px solid var(--line); box-shadow: 0 30px 60px -30px rgba(0, 0, 0, .7); max-height: calc(100vh - 70px); overflow: auto; }
+.mnav[hidden] { display: none; }
+.mnav a { display: flex; align-items: center; justify-content: space-between; padding: 13px 12px; border-radius: 10px; color: var(--ink); text-decoration: none; font-weight: 600; font-size: 16px; border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent); }
+.mnav a::after { content: "›"; color: var(--amber); font-size: 20px; line-height: 1; }
+.mnav a[aria-current] { color: var(--amber); }
+.mnav .mrow { display: flex; gap: 10px; padding-top: 12px; }
+.mnav .mrow .hbtn { flex: 1; justify-content: center; }
+.mnav .mrow a::after { content: none; }
+.mnav .mrow a { border-bottom: 0; padding: 0 16px; font-size: 14px; }
+
+@media (max-width: 960px) {
+  .nav > a:not(.btn) { display: none !important; }
+  .burger { display: grid !important; }
+  .hact { border-left: 0; padding-left: 0; margin-left: auto; }
+  .nav { margin-left: auto; }
+}
+@media (max-width: 560px) { .hact .hbtn.pri { display: none; } .mark { font-size: 19px !important; } }
+
+/* ---------- поиск ---------- */
+.sdlg { width: min(640px, calc(100vw - 24px)); max-height: min(70vh, 640px); padding: 0; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); color: var(--ink); box-shadow: 0 40px 120px -30px rgba(0, 0, 0, .8); margin-top: 10vh; }
+.sdlg::backdrop { background: rgba(4, 8, 10, .6); backdrop-filter: blur(4px); }
+.sdlg input { width: 100%; box-sizing: border-box; padding: 18px 20px; font: 500 17px var(--body); border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--ink); outline: none; }
+.sres { max-height: calc(min(70vh, 640px) - 64px); overflow: auto; padding: 6px; }
+.sres a { display: grid; gap: 2px; padding: 11px 14px; border-radius: 10px; color: var(--ink); text-decoration: none; }
+.sres a small { color: var(--muted); font-size: 13px; line-height: 1.4; }
+.sres a i { font: normal 600 10.5px var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--amber); }
+.sres a:hover, .sres a.sel { background: color-mix(in srgb, var(--amber) 11%, transparent); }
+.sres p { color: var(--muted); padding: 14px; margin: 0; }
+
+/* ---------- кнопки и карточки ---------- */
+.btn { border-radius: 999px; font-weight: 600; font-family: var(--body); }
+.btn.pri, .btn.pri:hover { background: var(--amber); color: var(--accent-ink); }
+.btn.pri:hover { background: var(--amber2); filter: none; }
+.btn.pri::after { content: ""; width: 16px; height: 16px; flex: none; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 8h11M9 4l4 4-4 4' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 8h11M9 4l4 4-4 4' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; transition: transform .2s; }
+.btn.pri:hover::after { transform: translateX(3px); }
+button.btn.pri::after { display: none; }
+.cta { border-radius: 20px; background: linear-gradient(100deg, color-mix(in srgb, var(--bg) 90%, transparent) 30%, color-mix(in srgb, var(--bg) 40%, transparent)), url(../../media/hero-rig-1200.webp) right center/cover no-repeat, var(--panel); }
+.cta h2 { font-weight: 800; }
+.crumbs { font: 500 12.5px var(--body); }
+.anav .ang-h { font: 700 11px var(--body); letter-spacing: .12em; }
+.tldr { border-radius: var(--radius); }
+.formula { border-radius: 12px; }
+footer { border-top: 1px solid var(--line); }
+
+/* ---------- приборы WITS / WITSML: без анимаций ---------- */
+.wx-g, .wx-g:hover { transition: none !important; transform: none !important; box-shadow: none !important; }
+.wx-g.pulse::after { content: none !important; animation: none !important; }
+.wx-ga .fg, .wx-ga .nd { transition: none !important; }
+.wx-g.open .wx-gi { animation: none !important; }
+
+/* ---------- мобильная вёрстка ---------- */
+@media (max-width: 700px) {
+  .ia-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .ia-cv { width: 100% !important; }
+  .wx { padding-inline: 14px !important; }
+  .calc { padding: 16px !important; }
+  .calc .ci, .calc .cout { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .cta { background: var(--panel); }
+}
+@media (max-width: 380px) { .calc .ci, .calc .cout { grid-template-columns: minmax(0, 1fr) !important; } }
+.alist i.new{font:normal 700 10px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink);background:var(--amber);padding:2px 7px;border-radius:999px;margin-left:8px;vertical-align:2px}
+/* шапка в одну строку */
+.top .w { flex-wrap: nowrap !important; }
+.nav { flex-wrap: nowrap !important; min-width: 0; }
+.nav > a { white-space: nowrap; padding: 0 12px; }
+.hact { flex: none; gap: 8px; }
+.top > .w { max-width: 1280px; }
+@media (max-width: 1440px) { .hact #theme { display: none; } }
+@media (max-width: 1360px) { .nav > a { padding: 0 9px; font-size: 14px; } .hact { margin-left: 6px; padding-left: 10px; } }
+@media (max-width: 1240px) { .hact .login { display: none; } }
+@media (max-width: 1100px) {
+  .nav > a:not(.btn) { display: none !important; }
+  .burger { display: grid !important; }
+  .hact #theme { display: grid; }
+  .hact { border-left: 0; padding-left: 0; margin-left: auto; }
+}
+/* связанные материалы: статья → калькулятор → программа */
+.rel { margin: 34px 0 10px; padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
+.rel h2 { font-size: 20px !important; margin: 0 0 12px !important; }
+.rel-g { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.rel-g a { display: grid; gap: 3px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; text-decoration: none; color: var(--ink); font-weight: 600; font-size: 14.5px; line-height: 1.35; }
+.rel-g a small { font: 600 10.5px var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--amber); }
+.rel-g a:hover { border-color: var(--amber); }
+.rel-g a.prod { background: color-mix(in srgb, var(--amber) 9%, transparent); border-color: color-mix(in srgb, var(--amber) 40%, var(--line)); }
+
+/* ---------- спокойные панели: без свечений, бликов и вращающихся рамок ---------- */
+.calc, .wx, .calc-lead, .cta, .tldr { background: var(--panel) !important; box-shadow: none !important; border: 1px solid var(--line) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+.calc::before, .calc::after, .calc-lead::before, .calc-lead::after, .wx::before, .wx::after { content: none !important; display: none !important; }
+.calc .co, .ia-o, .wx-dec, .wx-g, .wl-g { background: color-mix(in srgb, var(--bg) 35%, var(--panel)) !important; box-shadow: none !important; border: 1px solid var(--line) !important; transform: none !important; }
+.calc .co::before, .calc .co::after { content: none !important; display: none !important; }
+.calc .co:hover { transform: none !important; box-shadow: none !important; }
+.calc .co.key, .ia-o.key { border-color: color-mix(in srgb, var(--amber) 55%, var(--line)) !important; }
+.calc .co.key b { background: none !important; -webkit-background-clip: border-box !important; background-clip: border-box !important; color: var(--amber) !important; font-size: 32px; }
+.calc .co.upd b, .calc .co.upd::after { animation: none !important; }
+.calc .co.verdict b::before { animation: none !important; }
+.calc .co.verdict.ok { border-color: color-mix(in srgb, #5fd18b 50%, var(--line)) !important; }
+.calc .co.verdict.warn { border-color: color-mix(in srgb, #ff8a6b 55%, var(--line)) !important; }
+.calc input { box-shadow: none !important; transform: none !important; }
+.calc input:focus { box-shadow: none !important; border-color: var(--amber) !important; }
+.wx-b.pri, .calc-act button[data-act=copy] { background: var(--amber) !important; }
+.calc-lead .btn.pri { box-shadow: none !important; }
+.cta { background: var(--panel) !important; }
+.tldr { border-left: 3px solid var(--amber) !important; }
+.ia-cv { background: color-mix(in srgb, var(--bg) 55%, var(--panel)) !important; }
+
+/* Подписи без «капса с разрядкой»: обычный регистр, без моноширинного шрифта */
+.eyebrow, .badge, .clip figcaption small, figcaption small, .anav .ang-h, .ang-h, .apn small, .wm-h, .tldr > b,
+.rel-g a small, .sres a i, .pbody .st, .ab-prod small, .np-g legend, .np-as legend, #lv-ed legend,
+.pl-steps .pl-w, .task-d, .wl-ref h4, .alist i.new, .calc .cout::before {
+  text-transform: none !important; letter-spacing: 0 !important; font-family: var(--body) !important;
+}
+.eyebrow { font-size: 14px !important; font-weight: 600 !important; color: var(--muted) !important; }
+.eyebrow::before { display: none !important; }
+.article > .eyebrow { display: none !important; }
+.anav .ang-h, .ang-h { font-size: 13px !important; font-weight: 700 !important; color: var(--ink) !important; }
+.apn small, .rel-g a small { font-size: 12px !important; font-weight: 500 !important; color: var(--muted) !important; }
+.tldr > b { font-size: 15px !important; font-weight: 700 !important; color: var(--ink) !important; }
+.alist i.new { font-size: 12px !important; font-weight: 600 !important; }
+.calc .cout::before { font-size: 13px !important; font-weight: 600 !important; }
+/* без цветного свечения под скриншотами и в плашках */
+.shot-main, .trow figure img { box-shadow: none !important; }
+.cta { background: var(--panel) !important; }
+
+/* Выравнивание текста по ширине с переносами */
+.article p, .article li, .article .lead, .article dd, .sh p, .head p, .about p, .trow p, .card p, .alist span,
+.tldr li, .note, .steps p, .ab-pr p, .by-steps span, .task p, .steps2 p, .steps2 li, .pl-steps li, .pl-two li, .sx-grid li,
+.ab-prod span, .by-cards p, .faq details p, .qa details p, .other span, .feat p, .pbody p, .eitem p, .gloss dd {
+  text-align: justify; -webkit-hyphens: auto; hyphens: auto; hyphenate-limit-chars: 6 3 3;
+}
+/* в интерактивных блоках, таблицах и подписях — как было */
+.wx p, .ia p, .calc p, .ia-hint, .wl-ro, .lv-msg, .pg p, .pg li, .np p, .tt p, td, th, figcaption, .btns, .rel-g a {
+  text-align: left; -webkit-hyphens: manual; hyphens: manual;
+}
+/* Etude: ролик ИИ-помощника целиком, без обрезки; диалог под ним */
+.ai-row { grid-template-columns: minmax(0, 1fr) !important; }
+.ai-row .shot-main { height: auto !important; }
+.ai-row .shot-main video { height: auto !important; aspect-ratio: 1280 / 546 !important; object-fit: contain !important; }
+.ai-row .ai-chat { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 24px; align-items: start; }
+.ai-row .ai-chat .q { justify-self: end; } .ai-row .ai-chat .a { justify-self: start; }
+@media (max-width: 760px) { .ai-row .ai-chat { display: flex; } }

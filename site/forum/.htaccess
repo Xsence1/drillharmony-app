@@ -1,0 +1,17 @@
+# Форум DrillHarmony
+Options -Indexes
+DirectoryIndex index.php
+<FilesMatch "^(lib\.php|bot\.php|kb\.php|kb_gti\.php|topics\.php|forum-config.*\.php|layout\.html)$">
+  Require all denied
+</FilesMatch>
+<IfModule mod_headers.c>
+  Header set Cache-Control "no-store" "expr=%{CONTENT_TYPE} =~ m#text/html#"
+</IfModule>
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /forum/
+  RewriteRule ^_data/ - [F,L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.*)$ index.php?r=$1 [QSA,L]
+</IfModule>

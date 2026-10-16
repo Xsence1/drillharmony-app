@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru" data-theme="dark"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0f14"><meta name="format-detection" content="telephone=no">
+<title>Игра: посади горизонталь · DrillHarmony</title>
+<script src="../assets/j/b82b602a49.js"></script><script src="../assets/j/8963aff236.js"></script>
+<link rel="stylesheet" href="../fonts/fonts.css"><link rel="stylesheet" href="../assets/c/17f53e8b82.css"><link rel="stylesheet" href="../assets/c/b31b379876.css"><link rel="stylesheet" href="../assets/c/53fecde9f7.css"><link rel="stylesheet" href="../assets/c/37061930c4.css">
+<link rel="stylesheet" href="../app/app.css"><script src="../app/app.js"></script>
+</head><body class="in-app k-tool" data-slug="play" data-path="play/" data-kind="tool" data-name="Игра: посади горизонталь">
+<header class="abar"><a class="ib" href="../index.html" data-back aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></a>
+<div class="ttl"><small>Обучение</small><span>Игра: посади горизонталь</span></div><button class="ib star" type="button" aria-label="В избранное" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg></button>
+<button id="theme" type="button" hidden aria-hidden="true"></button></header>
+<main class="app-main">
+<article class="article">
+
+<h1 class="vh">Посади горизонталь за 60 секунд</h1>
+<p class="lead hint">Ствол идёт с зенитом около 50°, впереди пласт толщиной 5 м. Где точно кровля, неизвестно: по проекту она на пунктирной линии, на деле может оказаться выше или ниже и с наклоном. Войдите в пласт почти горизонтально и удержитесь в нём до конца минуты.</p>
+<section aria-label="Игра: посади горизонталь" class="pg" id="pg">
+<div class="pg-hud"><div><span>Время</span><b id="pg-t">60 с</b></div><div><span>Зенит</span><b id="pg-inc">—</b></div><div><span>До кровли по проекту</span><b id="pg-plan">—</b></div><div><span>ГК</span><b id="pg-grv">—</b></div><div><span>Режим</span><b id="pg-mode">Ротор</b></div><div><span>В пласте</span><b id="pg-zone">—</b></div></div>
+<canvas aria-label="Разрез: ствол, проектная кровля и подошва пласта" class="pg-cv" id="pg-cv" role="img"></canvas>
+<div class="pg-ctl"><button id="pg-up" type="button">▲ Слайд на набор<small>держать · стрелка вверх или W</small></button><button id="pg-dn" type="button">▼ Слайд на падение<small>держать · стрелка вниз или S</small></button></div>
+<div class="pg-ov" id="pg-start"><div class="pg-card"><h2>Посади горизонталь за 60 секунд</h2><ul><li>Отпустили кнопки, и пошёл ротор: ствол идёт прямо и чуть падает.</li><li>Держите кнопку, чтобы слайдить: набор или падение 8° на 30 м.</li><li>Если ГК падает и ствол становится жёлтым, вы в коллекторе. Если растёт, подходите к глинам.</li><li>Очки: 70 % за долю горизонтали в пласте, 30 % за то, насколько горизонтально вошли.</li></ul><div class="pg-btns"><button class="btn pri" id="pg-go" type="button">Начать</button></div><p class="pg-best" id="pg-best"></p></div></div>
+<div class="pg-ov" hidden="" id="pg-res"><div class="pg-card"><div class="pg-big"><span id="pg-sc">0</span><small> / 100</small></div><h2 id="pg-gr"></h2><div id="pg-det"></div><div class="pg-btns"><button class="btn pri" id="pg-again" type="button">Ещё раз</button><button class="btn" id="pg-share" type="button">Поделиться результатом</button><a class="btn ext" href="https://drillharmony.com/slidex/" rel="noopener">Полная версия в SlideX</a></div></div></div>
+</section>
+<h2>Что в игре упрощено</h2>
+<p>Это разминка. Здесь замер мгновенный и прямо на долоте, нет реактивного момента, компоновка всегда даёт ровно 8°/30 м, а ротор одинаково роняет угол. В реальной скважине замер отстаёт от долота на 10–20 м, а способность компоновки меняется от пласта к пласту, поэтому посадку считают заранее.</p>
+<ul><li>Как рассчитать посадку на цель: <a class="ext" href="https://drillharmony.com/articles/landing/" rel="noopener">статья</a> и <a href="../calculators/landing/index.html">калькулятор посадки</a>.</li><li>Как ведут ствол по ГК и сопротивлению: <a class="ext" href="https://drillharmony.com/articles/geosteering/" rel="noopener">Геонавигация</a>.</li><li>Ориентирование, отставание замера, реактивный момент и осложнения есть в тренажёре <a class="ext" href="https://drillharmony.com/slidex/" rel="noopener">SlideX</a>.</li></ul>
+</article>
+<p class="src">На сайте: <a class="ext" href="https://drillharmony.com/play/" rel="noopener">drillharmony.com/play/</a></p>
+</main>
+
+<script src="../assets/j/68b15ed466.js"></script><script src="../assets/j/c7b6858526.js"></script>
+</body></html>

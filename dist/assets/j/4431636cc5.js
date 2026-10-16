@@ -1,0 +1,1 @@
+(()=>{const e=document.querySelector(".anav");e&&matchMedia("(max-width: 960px)").matches&&(e.open=!1)})();

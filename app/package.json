@@ -1,0 +1,32 @@
+{
+  "name": "drillharmony-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DrillHarmony: калькуляторы и инструменты инженера ННБ для Android и iOS",
+  "scripts": {
+    "www": "cd .. && python3 build.py && python3 app/mk_app.py",
+    "sync": "npm run www && npx cap sync",
+    "android": "npm run sync && npx cap open android",
+    "ios": "npm run sync && npx cap open ios",
+    "assets": "npx capacitor-assets generate --assetPath resources --iconBackgroundColor \"#ffb238\" --iconBackgroundColorDark \"#ffb238\" --splashBackgroundColor \"#0a0f14\" --splashBackgroundColorDark \"#0a0f14\"",
+    "setup": "node scripts/setup-native.mjs",
+    "apk": "cd android && ./gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/app": "^8.0.0",
+    "@capacitor/clipboard": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/filesystem": "^8.0.0",
+    "@capacitor/ios": "^8.0.0",
+    "@capacitor/share": "^8.0.0",
+    "@capacitor/splash-screen": "^8.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

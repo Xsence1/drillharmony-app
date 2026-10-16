@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ru" data-theme="dark"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0f14"><meta name="format-detection" content="telephone=no">
+<title>Удержите ствол в пласте · DrillHarmony</title>
+<script src="../../assets/j/b82b602a49.js"></script><script src="../../assets/j/8963aff236.js"></script>
+<link rel="stylesheet" href="../../fonts/fonts.css"><link rel="stylesheet" href="../../assets/c/17f53e8b82.css"><link rel="stylesheet" href="../../assets/c/b31b379876.css">
+<link rel="stylesheet" href="../../app/app.css"><script src="../../app/app.js"></script>
+</head><body class="in-app k-model" data-slug="m-gs" data-path="articles/geosteering/#ia-gs" data-kind="model" data-name="Удержите ствол в пласте">
+<header class="abar"><a class="ib" href="../../index.html" data-back aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></a>
+<div class="ttl"><small>Модели</small><span>Удержите ствол в пласте</span></div><button class="ib star" type="button" aria-label="В избранное" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg></button>
+<button id="theme" type="button" hidden aria-hidden="true"></button></header>
+<main class="app-main">
+<article class="article"><section aria-label="Интерактивный тренажёр геонавигации" class="wx ia" id="ia-gs" tabindex="-1">
+<div class="wx-top"><p class="hint">Нажмите «Бурить» и управляйте зенитом кнопками (или стрелками ↑↓ на клавиатуре). При зените больше 90° ствол идёт вверх, меньше 90° вниз. Гамма-датчик стоит в 12 м за долотом, поэтому реагировать нужно заранее.</p></div>
+<div class="ia-grid"><canvas aria-label="Разрез: пласт-коллектор, ствол скважины, долото и гамма-датчик; ниже — кривая ГК" class="ia-cv flat" style="height:500px"></canvas>
+<div class="ia-side">
+<div class="ia-btns"><button class="wx-b pri" id="gs-run" type="button">Бурить</button><button class="wx-b" id="gs-reset" type="button">Сначала</button></div>
+<div class="ia-btns"><button class="wx-b" id="gs-up" type="button">Зенит +0,5° (вверх)</button><button class="wx-b" id="gs-dn" type="button">Зенит −0,5° (вниз)</button></div>
+<div class="ia-o key"><span>Зенит сейчас / задан</span><b><em id="gs-o-i">—</em> / <em id="gs-o-tg">—</em></b><small>°</small></div>
+<label class="ia-sl">Наклон пласта (+ поднимается)<output></output><input data-d="1" data-u="°" id="gs-b" max="3" min="-3" step=".1" type="range" value="1"/></label>
+<label class="ia-sl">Толщина пласта<output></output><input data-d="1" data-u=" м" id="gs-th" max="10" min="2" step=".5" type="range" value="4"/></label>
+<label class="ia-sl">Скорость модели<output></output><input data-u=" м/с" id="gs-sp" max="40" min="4" step="1" type="range" value="14"/></label>
+<label class="wx-hold"><input id="gs-wave" type="checkbox"/> волнистый пласт</label>
+<label class="wx-hold"><input id="gs-hide" type="checkbox"/> как на буровой: впереди пласт не виден</label>
+</div></div>
+<p class="ia-leg"><span style="color:var(--amber)"><i style="background:var(--amber)"></i>ствол в коллекторе</span><span style="color:var(--bad,#ff8a6b)"><i style="background:var(--bad,#ff8a6b)"></i>ствол в глине</span><span style="color:#5ec8d8">◆ гамма-датчик</span><span>● долото · вертикальный масштаб растянут</span></p>
+<p class="ia-note" hidden="" id="gs-msg"></p>
+<div class="ia-outs"><div class="ia-o"><span>Пробурено</span><b id="gs-o-md">—</b></div><div class="ia-o key"><span>В коллекторе</span><b id="gs-o-pc">—</b></div><div class="ia-o"><span>Угол встречи</span><b id="gs-o-enc" style="font-size:16px">—</b><small>°</small></div><div class="ia-o"><span>До кровли</span><b id="gs-o-top">—</b><small>м</small></div><div class="ia-o"><span>До подошвы</span><b id="gs-o-bot">—</b><small>м</small></div><div class="ia-o"><span>Выход из пласта через</span><b id="gs-o-ex" style="font-size:16px">—</b></div></div>
+<p class="ia-hint">Интенсивность ограничена 1,5°/10 м, поэтому зенит меняется не сразу. Угол встречи = (90° − зенит) + наклон пласта; «до кровли» и «до подошвы» считаются по вертикали у долота.</p>
+</section></article>
+<p class="src">На сайте: <a class="ext" href="https://drillharmony.com/articles/geosteering/#ia-gs" rel="noopener">drillharmony.com/articles/geosteering/#ia-gs</a></p>
+</main>
+
+<script src="../../assets/j/2d6f05688a.js"></script><script src="../../assets/j/82ef5376c6.js"></script><script src="../../assets/j/55a2f9aa01.js"></script><script src="../../assets/j/c7b6858526.js"></script>
+</body></html>

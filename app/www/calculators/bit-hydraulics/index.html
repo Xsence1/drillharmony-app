@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ru" data-theme="dark"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0f14"><meta name="format-detection" content="telephone=no">
+<title>Гидравлика долота · DrillHarmony</title>
+<script src="../../assets/j/b82b602a49.js"></script><script src="../../assets/j/8963aff236.js"></script>
+<link rel="stylesheet" href="../../fonts/fonts.css"><link rel="stylesheet" href="../../assets/c/17f53e8b82.css"><link rel="stylesheet" href="../../assets/c/b31b379876.css">
+<link rel="stylesheet" href="../../app/app.css"><script src="../../app/app.js"></script>
+</head><body class="in-app k-calc has-act" data-slug="bit-hydraulics" data-path="calculators/bit-hydraulics/" data-kind="calc" data-name="Гидравлика долота">
+<header class="abar"><a class="ib" href="../../index.html" data-back aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></a>
+<div class="ttl"><small>Бурение и КНБК</small><span>Гидравлика долота</span></div><button class="ib star" type="button" aria-label="В избранное" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg></button>
+<button id="theme" type="button" hidden aria-hidden="true"></button></header>
+<main class="app-main">
+<div class="article">
+
+
+
+<div class="calc" data-calc="bith"><div class="cout"><div class="co key"><span>Перепад на долоте</span><b id="o_dp">—</b><small>МПа</small></div><div class="co key"><span>HSI</span><b id="o_hsi">—</b><small>л.с./дюйм²</small></div><div class="co"><span>TFA</span><b id="o_tfa">—</b><small>мм²</small></div><div class="co"><span>TFA</span><b id="o_tfai">—</b><small>дюйм²</small></div><div class="co"><span>Скорость в насадках</span><b id="o_v">—</b><small>м/с</small></div><div class="co"><span>Мощность на долоте</span><b id="o_kw">—</b><small>кВт</small></div><div class="co"><span>Сила удара струи</span><b id="o_if">—</b><small>кН</small></div><div class="co verdict"><span>Вывод</span><b id="o_vv">—</b><small></small></div></div><div class="ci"><label data-p="q" data-u="л/с"><span data-u="л/с">Расход</span><input id="q" inputmode="decimal" value="30"/><small>л/с</small></label><label data-p="rho" data-u="г/см³"><span data-u="г/см³">Плотность раствора</span><input id="rho" inputmode="decimal" value="1,18"/><small>г/см³</small></label><label data-p="bit" data-u="мм"><span data-u="мм">Диаметр долота</span><input id="d" inputmode="decimal" value="215,9"/><small>мм</small></label><label data-u="шт."><span data-u="шт.">Насадок, группа 1</span><input id="n1" inputmode="decimal" value="5"/><small>шт.</small></label><label data-u="/32″"><span data-u="/32″">Диаметр, группа 1</span><input id="d1" inputmode="decimal" value="12"/><small>/32″</small></label><label data-u="шт."><span data-u="шт.">Насадок, группа 2</span><input id="n2" inputmode="decimal" value="0"/><small>шт.</small></label><label data-u="/32″"><span data-u="/32″">Диаметр, группа 2</span><input id="d2" inputmode="decimal" value="0"/><small>/32″</small></label></div></div>
+<div class="calc-act" hidden=""><button data-act="copy" type="button">Скопировать результат</button><button data-act="link" type="button">Поделиться</button><button data-act="reset" type="button">Сбросить</button></div>
+
+
+
+
+
+
+
+
+
+<details class="fold viz"><summary>Схема</summary><div class="fold-b"><section aria-label="Струи из насадок" class="wx ia ia-calc" id="iv-bith"><canvas aria-label="Струи из насадок" class="ia-cv flat" role="img" style="height:300px"></canvas></section></div></details><details class="fold ref"><summary>Как считается</summary><div class="fold-b"><h1>Гидравлика долота: насадки, перепад, HSI</h1><p class="lead">Подберите насадки под расход и раствор: калькулятор покажет площадь насадок, скорость струи, перепад на долоте и удельную гидравлическую мощность HSI. Две группы насадок нужны для долот с разными диаметрами.</p><h2>Формулы</h2><div class="formula">TFA = Σ n · π/4 · (d/32 · 25,4 мм)²
+v   = Q / TFA                         скорость в насадках, м/с
+ΔP  = ρ · v² / (2 · Cd²),  Cd = 0,95   перепад на долоте, Па
+N   = ΔP · Q                          гидравлическая мощность, Вт
+HSI = N / площадь забоя               л.с./дюйм²
+F   = ρ · Q · v · Cd                  сила удара струи, Н</div><h2>Как подбирать насадки</h2><ul>
+<li><b>Сначала ограничение по давлению.</b> Перепад на долоте + потери в трубах, затрубье, ВЗД и телесистеме не должны превышать рабочее давление насосов и манифольда с запасом.</li>
+<li><b>Перепад на долоте забирает заметную долю.</b> Часто ориентируются на 40–65 % от давления на стояке для максимальной мощности или удара струи. Окончательно решают по рекомендациям производителя долота.</li>
+<li><b>HSI для PDC</b> часто держат в районе 2–5 л.с./дюйм² в мягких и средних породах, где долото склонно сальниковать. В твёрдых породах важнее нагрузка и обороты.</li>
+<li><b>Телесистема и ВЗД.</b> У них свои ограничения по расходу и перепаду, поэтому гидравлику долота нельзя подбирать отдельно от компоновки.</li>
+<li><b>Насадки изнашиваются.</b> Если давление на стояке медленно падает при том же расходе, проверьте насадки и промывочные каналы, а также промыв колонны.</li>
+</ul><p>Влияние расхода на ЭЦП можно посчитать в калькуляторе <a href="../../calculators/ecd/index.html">ЭЦП</a>, скорость в затрубье в калькуляторе <a href="../../calculators/annular-velocity/index.html">Скорость в затрубье</a>.</p><p class="small muted calc-more">Расчёт справочный. Проектные решения принимаются по утверждённым методикам и программе на бурение.</p></div></details></div>
+<p class="src">На сайте: <a class="ext" href="https://drillharmony.com/calculators/bit-hydraulics/" rel="noopener">drillharmony.com/calculators/bit-hydraulics/</a></p>
+</main>
+<nav class="actbar" aria-label="Действия"><button type="button" data-a="prof"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M8 7h8M7 11h10M9 16h6"/></svg><span>Профиль</span></button><button type="button" data-a="reset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.6"/><path d="M4 4v4.6h4.6"/></svg><span>Сбросить</span></button><button type="button" data-a="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg><span>Копировать</span></button><button type="button" data-a="share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span>Поделиться</span></button><button type="button" data-a="save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>В историю</span></button></nav>
+<script src="../../assets/j/518f08db58.js"></script><script src="../../assets/j/bfd7382c0a.js"></script><script src="../../assets/j/1ec0dde8f1.js"></script><script src="../../assets/j/82ef5376c6.js"></script><script src="../../assets/j/ccadc3f02b.js"></script><script src="../../assets/j/c7b6858526.js"></script>
+</body></html>

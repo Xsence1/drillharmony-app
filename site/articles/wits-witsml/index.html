@@ -1,0 +1,236 @@
+<!doctype html>
+<!-- DrillHarmony · © ИП Шайсламова А. В. · drillharmony.com · Материалы сайта защищены авторским правом. Копирование без письменного разрешения правообладателя запрещено. -->
+<html lang="ru" data-theme="dark"><head><meta charset="utf-8"><script src="../../assets/j/b82b602a49.js"></script><meta name="author" content="DrillHarmony, ИП Шайсламова А. В."><meta name="copyright" content="© ИП Шайсламова А. В., drillharmony.com"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>WITS: записи, устройство пакетов и данные для геонавигации | DrillHarmony</title>
+<meta name="description" content="Как устроены пакеты WITS 0, все 25 записей WITS с номерами параметров инклинометрии и каротажа, объекты WITSML 1.4.1.1 и 2.0 и какие данные из WITS и WITSML получает программа геонавигации.">
+<link rel="canonical" href="https://drillharmony.com/articles/wits-witsml/">
+<meta property="og:type" content="website"><meta property="og:locale" content="ru_RU"><meta property="og:site_name" content="DrillHarmony.com">
+<meta property="og:url" content="https://drillharmony.com/articles/wits-witsml/"><meta property="og:title" content="WITS: записи, устройство пакетов и данные для геонавигации | DrillHarmony"><meta property="og:description" content="Как устроены пакеты WITS 0, все 25 записей WITS с номерами параметров инклинометрии и каротажа, объекты WITSML 1.4.1.1 и 2.0 и какие данные из WITS и WITSML получает программа геонавигации.">
+<meta property="og:image" content="https://drillharmony.com/og/article-wits.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../../favicon.ico" sizes="any"><link rel="icon" href="../../favicon.svg" type="image/svg+xml"><link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="../../apple-touch-icon.png"><meta name="theme-color" content="#080d10">
+<link rel="stylesheet" href="../../fonts/fonts.css"><link rel="stylesheet" href="../../assets/page.css">
+<script src="../../assets/j/8963aff236.js"></script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://drillharmony.com/#org", "name": "DrillHarmony", "url": "https://drillharmony.com/", "logo": "https://drillharmony.com/icon-512.png", "email": "info@drillharmony.com"}, {"@type": "Article", "headline": "Как устроен поток WITS с буровой", "description": "Как устроены пакеты WITS 0, все 25 записей WITS с номерами параметров инклинометрии и каротажа, объекты WITSML 1.4.1.1 и 2.0 и какие данные из WITS и WITSML получает программа геонавигации.", "inLanguage": "ru", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "author": {"@id": "https://drillharmony.com/#org"}, "publisher": {"@id": "https://drillharmony.com/#org"}, "mainEntityOfPage": "https://drillharmony.com/articles/wits-witsml/", "image": "https://drillharmony.com/og/article-wits.png"}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "DrillHarmony", "item": "https://drillharmony.com/"}, {"@type": "ListItem", "position": 2, "name": "Статьи", "item": "https://drillharmony.com/articles/"}, {"@type": "ListItem", "position": 3, "name": "WITS", "item": "https://drillharmony.com/articles/wits-witsml/"}]}]}</script>
+</head><body>
+<header class="top"><div class="w"><a class="mark" href="../../" aria-label="DrillHarmony — на главную"><svg viewBox="0 0 28 28" width="26" height="26" aria-hidden="true"><g stroke="currentColor" stroke-width="1.2" opacity=".45"><path d="M2 6h24M2 10h24M2 14h24"/></g><path d="M7 3v8c0 5 3 9 8 11.5 2.5 1.2 5 1.8 8 1.8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><circle cx="23.5" cy="24.3" r="2.6" fill="currentColor"/></svg> DrillHarmony</a>
+<nav class="nav"><a href="../../etude/">Etude</a><a href="../../tempo/">Tempo</a><a href="../../slidex/">SlideX</a><a href="../../articles/" aria-current="page">Статьи</a><a href="../../calculators/">Калькуляторы</a><button class="tgl" id="theme" type="button" aria-label="Переключить тему" title="Светлая / тёмная тема"><svg class="moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="currentColor"/></svg><svg class="sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg></button></nav></div></header>
+<nav class="crumbs w" aria-label="Навигация"><a href="../../">DrillHarmony</a> / <a href="../../articles/">Статьи</a> / WITS</nav>
+<main>
+<div class="w artwrap"><aside class="anav-wrap"><details class="anav" open><summary>Все статьи</summary><nav aria-label="Статьи"><div class="ang"><div class="ang-h">Траектория</div><a href="../../articles/minimum-curvature/">Метод минимальной кривизны</a><a href="../../articles/j-profile/">Расчёт J-профиля</a><a href="../../articles/dogleg-severity/">Интенсивность искривления</a><a href="../../articles/azimuth-declination/">Азимуты и магнитное склонение</a><a href="../../articles/separation-factor/">Коэффициент разделения SF</a><a href="../../articles/magnetic-qc/">Магнитные помехи и контроль замеров</a><a href="../../articles/geosteering/">Геонавигация</a><a href="../../articles/landing/">Посадка горизонтали</a><a href="../../articles/gyro/">Гироскоп: когда обязателен</a><a href="../../articles/sidetrack/">Боковой ствол и зарезка</a></div><div class="ang"><div class="ang-h">Ориентирование и КНБК</div><a href="../../articles/toolface/">Отклонитель и реактивный момент</a><a href="../../articles/bha-build/">КНБК для набора кривизны</a><a href="../../articles/rss-vs-motor/">РУС или ВЗД</a><a href="../../articles/weight-transfer/">Передача нагрузки в слайде</a><a href="../../articles/wob-loss/">Нагрузка не доходит до долота</a><a href="../../articles/slide-hacks/">Лайфхаки слайда</a><a href="../../articles/motor-curve/">Характеристика ВЗД и срыв</a></div><div class="ang"><div class="ang-h">Бурение, долото, колонна</div><a href="../../articles/mse/">MSE: эффективность бурения</a><a href="../../articles/bit-hydraulics/">Гидравлика долота</a><a href="../../articles/broomstick/">«Метла»: вес на крюке</a><a href="../../articles/casing-run/">Спуск колонны в горизонталь</a></div><div class="ang"><div class="ang-h">Гидравлика и осложнения</div><a href="../../articles/ecd/">ЭЦП</a><a href="../../articles/hole-cleaning/">Очистка ствола</a><a href="../../articles/kick/">ГНВП и глушение</a><a href="../../articles/stuck-pipe/">Прихват колонны</a><a href="../../articles/vibration/">Вибрации и stick-slip</a><a href="../../articles/mwd-telemetry/">Сбои телесистемы</a></div><div class="ang"><div class="ang-h">Данные, программы, обучение</div><a href="../../articles/wits-witsml/" aria-current="page">WITS: поток с буровой</a><a href="../../articles/witsml/">WITSML с нуля</a><a href="../../articles/migration/">Переход на новое ПО</a><a href="../../articles/ai-well-planning/">ИИ в проектировании</a><a href="../../articles/nnb-training/">Обучение инженеров ННБ</a><a href="../../articles/reporting/">Отчётность инженера ННБ</a><a href="../../articles/interview/">Вопросы на собеседовании</a><a href="../../articles/glossary/">Словарь терминов</a><a href="../../articles/dictionary/">Словарь RU–EN</a></div><div class="ang ang-more"><a href="../../articles/">Все статьи</a><a href="../../calculators/">Калькуляторы</a></div></nav></details></aside>
+<article class="article">
+<div class="eyebrow">Статьи · данные с буровой</div>
+<h1>Как устроен поток WITS с буровой</h1>
+<p class="lead">WITS и WITSML — два стандарта передачи данных бурения, которые часто путают. WITS передаёт поток текущих значений со станции ГТИ и телесистемы, WITSML служит языком обмена данными о скважине между системами и компаниями. Ниже о том, как устроены пакеты WITS, все 25 стандартных записей и что из этого потока берёт программа геонавигации. WITSML разобран в <a href="../../articles/witsml/">отдельной статье</a>.</p>
+<div class="tldr"><b>Коротко</b><ul><li>WITS — поток текущих значений со станции ГТИ и телесистемы: строки «номер записи, номер параметра, значение».</li><li>WITSML хранит объекты скважины на сервере: траекторию, каротаж, КНБК, с единицами и историей.</li><li>Для ННБ главное в WITS — записи 7 (замеры) и 8 (каротаж с глубиной датчика), в WITSML — объекты trajectory и log.</li></ul></div>
+<section class="wx" id="wx" aria-label="Интерактивная модель потока WITS">
+<div class="wx-top"><div class="eyebrow">Интерактивная модель</div><b>Буровая в реальном времени: поток WITS 0 и что из него берёт геонавигация</b><p>Модель бурит горизонтальный участок и отправляет записи 1, 7 и 8, как станция ГТИ и телесистема. Нажмите на строку потока, и увидите, что она значит. На приборах и планшете те же данные показаны так, как их видит инженер.</p></div>
+<div class="wx-tabs" role="tablist"><button type="button" class="on" role="tab" aria-selected="true" data-t="wx-p1">Поток WITS 0</button><button type="button" role="tab" aria-selected="false" data-t="wx-pg">Приборы</button><button type="button" role="tab" aria-selected="false" data-t="wx-pp">Планшет</button><button type="button" role="tab" aria-selected="false" data-t="wx-p2">То же в WITSML</button><button type="button" role="tab" aria-selected="false" data-t="wx-p3">Разобрать свой поток</button></div>
+<div class="wx-ctl"><button type="button" id="wx-play" class="wx-b pri" aria-pressed="true">Пауза</button><span class="wx-spd">Бурение <button type="button" data-s="60">×60</button><button type="button" class="on" data-s="200">×200</button><button type="button" data-s="600">×600</button></span><span class="wx-rec">Записи <label><input type="checkbox" value="1" checked> 1</label><label><input type="checkbox" value="7" checked> 7</label><label><input type="checkbox" value="8" checked> 8</label></span><label class="wx-hold"><input type="checkbox" id="wx-hold"> не прокручивать</label></div>
+<div class="wx-pane" id="wx-p1"><div class="wx-grid"><div class="wx-term" id="wx-term" tabindex="0" aria-label="Поток WITS 0"></div><div class="wx-dec" id="wx-dec"></div></div>
+<div class="wx-chart"><div class="wx-ch-h"><span id="wx-st"></span><label><input type="checkbox" id="wx-wrong"> показать гамму, привязанную к глубине долота</label></div><canvas id="wx-cv" role="img" aria-label="Разрез: пласт, ствол скважины, долото и гамма-датчик; ниже — кривая гамма-каротажа"></canvas>
+<p class="wx-leg"><span class="k1"></span>ствол в коллекторе <span class="k2"></span>ствол в глине <span class="k3"></span>ещё не пройдено датчиком ГК <span class="k4"></span>замеры (запись 7)</p></div></div>
+<div class="wx-pane" id="wx-pg" hidden><p>Каждый прибор показывает значение из своей строки WITS, код указан на плитке. Нажмите на прибор: увидите исходную строку, а в потоке подсветятся все её повторы. Снимите галочку записи 8 вверху, и гамма с сопротивлением перестанут обновляться.</p><div class="wx-gauges" id="wx-gauges"></div></div>
+<div class="wx-pane" id="wx-pp" hidden><div class="wx-ctl"><span class="wx-spd wx-span">Окно <button type="button" class="on" data-s="60">60 м</button><button type="button" data-s="150">150 м</button></span><span>Наведите на планшет, и он покажет значения на глубине.</span></div><div class="wx-plw"><canvas id="wx-pl" role="img" aria-label="Планшет по глубине: проходка и слайд, нагрузка и обороты, гамма-каротаж, сопротивление; отмечены долото и датчики"></canvas></div><p class="wx-leg">Каротаж заканчивается выше долота: гамма-датчик отстаёт на 14,5 м, датчик сопротивления на 12,9 м. Треугольники у шкалы глубин обозначают замеры инклинометрии.</p></div>
+<div class="wx-pane" id="wx-p2" hidden><p>Те же данные на сервере WITSML: каротаж лежит в растущем объекте <b>log</b>, замеры в <b>trajectory</b>. Клиент запрашивает только строки после последней полученной глубины.</p><pre class="wx-xml" id="wx-xml"></pre></div>
+<div class="wx-pane" id="wx-p3" hidden><p>Вставьте фрагмент потока со своей станции. Модель разберёт строки по словарю записей 1, 7 и 8 и покажет ошибки: строки вне пакета, разные записи в одном пакете, пустые значения.</p>
+<textarea id="wx-in" spellcheck="false" aria-label="Поток WITS 0 для разбора">&amp;&amp;
+01082451.36
+01102451.36
+011322.4
+0118-9999
+012040
+!!
+08232451.0
+&amp;&amp;
+07082438.40
+071389.62
+0715146.55
+08236.2
+!!</textarea><div class="wx-pact"><button type="button" id="wx-grab" class="wx-b">Взять последние строки из модели</button></div><div id="wx-res"></div></div>
+</section>
+<h2>WITS: поток с буровой</h2>
+<p>WITS (Wellsite Information Transfer Specification) появился в 1980-х как общий язык сервисных компаний на буровой. Стандарт описывает несколько уровней, от простого текста до самоописываемых двоичных потоков:</p>
+<div class="tablewrap tl"><table><thead><tr><th>Уровень</th><th>Что это</th></tr></thead><tbody>
+<tr><td>Level 0</td><td>Текст ASCII: пакеты из строк «номер записи + номер параметра + значение». Передача в одну сторону</td></tr>
+<tr><td>Level 1</td><td>Двоичный формат LIS: 25 предопределённых записей фиксированного размера</td></tr>
+<tr><td>Level 2</td><td>Двусторонний обмен: приёмник может запросить данные и изменить интервалы передачи (через записи комментариев LIS); вариант 2b добавляет буферизацию</td></tr>
+<tr><td>Level 4</td><td>Самоописываемый поток на основе RP66 (DLIS)</td></tr>
+</tbody></table></div>
+<p>На практике почти везде работает Level 0: его отдают станции ГТИ, телесистемы и программы ННБ, его принимают системы мониторинга. Транспорт стандарт не фиксирует. Обычно это последовательный порт (часто 9600 бод) или TCP-соединение.</p>
+<h2>Как устроен пакет WITS 0</h2>
+<p>Пакет начинается строкой «&amp;&amp;» и заканчивается строкой «!!». Между ними идут строки данных. Каждая строка: две цифры номера записи, две цифры номера параметра и сразу значение, без разделителя. Строки обычно заканчиваются CR LF, но встречается и просто LF, и приёмник должен понимать оба варианта.</p>
+<div class="formula">&amp;&amp;
+0701WELL-1205        ← 07 01: идентификатор скважины
+07021                ← 07 02: номер ствола
+07037                ← 07 03: номер записи (7 — инклинометрия)
+0704118              ← 07 04: порядковый номер
+0705261015           ← 07 05: дата ГГММДД (UTC)
+0706093512           ← 07 06: время ЧЧММСС (UTC)
+07082451.36          ← 07 08: глубина замера по стволу, м
+07092287.10          ← 07 09: глубина замера по вертикали, м
+071386.42            ← 07 13: зенит, °
+0715146.60           ← 07 15: азимут с поправками, °
+071757.0             ← 07 17: гравитационный toolface, °
+!!</div>
+<p>Подписи справа поясняют пример, в реальном потоке их нет. Правила, которые нужно знать при разборе:</p>
+<ul>
+<li><b>Один пакет — одна запись.</b> По спецификации пакет относится к одной записи, и у всех строк в нём одинаковые первые две цифры. Надёжнее разбирать каждую строку по её префиксу: не все отправители соблюдают правило.</li>
+<li><b>Общий заголовок.</b> Параметры 01–07 есть в каждой записи: идентификатор скважины (включает код отправителя), номер ствола, номер записи, порядковый номер, дата, время и код операции. Дата передаётся как ГГММДД, время как ЧЧММСС, оба по UTC; смещение часового пояса хранится в записи 23.</li>
+<li><b>Код операции</b> (параметр 07 заголовка) говорит, что происходит на буровой: например, 2 — бурение, 4 — проработка, 5 — расширка, 6 — отбор керна, 20 — разбуривание цемента. Механическая скорость и нагрузка на долото имеют смысл только при этих кодах, в остальное время отправитель должен ставить пустое значение.</li>
+<li><b>Пустые значения.</b> Отсутствие данных обычно кодируют как −9999 или −9999.0; точное значение нужно уточнить у отправителя и отфильтровать до записи в базу.</li>
+<li><b>Единицы.</b> В пакете их нет. Стандарт допускает два набора, метрический и FPS (футы, фунты, секунды); какой используется, указывается в записи 23 или согласуется заранее.</li>
+<li><b>Когда отправляется запись.</b> У каждой записи свой триггер: по времени (запись 1 обычно раз в 1–5 секунд), по глубине (запись 2 на каждый интервал проходки) или по событию (запись 7 после нового замера).</li>
+<li><b>Длина значения.</b> Спецификация задаёт тип и длину каждого параметра, но на практике значения бывают любой длины. Не обрезайте и не дополняйте их пробелами при разборе.</li>
+</ul>
+<h2>Все записи WITS</h2>
+<p>Стандарт определяет 25 записей. Номера 26–49 зарезервированы под будущие стандартные записи, 50–80 отданы под пользовательские. В них сервисные компании передают данные, которых нет в стандарте, например азимутальный гамма-каротаж или вибрации.</p>
+<div class="tablewrap tl"><table><thead><tr><th>№</th><th>Запись</th><th>Что в ней</th></tr></thead><tbody>
+<tr><td>1</td><td>General Time-Based — основные параметры по времени</td><td>Глубины забоя и долота, механическая скорость, вес на крюке, нагрузка, момент, обороты, давление, расход, объёмы ёмкостей, газ</td></tr>
+<tr><td>2</td><td>Drilling Depth-Based — бурение по глубине</td><td>Средние значения режима на интервал проходки</td></tr>
+<tr><td>3</td><td>Drilling Connections — наращивания</td><td>Время и параметры наращивания свечи</td></tr>
+<tr><td>4</td><td>Hydraulics — гидравлика</td><td>Расход, давления, свойства раствора, потери</td></tr>
+<tr><td>5</td><td>Tripping/Casing Run Time-Based — СПО по времени</td><td>Скорость СПО, вес, объёмы долива и вытеснения</td></tr>
+<tr><td>6</td><td>Tripping/Casing Run Connections — СПО по свечам</td><td>Параметры каждой свечи при спуске и подъёме</td></tr>
+<tr><td>7</td><td>Survey/Directional — инклинометрия</td><td>Глубина замера, зенит, азимут, toolface, координаты, интенсивность</td></tr>
+<tr><td>8</td><td>MWD Formation Evaluation — каротаж телесистемы</td><td>Гамма, сопротивление, пористость, плотность, каверномер с глубиной каждого датчика</td></tr>
+<tr><td>9</td><td>MWD Mechanical — механика телесистемы</td><td>Скважинные нагрузка и момент, удары и вибрации, температура</td></tr>
+<tr><td>10</td><td>Pressure Evaluation — оценка давлений</td><td>Пластовое давление, d-экспонента, градиенты</td></tr>
+<tr><td>11</td><td>Mud Tank Volumes — объёмы ёмкостей</td><td>Объём каждой ёмкости и суммарный, доливная ёмкость</td></tr>
+<tr><td>12</td><td>Chromatograph Cycle-Based — хроматограф по циклам</td><td>Состав газа C1–C5 на каждый цикл анализа</td></tr>
+<tr><td>13</td><td>Chromatograph Depth-Based — хроматограф по глубине</td><td>Тот же газ, привязанный к глубине с учётом отставания</td></tr>
+<tr><td>14</td><td>Lagged Continuous Mud Properties — свойства раствора с отставанием</td><td>Плотность, температура, сопротивление раствора на выходе, привязанные к глубине</td></tr>
+<tr><td>15</td><td>Cuttings/Lithology — шлам и литология</td><td>Описание шлама и процент пород</td></tr>
+<tr><td>16</td><td>Hydrocarbon Show — нефтегазопроявления</td><td>Признаки углеводородов в шламе и газе</td></tr>
+<tr><td>17</td><td>Cementing — цементирование</td><td>Расход, давление, плотность при цементировании</td></tr>
+<tr><td>18</td><td>Drill Stem Testing — испытание пластов</td><td>Давления и расходы при испытании</td></tr>
+<tr><td>19</td><td>Configuration — конфигурация</td><td>Настройки датчиков и отправителя</td></tr>
+<tr><td>20</td><td>Mud Report — параметры раствора</td><td>Суточные замеры раствора</td></tr>
+<tr><td>21</td><td>Bit Report — отчёт по долоту</td><td>Тип долота, насадки, площадь насадок, отработка и износ</td></tr>
+<tr><td>22</td><td>Remarks — комментарии</td><td>Текстовые сообщения</td></tr>
+<tr><td>23</td><td>Well Identification — идентификация скважины</td><td>Название, координаты, альтитуды, единицы, часовой пояс</td></tr>
+<tr><td>24</td><td>Vessel Motion/Mooring Status — качка судна</td><td>Для морского бурения</td></tr>
+<tr><td>25</td><td>Weather/Sea State — погода и волнение</td><td>Для морского бурения</td></tr>
+</tbody></table></div>
+<p>На суше в работе обычно 1, 2, 7, 8, 11 и 12–14; остальные отправляют не все станции. Какие записи и параметры реально приходят, нужно проверить на подключении: по документации отправителя не угадаешь.</p>
+<h2>Запись 1: основные параметры по времени</h2>
+<p>Главная запись станции ГТИ. Ключевые параметры:</p>
+<div class="tablewrap tl"><table><thead><tr><th>Код</th><th>Мнемоника</th><th>Параметр</th></tr></thead><tbody>
+<tr><td>0108</td><td>DMEA</td><td>Глубина забоя по стволу</td></tr>
+<tr><td>0109</td><td>DVER</td><td>Глубина забоя по вертикали</td></tr>
+<tr><td>0110</td><td>DBTM</td><td>Глубина долота по стволу</td></tr>
+<tr><td>0111</td><td>DBTV</td><td>Глубина долота по вертикали</td></tr>
+<tr><td>0112</td><td>BLKP</td><td>Положение талевого блока</td></tr>
+<tr><td>0113</td><td>ROPA</td><td>Механическая скорость, средняя</td></tr>
+<tr><td>0114</td><td>HKLA</td><td>Вес на крюке, средний</td></tr>
+<tr><td>0116</td><td>WOBA</td><td>Нагрузка на долото, средняя</td></tr>
+<tr><td>0118</td><td>TQA</td><td>Момент на роторе, средний</td></tr>
+<tr><td>0120</td><td>RPMA</td><td>Обороты ротора, средние</td></tr>
+<tr><td>0121</td><td>SPPA</td><td>Давление на стояке, среднее</td></tr>
+</tbody></table></div>
+<p>Дальше в записи идут ходы насосов, объёмы ёмкостей, расход, плотность и температура раствора на входе и выходе, суммарный газ. У части параметров есть пары «среднее и максимум»: 0115 и 0117 хранят максимумы веса на крюке и нагрузки, 0119 максимум момента.</p>
+<h2>Запись 7: инклинометрия</h2>
+<p>Запись приходит после каждого принятого замера. Полный состав:</p>
+<div class="tablewrap tl"><table><thead><tr><th>Код</th><th>Мнемоника</th><th>Параметр</th><th>Единицы (метр. / FPS)</th></tr></thead><tbody>
+<tr><td>0701–0707</td><td></td><td>Общий заголовок: скважина, ствол, номер записи, порядковый номер, дата, время, код операции</td><td></td></tr>
+<tr><td>0708</td><td>DSVM</td><td>Глубина замера по стволу</td><td>м / фут</td></tr>
+<tr><td>0709</td><td>DSVV</td><td>Глубина замера по вертикали</td><td>м / фут</td></tr>
+<tr><td>0710</td><td>PASS</td><td>Номер прохода</td><td></td></tr>
+<tr><td>0711</td><td>DMEA</td><td>Глубина забоя по стволу</td><td>м / фут</td></tr>
+<tr><td>0712</td><td>STYP</td><td>Тип замера (текст)</td><td></td></tr>
+<tr><td>0713</td><td>SINC</td><td>Зенитный угол</td><td>°</td></tr>
+<tr><td>0714</td><td>SAZU</td><td>Азимут без поправок</td><td>°</td></tr>
+<tr><td>0715</td><td>SAZC</td><td>Азимут с поправками</td><td>°</td></tr>
+<tr><td>0716</td><td>SMTF</td><td>Магнитный toolface</td><td>°</td></tr>
+<tr><td>0717</td><td>SGTF</td><td>Гравитационный toolface</td><td>°</td></tr>
+<tr><td>0718</td><td>SNS</td><td>Смещение север — юг</td><td>м / фут</td></tr>
+<tr><td>0719</td><td>SEW</td><td>Смещение восток — запад</td><td>м / фут</td></tr>
+<tr><td>0720</td><td>SDLS</td><td>Интенсивность искривления</td><td>°/30 м / °/100 фут</td></tr>
+<tr><td>0721</td><td>SWLK</td><td>Интенсивность по азимуту</td><td>°/30 м / °/100 фут</td></tr>
+<tr><td>0722–0726</td><td>SPR1–SPR5</td><td>Резервные поля</td><td></td></tr>
+</tbody></table></div>
+<p>Сырых осей Gx…Bz, Gt, Bt и Dip в стандартной записи 7 нет. Телесистемы передают их в резервных полях 0722–0726 или в пользовательских записях 50–80, и эту договорённость нужно зафиксировать при подключении. Как из осей получить замер и обратно, можно посчитать в калькуляторах <a href="../../calculators/raw-survey/">замер по сырым осям</a> и <a href="../../calculators/survey-axes/">оси по замеру</a>.</p>
+<h2>Запись 8: каротаж телесистемы</h2>
+<p>Для каждого датчика передаётся не только показание, но и глубина самого датчика по стволу и по вертикали. В этом главное отличие от записи 1, где глубина одна, глубина долота.</p>
+<div class="tablewrap tl"><table><thead><tr><th>Код</th><th>Мнемоника</th><th>Параметр</th></tr></thead><tbody>
+<tr><td>0808, 0810</td><td>DMEA, DBTM</td><td>Глубина забоя и долота по стволу (0809, 0811 — по вертикали)</td></tr>
+<tr><td>0813 / 0815, 0816</td><td>DR1M / MR1, MR1C</td><td>Глубина датчика сопротивления 1 / показание и с поправкой за скважину</td></tr>
+<tr><td>0817 / 0819, 0820</td><td>DR2M / MR2, MR2C</td><td>То же для датчика сопротивления 2</td></tr>
+<tr><td>0821 / 0823, 0824</td><td>DG1M / MG1, MG1C</td><td>Глубина гамма-датчика 1 / показание и с поправкой, API</td></tr>
+<tr><td>0825 / 0827, 0828</td><td>DG2M / MG2, MG2C</td><td>То же для гамма-датчика 2</td></tr>
+<tr><td>0829 / 0831</td><td>DP1M / MPO1</td><td>Пористость, датчик 1 (0832 / 0834 — датчик 2)</td></tr>
+<tr><td>0839 / 0841</td><td>DFDM / MFD</td><td>Плотность пород, г/см³</td></tr>
+<tr><td>0842 / 0844</td><td>DCLM / MCLP</td><td>Каверномер, мм</td></tr>
+<tr><td>0835–0838</td><td>MFTA, MFTP, MFRA, MFRP</td><td>Температура и сопротивление раствора в затрубье и в трубах</td></tr>
+<tr><td>0845, 0846</td><td>MFPP, MFFP</td><td>Градиенты порового давления и гидроразрыва по данным MWD</td></tr>
+</tbody></table></div>
+<h2>А что такое WITSML</h2>
+<p>WITSML — второй стандарт, который часто путают с WITS. Это не поток чисел, а объекты скважины на сервере: траектория, каротаж, КНБК, с единицами, идентификаторами и историей. Станция ГТИ отдаёт WITS на буровой, а между буровой, офисом и заказчиком данные чаще ходят по WITSML.</p>
+<div class="note"><b>Отдельная статья: <a href="../../articles/witsml/">WITSML с нуля</a>.</b> Объекты и сервер, XML trajectory и log с комментариями к каждой строке, мнемоники телесистемы, ГК, УЭС и радиоактивного каротажа, интерактивный планшет и приборы с шаблонами ННБ и назначением своих мнемоник.</div>
+
+<h2>Что получает программа геонавигации</h2>
+<p>Программе геонавигации нужны три потока: где находится ствол, что видят датчики и на какой глубине они это видят. Остальное (опорные скважины, модель пласта, отбивки) она берёт не из WITS.</p>
+<div class="tablewrap tl"><table><thead><tr><th>Что нужно</th><th>Из WITS 0</th><th>Из WITSML</th></tr></thead><tbody>
+<tr><td>Траектория</td><td>Запись 7: 0708 глубина замера, 0713 зенит, 0715 азимут с поправками</td><td>trajectory</td></tr>
+<tr><td>Гамма-каротаж</td><td>Запись 8: 0823 показание и 0821 глубина датчика</td><td>log, кривая гамма по глубине</td></tr>
+<tr><td>Сопротивление</td><td>Запись 8: 0815/0819 и глубины датчиков 0813/0817</td><td>log</td></tr>
+<tr><td>Текущая глубина</td><td>Запись 1: 0108 забой, 0110 долото</td><td>log, кривые глубин по времени</td></tr>
+<tr><td>Режим и положение отклонителя</td><td>Запись 1: 0113 механическая скорость; toolface в пользовательских записях или в 0716/0717</td><td>log</td></tr>
+<tr><td>Отбивки, модель, опорные скважины</td><td>—</td><td>formationMarker, log опорных скважин, файлы LAS</td></tr>
+</tbody></table></div>
+<p>Что важно для геонавигации:</p>
+<ul>
+<li><b>Глубина датчика, а не долота.</b> Гамма-датчик стоит в 10–20 м над долотом. Значение нужно привязывать к его глубине (0821), иначе кривая сдвинется на длину отставания. Если отправитель уже учёл смещение датчика, программа не должна вычитать его второй раз. Это частая ошибка.</li>
+<li><b>Траекторию программа пересчитывает сама.</b> Обычно из записи 7 берут только глубину, зенит и азимут, а вертикаль и координаты считают методом минимальной кривизны от точки привязки. Готовые 0709, 0718 и 0719 используют для сверки.</li>
+<li><b>Замер мог прийти дважды.</b> После повторной отправки или перезамера в потоке оказываются две записи на одной глубине. Нужно правило: последняя заменяет предыдущую, или инженер подтверждает замер вручную.</li>
+<li><b>Реальное время и память — разные данные.</b> По WITS идёт прореженный поток телесистемы. После рейса данные из памяти прибора загружают по WITSML или LAS, и они заменяют записанные в реальном времени.</li>
+<li><b>Азимутальные данные.</b> Изображения и азимутальный гамма-каротаж по секторам (верх и низ) стандартными записями WITS не описаны. Их передают в пользовательских записях 50–80 или в log WITSML, формат согласуют с сервисной компанией.</li>
+<li><b>Пустые значения и единицы.</b> −9999 в гамме, принятое за реальное значение, ломает корреляцию. Единицы глубины (метры или футы) нужно проверить в первый же час.</li>
+</ul>
+<p>Как это выглядит в потоке, видно в <a href="#wx">интерактивной модели</a> в начале статьи: включите гамму, привязанную к глубине долота, и кривая сдвинется относительно пласта на длину до датчика.</p>
+<p>Как по гамме и сопротивлению держат горизонтальный ствол в пласте, рассказано в статье <a href="../../articles/geosteering/">Геонавигация</a>.</p>
+<h2>Сравнение</h2>
+<div class="tablewrap tl"><table><thead><tr><th></th><th>WITS</th><th>WITSML</th></tr></thead><tbody><tr><td>Что передаёт</td><td>Текущие значения параметров</td><td>Объекты скважины с историей</td></tr><tr><td>Формат</td><td>Текст, номера параметров</td><td>XML со схемой</td></tr><tr><td>Транспорт</td><td>Последовательный порт, TCP</td><td>HTTP(S), WebSocket</td></tr><tr><td>Где работает</td><td>Буровая: станция → сборщик</td><td>Между буровой, офисом и компаниями</td></tr><tr><td>Единицы и метаданные</td><td>Нет</td><td>Есть</td></tr></tbody></table></div>
+<h2>Типичная схема</h2>
+<ol><li>Станция ГТИ и телесистема выдают WITS 0.</li>
+<li>Сборщик на буровой принимает поток, буферизует его при обрыве связи и передаёт на сервер.</li>
+<li>WITSML-сервер хранит данные как объекты скважины.</li>
+<li>Мониторинг, геонавигация, программы проектирования и сторонние системы забирают данные по WITSML.</li></ol>
+<h2>На что обратить внимание при подключении</h2>
+<ul><li><b>Словарь параметров.</b> Станции разных производителей по-разному заполняют записи WITS, поэтому нужна таблица соответствия: какой код что означает и в каких единицах.</li>
+<li><b>Единицы.</b> В WITS 0 они не передаются, их нужно согласовать заранее.</li>
+<li><b>Время.</b> По стандарту время в UTC. Проверьте, не шлёт ли станция местное время, и синхронизируйте часы.</li>
+<li><b>Пустые значения.</b> Узнайте, чем отправитель кодирует отсутствие данных, и отфильтруйте их до записи в базу.</li>
+<li><b>Пользовательские записи.</b> Запросите у сервисной компании описание записей 50–80 и резервных полей. Там часто самое ценное: сырые оси, вибрации, азимутальный каротаж.</li>
+<li><b>Обрыв связи.</b> Буфер на буровой, иначе данные за время обрыва потеряются.</li></ul>
+<div class="note"><b>Tempo</b> принимает WITS со станции ГТИ через сборщик на буровой, досылает данные после обрыва связи и выдаёт их по WITSML для мониторинга, <a href="../../etude/">Etude</a> и сторонних систем. <a href="../../tempo/">Подробнее о Tempo</a>.</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<section class="rel" aria-label="Связанные материалы"><h2>Связанные материалы</h2><div class="rel-g"><a href="../../tools/las-viewer/"><small>Инструмент</small>Просмотр LAS онлайн</a><a href="../../articles/witsml/"><small>Статья</small>WITSML с нуля</a><a href="../../articles/geosteering/"><small>Статья</small>Геонавигация</a><a href="../../tests/#data"><small>Тест</small>Данные: WITS и WITSML</a><a class="prod" href="../../tempo/"><small>Программа</small>Tempo — мониторинг бурения онлайн</a></div></section>
+<nav class="apn" aria-label="Соседние статьи"><a class="prev" href="../../articles/mwd-telemetry/"><small>Предыдущая</small>Сбои телесистемы</a><a class="next" href="../../articles/witsml/"><small>Следующая</small>WITSML с нуля</a></nav>
+</article></div>
+<script src="../../assets/j/4431636cc5.js"></script>
+<div class="w"><div class="cta"><div><h2>Подключить буровую к Tempo</h2><p>Данные станций ГТИ и ННБ в реальном времени для всех служб: операции, скрытое НПВ, подсказки ННБ.</p></div><div class="btns"><a class="btn pri" href="../../tempo/">Подробнее о Tempo</a></div></div></div>
+<script src="../../assets/j/2c46805e2a.js"></script>
+</main>
+<footer><div class="w">
+<div><b style="color:var(--ink)">DrillHarmony</b> · Etude · Tempo · SlideX<br>ИП Шайсламова Анастасия Васильевна · ИНН 780445570608 · <a href="../../privacy.html">Политика обработки персональных данных</a><br>© 2026 DrillHarmony. Материалы сайта защищены авторским правом. При цитировании нужна ссылка на drillharmony.com.</div>
+<div><a href="mailto:info@drillharmony.com">info@drillharmony.com</a></div>
+</div></footer>
+<script src="../../assets/j/c7b6858526.js"></script>
+<script src="../../bg.js" defer></script>
+</body></html>

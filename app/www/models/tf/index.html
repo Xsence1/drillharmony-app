@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ru" data-theme="dark"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0f14"><meta name="format-detection" content="telephone=no">
+<title>Куда пойдёт ствол при заданном toolface · DrillHarmony</title>
+<script src="../../assets/j/b82b602a49.js"></script><script src="../../assets/j/8963aff236.js"></script>
+<link rel="stylesheet" href="../../fonts/fonts.css"><link rel="stylesheet" href="../../assets/c/17f53e8b82.css"><link rel="stylesheet" href="../../assets/c/b31b379876.css">
+<link rel="stylesheet" href="../../app/app.css"><script src="../../app/app.js"></script>
+</head><body class="in-app k-model" data-slug="m-tf" data-path="articles/toolface/#ia-tf" data-kind="model" data-name="Куда пойдёт ствол при заданном toolface">
+<header class="abar"><a class="ib" href="../../index.html" data-back aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></a>
+<div class="ttl"><small>Модели</small><span>Куда пойдёт ствол при заданном toolface</span></div><button class="ib star" type="button" aria-label="В избранное" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg></button>
+<button id="theme" type="button" hidden aria-hidden="true"></button></header>
+<main class="app-main">
+<article class="article"><section aria-label="Интерактивная 3D-модель ориентирования отклонителя" class="wx ia" id="ia-tf">
+<div class="wx-top"><p class="hint">Выберите угол установки, и оранжевая дуга покажет, куда уйдёт ствол за интервал слайда. Нажмите «Нагрузить долото», чтобы увидеть, как реактивный момент уводит отклонитель влево.</p></div>
+<div class="ia-grid"><canvas aria-label="3D-вид ствола, циферблата отклонителя и дуг набора" class="ia-cv"></canvas>
+<div class="ia-side">
+<label class="ia-sl">Нужный toolface<output></output><input data-u="°" id="tf-tf" max="359" min="0" step="1" type="range" value="45"/></label>
+<label class="ia-sl">Зенит<output></output><input data-u="°" id="tf-i" max="90" min="1" step="1" type="range" value="30"/></label>
+<label class="ia-sl">Азимут<output></output><input data-u="°" id="tf-a" max="359" min="0" step="1" type="range" value="60"/></label>
+<label class="ia-sl">Интенсивность компоновки<output></output><input data-d="1" data-u="°/10 м" id="tf-dls" max="4" min=".5" step=".1" type="range" value="2"/></label>
+<label class="ia-sl">Длина слайда<output></output><input data-u=" м" id="tf-dm" max="30" min="5" step="1" type="range" value="10"/></label>
+<label class="ia-sl">Реактивный угол<output></output><input data-u="°" id="tf-ra" max="90" min="0" step="5" type="range" value="30"/></label>
+<div class="ia-btns"><button class="wx-b on" data-c="1" type="button">С упреждением</button><button class="wx-b" data-c="0" type="button">Без упреждения</button></div>
+<button class="wx-b pri" id="tf-go" type="button">Нагрузить долото</button>
+</div></div>
+<p class="ia-leg"><span><i style="background:var(--amber)"></i>куда нужно</span><span style="color:var(--bad,#ff8a6b)"><i class="d"></i>куда пойдёт без упреждения</span><span><i class="d"></i>дуги для 0°, 90°, 180°, 270°</span><span>стрелка на кольце — положение отклонителя от верхней стенки</span></p>
+<p class="ia-note" id="tf-o-msg"></p>
+<div class="ia-outs"><div class="ia-o key"><span>Выставить на пульте</span><b id="tf-o-set">—</b><small>°</small></div><div class="ia-o"><span>Изменение зенита</span><b id="tf-o-di">—</b><small>°</small></div><div class="ia-o"><span>Изменение азимута</span><b id="tf-o-da">—</b><small>°</small></div><div class="ia-o"><span>Зенит в конце</span><b id="tf-o-i2">—</b><small>°</small></div><div class="ia-o"><span>Азимут в конце</span><b id="tf-o-a2">—</b><small>°</small></div></div>
+<p class="ia-hint">Изменения зенита и азимута считаются по приближённым формулам из статьи, значения «в конце» точно по дуге. Реактивный угол здесь задаётся вручную: на буровой его уточняют по телесистеме после выхода на режим.</p>
+</section></article>
+<p class="src">На сайте: <a class="ext" href="https://drillharmony.com/articles/toolface/#ia-tf" rel="noopener">drillharmony.com/articles/toolface/#ia-tf</a></p>
+</main>
+
+<script src="../../assets/j/2d6f05688a.js"></script><script src="../../assets/j/82ef5376c6.js"></script><script src="../../assets/j/0f2711bf87.js"></script><script src="../../assets/j/c7b6858526.js"></script>
+</body></html>

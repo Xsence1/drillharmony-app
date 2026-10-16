@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru" data-theme="dark"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0f14"><meta name="format-detection" content="telephone=no">
+<title>Два ствола с одного куста: облака неопределённости и SF · DrillHarmony</title>
+<script src="../../assets/j/b82b602a49.js"></script><script src="../../assets/j/8963aff236.js"></script>
+<link rel="stylesheet" href="../../fonts/fonts.css"><link rel="stylesheet" href="../../assets/c/17f53e8b82.css"><link rel="stylesheet" href="../../assets/c/b31b379876.css">
+<link rel="stylesheet" href="../../app/app.css"><script src="../../app/app.js"></script>
+</head><body class="in-app k-model" data-slug="m-sf" data-path="articles/separation-factor/#ia-sf" data-kind="model" data-name="Два ствола с одного куста: облака неопределённости и SF">
+<header class="abar"><a class="ib" href="../../index.html" data-back aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></a>
+<div class="ttl"><small>Модели</small><span>Два ствола с одного куста: облака неопределённости и SF</span></div><button class="ib star" type="button" aria-label="В избранное" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg></button>
+<button id="theme" type="button" hidden aria-hidden="true"></button></header>
+<main class="app-main">
+<article class="article"><section aria-label="Интерактивная 3D-модель коэффициента разделения" class="wx ia" id="ia-sf">
+<div class="wx-top"><p class="hint">Двигайте глубину по бурящемуся стволу, и модель найдёт ближайшую точку соседнего ствола и посчитает SF. Сравните замеры только телесистемой и гироскоп на верхнем интервале.</p></div>
+<div class="ia-grid"><canvas aria-label="3D-вид двух стволов и колец неопределённости" class="ia-cv"></canvas>
+<div class="ia-side">
+<label class="ia-sl">Глубина по бурящемуся стволу<output></output><input data-u=" м" id="sf-md" max="2600" min="50" step="10" type="range" value="320"/></label>
+<button class="wx-b" id="sf-min" type="button">Перейти к минимуму SF</button>
+<div class="ia-sl">Замеры на верхнем интервале<div class="ia-btns" style="grid-column:1/-1"><button class="wx-b on" data-g="0" type="button">Только телесистема</button><button class="wx-b" data-g="1" type="button">Гироскоп до 800 м</button></div></div>
+<div class="ia-o"><span>Минимальный SF на стволе</span><b id="sf-o-min" style="font-size:16px">—</b></div>
+<div class="ia-o"><span>Решение на этой глубине</span><b id="sf-o-st" style="font-size:14px;line-height:1.3">—</b></div>
+</div></div>
+<p class="ia-leg"><span><i style="background:var(--amber)"></i>бурящийся ствол</span><span style="color:#5ec8d8"><i style="background:#5ec8d8"></i>соседний ствол</span><span>пунктир — кратчайшее расстояние; зелёный — SF ≥ 1,5, жёлтый — 1–1,5, красный — меньше 1</span></p>
+<div class="ia-outs"><div class="ia-o key"><span>SF по правилу ISCWSA</span><b id="sf-o-i">—</b></div><div class="ia-o"><span>SF по простой формуле</span><b id="sf-o-s">—</b></div><div class="ia-o"><span>Расстояние D</span><b id="sf-o-d">—</b><small>м</small></div><div class="ia-o"><span>σS вдоль линии центров</span><b id="sf-o-ss">—</b><small>м</small></div></div>
+<canvas aria-label="График SF по глубине" class="ia-cv flat" id="sf-ch" style="height:170px;margin-top:12px"></canvas>
+<p class="ia-hint">Модель учебная: неопределённость растёт пропорционально глубине (у телесистемы быстрее, у гироскопа медленнее), стволы 311,2 и 244,5 мм, запас 0,3 м, k = 3,5. Настоящий расчёт ведут по моделям приборов ISCWSA и OWSG.</p>
+</section></article>
+<p class="src">На сайте: <a class="ext" href="https://drillharmony.com/articles/separation-factor/#ia-sf" rel="noopener">drillharmony.com/articles/separation-factor/#ia-sf</a></p>
+</main>
+
+<script src="../../assets/j/2d6f05688a.js"></script><script src="../../assets/j/82ef5376c6.js"></script><script src="../../assets/j/7479aee97f.js"></script><script src="../../assets/j/c7b6858526.js"></script>
+</body></html>

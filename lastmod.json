@@ -1,0 +1,326 @@
+{
+"": {
+"d": "2026-10-16",
+"h": "9830fd954e"
+},
+"about/": {
+"d": "2026-10-16",
+"h": "c3ee72f211"
+},
+"articles/": {
+"d": "2026-10-16",
+"h": "3a00063a18"
+},
+"articles/ai-well-planning/": {
+"d": "2026-10-16",
+"h": "7b573d35b1"
+},
+"articles/azimuth-declination/": {
+"d": "2026-10-16",
+"h": "d81457699c"
+},
+"articles/bha-build/": {
+"d": "2026-10-16",
+"h": "22ac9a6196"
+},
+"articles/bit-hydraulics/": {
+"d": "2026-10-16",
+"h": "8fc135fdf0"
+},
+"articles/broomstick/": {
+"d": "2026-10-16",
+"h": "d33097e90e"
+},
+"articles/casing-run/": {
+"d": "2026-10-16",
+"h": "32837338cc"
+},
+"articles/dictionary/": {
+"d": "2026-10-16",
+"h": "7705c0db5e"
+},
+"articles/dogleg-severity/": {
+"d": "2026-10-16",
+"h": "612340b2fb"
+},
+"articles/ecd/": {
+"d": "2026-10-16",
+"h": "2263895392"
+},
+"articles/geosteering/": {
+"d": "2026-10-16",
+"h": "e2d45ac8e2"
+},
+"articles/glossary/": {
+"d": "2026-10-16",
+"h": "ccfc552ae8"
+},
+"articles/gyro/": {
+"d": "2026-10-16",
+"h": "37d70ae5e1"
+},
+"articles/hole-cleaning/": {
+"d": "2026-10-16",
+"h": "7a9fe97965"
+},
+"articles/interview/": {
+"d": "2026-10-16",
+"h": "ec0e50fe1e"
+},
+"articles/j-profile/": {
+"d": "2026-10-16",
+"h": "7cad47dbd0"
+},
+"articles/kick/": {
+"d": "2026-10-16",
+"h": "918f7d031b"
+},
+"articles/landing/": {
+"d": "2026-10-16",
+"h": "9bd62ab06a"
+},
+"articles/magnetic-qc/": {
+"d": "2026-10-16",
+"h": "18d2a20b9e"
+},
+"articles/migration/": {
+"d": "2026-10-16",
+"h": "9d27abaec0"
+},
+"articles/minimum-curvature/": {
+"d": "2026-10-16",
+"h": "7bf0da2d36"
+},
+"articles/motor-curve/": {
+"d": "2026-10-16",
+"h": "c4788cceba"
+},
+"articles/mse/": {
+"d": "2026-10-16",
+"h": "3795616fe7"
+},
+"articles/mwd-telemetry/": {
+"d": "2026-10-16",
+"h": "2a340c7a28"
+},
+"articles/nnb-training/": {
+"d": "2026-10-16",
+"h": "3651753941"
+},
+"articles/reporting/": {
+"d": "2026-10-16",
+"h": "189a83036e"
+},
+"articles/rss-vs-motor/": {
+"d": "2026-10-16",
+"h": "0d714f095a"
+},
+"articles/separation-factor/": {
+"d": "2026-10-16",
+"h": "e50eb75e85"
+},
+"articles/sidetrack/": {
+"d": "2026-10-16",
+"h": "9b1abb27c1"
+},
+"articles/slide-hacks/": {
+"d": "2026-10-16",
+"h": "9e03963d93"
+},
+"articles/stuck-pipe/": {
+"d": "2026-10-16",
+"h": "8f408ff96a"
+},
+"articles/toolface/": {
+"d": "2026-10-16",
+"h": "ffeabea3a8"
+},
+"articles/vibration/": {
+"d": "2026-10-16",
+"h": "640caa27d5"
+},
+"articles/weight-transfer/": {
+"d": "2026-10-16",
+"h": "3f774c7c7d"
+},
+"articles/wits-witsml/": {
+"d": "2026-10-16",
+"h": "5d1261b4ca"
+},
+"articles/witsml/": {
+"d": "2026-10-16",
+"h": "bf59c90cf1"
+},
+"articles/wob-loss/": {
+"d": "2026-10-16",
+"h": "ae9d59f1be"
+},
+"buy/": {
+"d": "2026-10-16",
+"h": "8a27c33fdc"
+},
+"calculators/": {
+"d": "2026-10-16",
+"h": "50ef498e88"
+},
+"calculators/annular-velocity/": {
+"d": "2026-10-16",
+"h": "a54ad35543"
+},
+"calculators/barite/": {
+"d": "2026-10-16",
+"h": "eb609b3108"
+},
+"calculators/bit-hydraulics/": {
+"d": "2026-10-16",
+"h": "3eb8e2e71f"
+},
+"calculators/buoyancy/": {
+"d": "2026-10-16",
+"h": "7a63689724"
+},
+"calculators/critical-rpm/": {
+"d": "2026-10-16",
+"h": "88269a25ba"
+},
+"calculators/dogleg/": {
+"d": "2026-10-16",
+"h": "0c8a77f4d7"
+},
+"calculators/ecd/": {
+"d": "2026-10-16",
+"h": "3634e48ea4"
+},
+"calculators/hookload/": {
+"d": "2026-10-16",
+"h": "972852935e"
+},
+"calculators/hydrostatic/": {
+"d": "2026-10-16",
+"h": "b5982df392"
+},
+"calculators/kill-mud/": {
+"d": "2026-10-16",
+"h": "2b56103c88"
+},
+"calculators/landing/": {
+"d": "2026-10-16",
+"h": "1ae74c1cf0"
+},
+"calculators/minimum-curvature/": {
+"d": "2026-10-16",
+"h": "f4957e9e27"
+},
+"calculators/motor/": {
+"d": "2026-10-16",
+"h": "6ce22122f1"
+},
+"calculators/mse/": {
+"d": "2026-10-16",
+"h": "695f3e3260"
+},
+"calculators/nmdc/": {
+"d": "2026-10-16",
+"h": "e6fea5f6ff"
+},
+"calculators/projection/": {
+"d": "2026-10-16",
+"h": "225b5f7904"
+},
+"calculators/raw-survey/": {
+"d": "2026-10-16",
+"h": "4e63fcfeaf"
+},
+"calculators/sag/": {
+"d": "2026-10-16",
+"h": "d6d401b3c8"
+},
+"calculators/short-collar/": {
+"d": "2026-10-16",
+"h": "0132884b74"
+},
+"calculators/survey-axes/": {
+"d": "2026-10-16",
+"h": "a8b4dda379"
+},
+"calculators/toolface/": {
+"d": "2026-10-16",
+"h": "c1f2f7b9c4"
+},
+"calculators/units/": {
+"d": "2026-10-16",
+"h": "d256497269"
+},
+"calculators/well-volume/": {
+"d": "2026-10-16",
+"h": "af3d346b0b"
+},
+"career/": {
+"d": "2026-10-16",
+"h": "53da7a2252"
+},
+"cheatsheet/": {
+"d": "2026-10-16",
+"h": "2749f26c51"
+},
+"consent.html": {
+"d": "2026-10-16",
+"h": "f6b3ff5839"
+},
+"etude/": {
+"d": "2026-10-16",
+"h": "c26ef61414"
+},
+"forum/": {
+"d": "2026-10-16",
+"h": "c0f3f2d540"
+},
+"pilot/": {
+"d": "2026-10-16",
+"h": "5ec036d578"
+},
+"play/": {
+"d": "2026-10-16",
+"h": "57f13ab5c1"
+},
+"privacy.html": {
+"d": "2026-10-16",
+"h": "f5ebe4d08d"
+},
+"security/": {
+"d": "2026-10-16",
+"h": "ccbec6db2b"
+},
+"slidex/": {
+"d": "2026-10-16",
+"h": "37db570551"
+},
+"tasks/": {
+"d": "2026-10-16",
+"h": "c597bfadea"
+},
+"tempo/": {
+"d": "2026-10-16",
+"h": "b674b54f7f"
+},
+"tests/": {
+"d": "2026-10-16",
+"h": "f8c1276b57"
+},
+"tools/": {
+"d": "2026-10-16",
+"h": "4829c4fff7"
+},
+"tools/las-viewer/": {
+"d": "2026-10-16",
+"h": "22a7c54423"
+},
+"tools/npt-cost/": {
+"d": "2026-10-16",
+"h": "381570ea79"
+},
+"tools/trajectory/": {
+"d": "2026-10-16",
+"h": "409acf6f50"
+}
+}

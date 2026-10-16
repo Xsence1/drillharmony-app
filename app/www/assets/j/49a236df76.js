@@ -1,0 +1,1 @@
+window.calc=function(){if(!1===window.dhOK)return;const e=N("q"),n=N("dh")/1e3,t=N("dp")/1e3,o=Math.PI/4*(n*n-t*t),d=o>0,c=(e,n,t)=>document.getElementById(e).textContent=d?F(n,t):"—";c("o_v",e/1e3/o,2),c("o_a",o,4),c("o_vm",e/1e3/o*60,1)},window.calc();

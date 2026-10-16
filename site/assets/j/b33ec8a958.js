@@ -1,0 +1,1 @@
+window.calc=function(){if(!1===window.dhOK)return;const n=N("i"),t=N("ang"),o=n>0,c=(n,t,c)=>document.getElementById(n).textContent=o?F(t,c):"—";c("o_30",3*n,2),c("o_ft",3.048*n,2),c("o_r",1800/(Math.PI*n),1),c("o_l",t/n*10,1)},window.calc();

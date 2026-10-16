@@ -1,0 +1,185 @@
+<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000}canvas{display:block}</style></head><body>
+<canvas id="c"></canvas>
+<script>
+// Процедурная иллюстрация: буровая на закате, зимняя тайга. Своя работа, без фото.
+const W = +(new URLSearchParams(location.search).get('w') || 2400), H = +(new URLSearchParams(location.search).get('h') || 1000);
+const RIGX = +(new URLSearchParams(location.search).get('x') || 0.6);
+const cv = document.getElementById('c'); cv.width = W; cv.height = H;
+const g = cv.getContext('2d');
+let seed = 7; const rnd = () => (seed = seed * 16807 % 2147483647) / 2147483647;
+// value noise
+const P = new Uint8Array(512); for (let i = 0; i < 256; i++) P[i] = i; for (let i = 255; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [P[i], P[j]] = [P[j], P[i]]; } for (let i = 0; i < 256; i++) P[i + 256] = P[i];
+const fade = t => t * t * (3 - 2 * t);
+const vn = (x, y) => { const xi = Math.floor(x) & 255, yi = Math.floor(y) & 255, xf = x - Math.floor(x), yf = y - Math.floor(y);
+  const a = P[P[xi] + yi] / 255, b = P[P[xi + 1] + yi] / 255, c = P[P[xi] + yi + 1] / 255, d = P[P[xi + 1] + yi + 1] / 255, u = fade(xf), v = fade(yf);
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v; };
+const fbm = (x, y, o = 6) => { let s = 0, a = .5, f = 1; for (let i = 0; i < o; i++) { s += a * vn(x * f, y * f); f *= 2.03; a *= .5; } return s; };
+const lerp = (a, b, t) => a + (b - a) * t, cl = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), ss = (a, b, x) => { const t = cl((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+const mix = (c1, c2, t) => [lerp(c1[0], c2[0], t), lerp(c1[1], c2[1], t), lerp(c1[2], c2[2], t)];
+
+const HZ = H * 0.66;               // горизонт
+const SX = W * (RIGX + 0.045), SY = HZ - H * 0.012; // солнце чуть правее вышки
+// ---------- небо и облака, попиксельно ----------
+const img = g.createImageData(W, H), D = img.data;
+const skyTop = [10, 18, 30], skyMid = [38, 48, 66], skyLow = [150, 92, 60], skyHz = [255, 168, 80];
+for (let y = 0; y < HZ + 4; y++) {
+  const ty = y / HZ;
+  for (let x = 0; x < W; x++) {
+    let c = ty < .55 ? mix(skyTop, skyMid, ss(0, .55, ty)) : ty < .85 ? mix(skyMid, skyLow, ss(.55, .85, ty)) : mix(skyLow, skyHz, ss(.85, 1, ty));
+    const dx = (x - SX) / W, dy = (y - SY) / H, dsun = Math.sqrt(dx * dx * 1.2 + dy * dy * 4);
+    const glow = Math.exp(-dsun * 7) * 1.0 + Math.exp(-dsun * 26) * 1.2;
+    c = mix(c, [255, 190, 110], cl(glow * .85));
+    // облака: вытянутые по горизонтали
+    const nx = x / W * 5.5, ny = y / H * 14;
+    let d = fbm(nx + 3.1, ny * .9 + fbm(nx * .6, ny * .5, 3) * 1.2, 7);
+    const band = ss(.05, .3, ty) * (1 - ss(.78, .97, ty));
+    d = ss(.36, .7, d) * band;
+    if (d > 0) {
+      const lit = Math.exp(-dsun * 3.2);           // подсветка у солнца
+      const under = ss(.3, .95, ty);                 // нижние облака теплее
+      const d2 = ss(.36, .7, fbm(nx + 3.1, (ny - .25) * .9 + fbm(nx * .6, (ny - .25) * .5, 3) * 1.2, 7)) * band;
+      const edge = cl((d - d2) * 3 + .2);            // нижний край освещён
+      let cc = mix([22, 28, 40], [70, 62, 72], under);
+      cc = mix(cc, [255, 150, 70], cl(lit * (.35 + edge * 1.4) * (.4 + under)));
+      cc = mix(cc, [255, 214, 150], cl(Math.exp(-dsun * 9) * edge * 1.5));
+      c = mix(c, cc, cl(d * 1.15));
+    }
+    const i = (y * W + x) * 4; D[i] = c[0]; D[i + 1] = c[1]; D[i + 2] = c[2]; D[i + 3] = 255;
+  }
+}
+// ---------- снег ----------
+for (let y = Math.floor(HZ); y < H; y++) {
+  const t = (y - HZ) / (H - HZ);
+  for (let x = 0; x < W; x++) {
+    let c = mix([70, 74, 96], [22, 28, 42], ss(0, 1, Math.pow(t, .7)));
+    const n = fbm(x / W * 9 / (0.3 + t), (y - HZ) / (H - HZ) * 26, 5);   // сугробы — вытянутые полосы
+    c = mix(c, [118, 124, 150], cl((n - .5) * 1.1) * (1 - t * .5));
+    c = mix(c, [16, 20, 32], cl((.42 - n) * 1.6) * .6);
+    const dx = (x - SX) / W, refl = Math.exp(-Math.abs(dx) * 4) * Math.exp(-t * 2.6);
+    c = mix(c, [255, 164, 92], cl(refl * .62));
+    const i = (y * W + x) * 4; D[i] = c[0]; D[i + 1] = c[1]; D[i + 2] = c[2]; D[i + 3] = 255;
+  }
+}
+g.putImageData(img, 0, 0);
+// солнечный диск
+let rg = g.createRadialGradient(SX, SY, 0, SX, SY, H * .05);
+rg.addColorStop(0, 'rgba(255,250,230,1)'); rg.addColorStop(.35, 'rgba(255,230,170,.95)'); rg.addColorStop(1, 'rgba(255,170,80,0)');
+g.fillStyle = rg; g.beginPath(); g.arc(SX, SY, H * .05, 0, 7); g.fill();
+
+// ---------- тайга на горизонте ----------
+const forest = (base, hgt, col, dens, alpha) => {
+  g.fillStyle = col; g.globalAlpha = alpha; g.beginPath(); g.moveTo(0, base + 20);
+  for (let x = 0; x <= W; x += dens) {
+    const h = hgt * (.45 + fbm(x / W * 9, base, 3) * 1.1) * (.7 + rnd() * .6);
+    g.lineTo(x, base - h * .35); g.lineTo(x + dens * .5, base - h); g.lineTo(x + dens, base - h * .35);
+  }
+  g.lineTo(W, base + 20); g.closePath(); g.fill(); g.globalAlpha = 1;
+};
+forest(HZ + 2, H * .022, '#2a2a3a', 5, .85);
+forest(HZ + 6, H * .03, '#1a1c28', 6, .95);
+// дымка у горизонта
+let lg = g.createLinearGradient(0, HZ - H * .05, 0, HZ + H * .04);
+lg.addColorStop(0, 'rgba(255,170,100,0)'); lg.addColorStop(.6, 'rgba(255,170,110,.18)'); lg.addColorStop(1, 'rgba(120,110,130,0)');
+g.fillStyle = lg; g.fillRect(0, HZ - H * .05, W, H * .09);
+
+// ---------- буровая ----------
+const lights = []; // [x,y,r,col,int]
+const ink = '#07090d';
+const RX = W * RIGX, FLOOR = HZ - H * .02, TOPY = H * .06, BW = H * .22, TW = H * .035;
+const leg = t => [lerp(BW / 2, TW / 2, t)];
+const xAt = (side, y) => { const t = (FLOOR - y) / (FLOOR - TOPY); return RX + side * lerp(BW / 2, TW / 2, Math.pow(t, .92)); };
+g.strokeStyle = ink; g.lineCap = 'round';
+// ноги
+g.lineWidth = H * .006;
+for (const s of [-1, 1]) { g.beginPath(); for (let y = FLOOR; y >= TOPY; y -= 4) g.lineTo(xAt(s, y), y); g.stroke(); }
+// внутренние ноги (перспектива)
+g.lineWidth = H * .0035; g.globalAlpha = .9;
+for (const s of [-1, 1]) { g.beginPath(); for (let y = FLOOR; y >= TOPY; y -= 4) g.lineTo(RX + (xAt(s, y) - RX) * .55, y); g.stroke(); }
+g.globalAlpha = 1;
+// пояса и раскосы
+let ys = []; { let y = FLOOR, step = H * .045; while (y > TOPY + 5) { ys.push(y); y -= step; step *= .955; } ys.push(TOPY); }
+g.lineWidth = H * .0022;
+for (let i = 0; i < ys.length; i++) {
+  const y = ys[i]; g.beginPath(); g.moveTo(xAt(-1, y), y); g.lineTo(xAt(1, y), y); g.stroke();
+  if (i < ys.length - 1) {
+    const y2 = ys[i + 1]; g.beginPath();
+    g.moveTo(xAt(-1, y), y); g.lineTo(xAt(1, y2), y2); g.moveTo(xAt(1, y), y); g.lineTo(xAt(-1, y2), y2);
+    g.moveTo(RX + (xAt(-1, y) - RX) * .55, y); g.lineTo(RX + (xAt(1, y2) - RX) * .55, y2); g.stroke();
+  }
+}
+// площадка верхового и кронблок
+const mb = ys[Math.floor(ys.length * .62)];
+g.fillStyle = ink; g.fillRect(xAt(-1, mb) - H * .03, mb - 3, (xAt(1, mb) - xAt(-1, mb)) + H * .045, H * .006);
+g.fillRect(RX - TW * .9, TOPY - H * .03, TW * 1.8, H * .032);
+g.fillRect(RX - TW * .35, TOPY - H * .05, TW * .7, H * .022);
+g.lineWidth = 2; g.beginPath(); g.moveTo(RX, TOPY - H * .05); g.lineTo(RX, TOPY - H * .075); g.stroke();
+// талевый блок и верхний привод
+const TB = lerp(TOPY, FLOOR, .55);
+g.lineWidth = 1.2; g.beginPath(); g.moveTo(RX - 3, TOPY); g.lineTo(RX - 3, TB); g.moveTo(RX + 3, TOPY); g.lineTo(RX + 3, TB); g.stroke();
+g.fillRect(RX - H * .009, TB, H * .018, H * .04);
+// свеча за пальцем
+g.lineWidth = 2; g.globalAlpha = .8; g.beginPath(); for (let k = 0; k < 7; k++) { g.moveTo(xAt(-1, mb) + 10 + k * 5, mb + 2); g.lineTo(xAt(-1, FLOOR) + 30 + k * 4, FLOOR); } g.stroke(); g.globalAlpha = 1;
+// огни на вышке
+for (let i = 1; i < ys.length - 1; i += 2) for (const s of [-1, 1]) lights.push([xAt(s, ys[i]), ys[i], H * .004, [255, 205, 140], .9]);
+lights.push([RX, TOPY - H * .074, H * .005, [255, 70, 50], 1]);
+lights.push([xAt(-1, mb) - H * .02, mb - 6, H * .006, [255, 225, 170], 1]);
+// основание и пол
+const SUB = H * .075;
+g.fillStyle = ink;
+g.fillRect(RX - BW * .95, FLOOR, BW * 1.9, H * .012);
+g.fillRect(RX - BW * .85, FLOOR + H * .012, BW * 1.7, SUB - H * .012);
+g.strokeStyle = '#141820'; g.lineWidth = 2;
+for (let k = 0; k < 9; k++) { const x0 = RX - BW * .85 + k * BW * 1.7 / 8; g.beginPath(); g.moveTo(x0, FLOOR + H * .012); g.lineTo(x0 + BW * 1.7 / 8, FLOOR + SUB); g.stroke(); }
+// будка бурильщика
+g.fillStyle = ink; g.fillRect(RX + BW * .5, FLOOR - H * .045, H * .07, H * .045);
+// мостки и лестница
+g.beginPath(); g.moveTo(RX - BW * .95, FLOOR + 4); g.lineTo(RX - BW * 2.4, FLOOR + SUB); g.lineTo(RX - BW * 2.4, FLOOR + SUB + 6); g.lineTo(RX - BW * .95, FLOOR + 12); g.fill();
+// прожекторы пола
+for (const dx of [-.8, -.3, .3, .8]) lights.push([RX + BW * dx, FLOOR - H * .006, H * .007, [255, 220, 160], 1.2]);
+for (let k = 0; k < 3; k++) lights.push([RX + BW * .52 + k * H * .02, FLOOR - H * .03, H * .004, [255, 200, 120], .9]);
+
+// ---------- городок: вагончики, ёмкости, техника ----------
+const gnd = HZ + H * .1;
+const trailer = (x, y, w, h, win) => {
+  g.fillStyle = 'rgba(5,8,14,.55)'; g.beginPath(); g.ellipse(x + w * .5, y + 2, w * .62, h * .16, 0, 0, 7); g.fill();
+  g.fillStyle = '#0c1016'; g.fillRect(x, y - h, w, h);
+  g.fillStyle = 'rgba(210,220,240,.18)'; g.fillRect(x, y - h, w, 3); // снег на крыше
+  for (let k = 0; k < win; k++) { const wx = x + w * (k + .6) / (win + .4); lights.push([wx, y - h * .55, h * .1, [255, 190, 110], .55]); g.fillStyle = '#ffcf8a'; g.fillRect(wx - h * .07, y - h * .62, h * .14, h * .14); }
+};
+const tank = (x, y, r, l) => { g.fillStyle = 'rgba(5,8,14,.55)'; g.beginPath(); g.ellipse(x + l * .5, y + 2, l * .6, r * .5, 0, 0, 7); g.fill(); g.fillStyle = '#0b0e14'; g.fillRect(x, y - r * 2, l, r * 2); g.beginPath(); g.ellipse(x + l, y - r, r * .35, r, 0, 0, 7); g.fill(); g.fillStyle = 'rgba(200,210,230,.15)'; g.fillRect(x, y - r * 2, l, 2); };
+const y1 = FLOOR + SUB;
+tank(RX - BW * 3.6, y1, H * .022, H * .16); tank(RX - BW * 3.5, y1 + H * .02, H * .02, H * .14);
+trailer(RX + BW * 1.1, y1, H * .2, H * .05, 4); trailer(RX + BW * 2.15, y1 + H * .012, H * .17, H * .045, 3);
+trailer(RX - BW * 2.3, y1 + H * .035, H * .22, H * .055, 5);
+trailer(RX + BW * 3.1, y1 + H * .055, H * .26, H * .06, 5);
+trailer(RX - BW * 4.6, y1 + H * .07, H * .26, H * .065, 6);
+tank(RX + BW * 4.6, y1 - H * .01, H * .02, H * .12);
+// дальние огни на горизонте
+for (let k = 0; k < 40; k++) { const x = rnd() * W; if (Math.abs(x - RX) < BW * 2) continue; lights.push([x, HZ + rnd() * H * .02, H * .0025, [255, 200, 140], .5 + rnd() * .4]); }
+// дорожки на снегу
+g.strokeStyle = 'rgba(25,30,44,.55)'; g.lineWidth = H * .006;
+g.beginPath(); g.moveTo(RX - BW * 1.2, y1 + 6); g.bezierCurveTo(RX - BW * .5, H * .86, RX - BW * 2.5, H * .93, RX - BW * 3.5, H + 10); g.stroke();
+g.beginPath(); g.moveTo(RX - BW * 1.0, y1 + 6); g.bezierCurveTo(RX - BW * .2, H * .86, RX - BW * 2.1, H * .93, RX - BW * 3.0, H + 10); g.stroke();
+// длинные тени от огней на снегу (тёплые отражения)
+for (const [x, y, r, c, a] of lights) if (y > FLOOR - 20) { const gr = g.createRadialGradient(x, y + H * .05, 0, x, y + H * .05, H * .09); gr.addColorStop(0, `rgba(${c},${.18 * a})`); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(x - H * .1, y, H * .2, H * .16); }
+
+// ели на переднем плане по краям
+const spruce = (x, base, h) => { g.fillStyle = '#05070b'; g.beginPath(); g.moveTo(x, base - h); const n = 9; for (let k = 1; k <= n; k++) { const yy = base - h + h * k / n, ww = h * .22 * (k / n) + 2; g.lineTo(x + ww, yy); g.lineTo(x + ww * .45, yy - h * .02); } for (let k = n; k >= 1; k--) { const yy = base - h + h * k / n, ww = h * .22 * (k / n) + 2; g.lineTo(x - ww * .45, yy - h * .02); g.lineTo(x - ww, yy); } g.closePath(); g.fill(); g.fillRect(x - h * .012, base - h * .02, h * .024, h * .04); };
+[[.02, .98, .5], [.06, 1.0, .38], [.11, .99, .3], [.95, .99, .42], [.99, 1.0, .55], [.9, 1.01, .28]].forEach(([fx, fb, fh]) => spruce(W * fx, H * fb, H * fh));
+// ---------- свечение огней ----------
+g.globalCompositeOperation = 'lighter';
+for (const [x, y, r, c, a] of lights) {
+  const gr = g.createRadialGradient(x, y, 0, x, y, r * 9); gr.addColorStop(0, `rgba(${c},${.55 * a})`); gr.addColorStop(.25, `rgba(${c},${.18 * a})`); gr.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = gr; g.beginPath(); g.arc(x, y, r * 9, 0, 7); g.fill();
+  g.fillStyle = `rgba(255,245,225,${a})`; g.beginPath(); g.arc(x, y, r * .7, 0, 7); g.fill();
+}
+// солнце просвечивает сквозь вышку
+rg = g.createRadialGradient(SX, SY, 0, SX, SY, H * .25); rg.addColorStop(0, 'rgba(255,190,110,.45)'); rg.addColorStop(1, 'rgba(255,140,60,0)');
+g.fillStyle = rg; g.fillRect(SX - H * .3, SY - H * .3, H * .6, H * .6);
+g.globalCompositeOperation = 'source-over';
+// виньетка и зерно
+rg = g.createRadialGradient(W * .6, H * .55, H * .2, W * .6, H * .55, W * .75); rg.addColorStop(0, 'rgba(0,0,0,0)'); rg.addColorStop(1, 'rgba(0,0,0,.55)');
+g.fillStyle = rg; g.fillRect(0, 0, W, H);
+const gi = g.getImageData(0, 0, W, H), GD = gi.data; for (let i = 0; i < GD.length; i += 4) { const n = (rnd() - .5) * 7; GD[i] += n; GD[i + 1] += n; GD[i + 2] += n; } g.putImageData(gi, 0, 0);
+document.title = 'done';
+</script></body></html>

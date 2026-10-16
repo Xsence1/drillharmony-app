@@ -1,0 +1,1 @@
+try{var t=localStorage.getItem("dh-theme");"light"!==t&&"dark"!==t||(document.documentElement.dataset.theme=t)}catch(t){}

@@ -1,0 +1,44 @@
+<!doctype html>
+<!-- DrillHarmony · © ИП Шайсламова А. В. · drillharmony.com · Материалы сайта защищены авторским правом. Копирование без письменного разрешения правообладателя запрещено. -->
+<html lang="ru" data-theme="dark"><head><meta charset="utf-8"><script src="../assets/j/b82b602a49.js"></script><meta name="author" content="DrillHarmony, ИП Шайсламова А. В."><meta name="copyright" content="© ИП Шайсламова А. В., drillharmony.com"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Игра «Посади горизонталь за 60 секунд» — проверь себя как инженер ННБ | DrillHarmony</title>
+<meta name="description" content="Браузерная игра для инженеров ННБ: слайд и ротор, кровля пласта по ГК. Войдите в пласт горизонтально и удержитесь в нём. Без регистрации.">
+<link rel="canonical" href="https://drillharmony.com/play/">
+<meta property="og:type" content="website"><meta property="og:locale" content="ru_RU"><meta property="og:site_name" content="DrillHarmony.com">
+<meta property="og:url" content="https://drillharmony.com/play/"><meta property="og:title" content="Игра «Посади горизонталь за 60 секунд» — проверь себя как инженер ННБ | DrillHarmony"><meta property="og:description" content="Браузерная игра для инженеров ННБ: слайд и ротор, кровля пласта по ГК. Войдите в пласт горизонтально и удержитесь в нём. Без регистрации.">
+<meta property="og:image" content="https://drillharmony.com/og/article-tf.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.ico" sizes="any"><link rel="icon" href="../favicon.svg" type="image/svg+xml"><link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="../apple-touch-icon.png"><meta name="theme-color" content="#080d10">
+<link rel="stylesheet" href="../fonts/fonts.css"><link rel="stylesheet" href="../assets/page.css">
+<script src="../assets/j/8963aff236.js"></script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Посади горизонталь за 60 секунд", "description": "Браузерная игра для инженеров ННБ: слайд и ротор, кровля пласта по ГК. Войдите в пласт горизонтально и удержитесь в нём. Без регистрации.", "inLanguage": "ru", "url": "https://drillharmony.com/play/"}</script>
+<link rel="stylesheet" href="../assets/c/@articles.css"><link rel="stylesheet" href="../assets/c/@tools.css"></head><body>
+<header class="top"><div class="w"><a class="mark" href="../" aria-label="DrillHarmony — на главную"><svg viewBox="0 0 28 28" width="26" height="26" aria-hidden="true"><g stroke="currentColor" stroke-width="1.2" opacity=".45"><path d="M2 6h24M2 10h24M2 14h24"/></g><path d="M7 3v8c0 5 3 9 8 11.5 2.5 1.2 5 1.8 8 1.8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><circle cx="23.5" cy="24.3" r="2.6" fill="currentColor"/></svg> DrillHarmony</a>
+<nav class="nav"><a href="../etude/">Etude</a><a href="../tempo/">Tempo</a><a href="../slidex/">SlideX</a><a href="../articles/" aria-current="page">Статьи</a><a href="../calculators/">Калькуляторы</a><button class="tgl" id="theme" type="button" aria-label="Переключить тему" title="Светлая / тёмная тема"><svg class="moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="currentColor"/></svg><svg class="sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg></button></nav></div></header>
+<nav class="crumbs w" aria-label="Навигация"><a href="../">DrillHarmony</a> / Игра</nav>
+<main>
+<div class="w artwrap solo">
+<article class="article">
+<div class="eyebrow">Игра для инженеров ННБ</div>
+<h1>Посади горизонталь за 60 секунд</h1>
+<p class="lead">Ствол идёт с зенитом около 50°, впереди пласт толщиной 5 м. Где точно кровля, неизвестно: по проекту она на пунктирной линии, на деле может оказаться выше или ниже и с наклоном. Войдите в пласт почти горизонтально и удержитесь в нём до конца минуты.</p>
+<section class="pg" id="pg" aria-label="Игра: посади горизонталь">
+<div class="pg-hud"><div><span>Время</span><b id="pg-t">60 с</b></div><div><span>Зенит</span><b id="pg-inc">—</b></div><div><span>До кровли по проекту</span><b id="pg-plan">—</b></div><div><span>ГК</span><b id="pg-grv">—</b></div><div><span>Режим</span><b id="pg-mode">Ротор</b></div><div><span>В пласте</span><b id="pg-zone">—</b></div></div>
+<canvas class="pg-cv" id="pg-cv" role="img" aria-label="Разрез: ствол, проектная кровля и подошва пласта"></canvas>
+<div class="pg-ctl"><button type="button" id="pg-up">▲ Слайд на набор<small>держать · стрелка вверх или W</small></button><button type="button" id="pg-dn">▼ Слайд на падение<small>держать · стрелка вниз или S</small></button></div>
+<div class="pg-ov" id="pg-start"><div class="pg-card"><h2>Посади горизонталь за 60 секунд</h2><ul><li>Отпустили кнопки, и пошёл ротор: ствол идёт прямо и чуть падает.</li><li>Держите кнопку, чтобы слайдить: набор или падение 8° на 30 м.</li><li>Если ГК падает и ствол становится жёлтым, вы в коллекторе. Если растёт, подходите к глинам.</li><li>Очки: 70 % за долю горизонтали в пласте, 30 % за то, насколько горизонтально вошли.</li></ul><div class="pg-btns"><button type="button" class="btn pri" id="pg-go">Начать</button></div><p class="pg-best" id="pg-best"></p></div></div>
+<div class="pg-ov" id="pg-res" hidden><div class="pg-card"><div class="pg-big"><span id="pg-sc">0</span><small> / 100</small></div><h2 id="pg-gr"></h2><div id="pg-det"></div><div class="pg-btns"><button type="button" class="btn pri" id="pg-again">Ещё раз</button><button type="button" class="btn" id="pg-share">Поделиться результатом</button><a class="btn" href="../slidex/">Полная версия в SlideX</a></div></div></div>
+</section>
+<h2>Что в игре упрощено</h2>
+<p>Это разминка. Здесь замер мгновенный и прямо на долоте, нет реактивного момента, компоновка всегда даёт ровно 8°/30 м, а ротор одинаково роняет угол. В реальной скважине замер отстаёт от долота на 10–20 м, а способность компоновки меняется от пласта к пласту, поэтому посадку считают заранее.</p>
+<ul><li>Как рассчитать посадку на цель: <a href="../articles/landing/">статья</a> и <a href="../calculators/landing/">калькулятор посадки</a>.</li><li>Как ведут ствол по ГК и сопротивлению: <a href="../articles/geosteering/">Геонавигация</a>.</li><li>Ориентирование, отставание замера, реактивный момент и осложнения есть в тренажёре <a href="../slidex/">SlideX</a>.</li></ul>
+</article></div>
+<script src="../assets/j/4431636cc5.js"></script>
+<script src="../assets/j/@play.js"></script>
+</main>
+<footer><div class="w">
+<div><b style="color:var(--ink)">DrillHarmony</b> · Etude · Tempo · SlideX<br>ИП Шайсламова Анастасия Васильевна · ИНН 780445570608 · <a href="../privacy.html">Политика обработки персональных данных</a><br>© 2026 DrillHarmony. Материалы сайта защищены авторским правом. При цитировании нужна ссылка на drillharmony.com.</div>
+<div><a href="mailto:info@drillharmony.com">info@drillharmony.com</a></div>
+</div></footer>
+<script src="../assets/j/c7b6858526.js"></script>
+<script src="../bg.js" defer></script>
+</body></html>

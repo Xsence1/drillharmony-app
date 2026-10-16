@@ -1,0 +1,35 @@
+# DrillHarmony — защита от массового копирования сайта (Apache, REG.RU)
+# © ИП Шайсламова А. В. · drillharmony.com
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# Программы для выкачивания сайтов целиком и массовые парсеры
+RewriteCond %{HTTP_USER_AGENT} (HTTrack|WebCopier|WebZIP|Teleport|Offline\ Explorer|SiteSucker|WebStripper|WebReaper|Website\ Copier|Website\ eXtractor|Wget|python-requests|python-urllib|Scrapy|Go-http-client|libwww-perl|Java/|MJ12bot|BLEXBot|DataForSeoBot|PetalBot|MegaIndex|serpstatbot) [NC]
+RewriteRule .* - [F,L]
+
+# Видео нельзя встраивать на чужие сайты (свой сайт, поисковики и прямые заходы — можно)
+RewriteCond %{HTTP_REFERER} !^$
+RewriteCond %{HTTP_REFERER} !^https?://([a-z0-9-]+\.)*drillharmony\.com [NC]
+RewriteCond %{HTTP_REFERER} !(google|yandex|bing)\. [NC]
+RewriteRule \.(mp4|webm)$ - [F,NC,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+# Сайт нельзя показать внутри чужой страницы (кроме Вебвизора Яндекс Метрики)
+Header always set Content-Security-Policy "frame-ancestors 'self' https://webvisor.com https://*.webvisor.com https://metrika.yandex.ru https://metrika.yandex.by https://metrica.yandex.com"
+Header always set X-Content-Type-Options "nosniff"
+</IfModule>
+
+# Кеш: файлы с хешем в имени — надолго, HTML и общие файлы — всегда проверять
+<IfModule mod_headers.c>
+<FilesMatch "\.(html|xml|json|txt)$">
+Header set Cache-Control "no-cache"
+</FilesMatch>
+<FilesMatch "^[0-9a-f]{10}\.(js|css)$">
+Header set Cache-Control "public, max-age=31536000, immutable"
+</FilesMatch>
+<FilesMatch "^(page\.css|bg\.js|fonts\.css)$">
+Header set Cache-Control "no-cache"
+</FilesMatch>
+</IfModule>

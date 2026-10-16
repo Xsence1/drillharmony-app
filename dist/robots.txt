@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /_leads/
+Disallow: /lead.php
+Disallow: /page.html
+Allow: /
+
+Sitemap: https://drillharmony.com/sitemap.xml

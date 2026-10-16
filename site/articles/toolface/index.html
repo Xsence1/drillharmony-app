@@ -1,0 +1,95 @@
+<!doctype html>
+<!-- DrillHarmony · © ИП Шайсламова А. В. · drillharmony.com · Материалы сайта защищены авторским правом. Копирование без письменного разрешения правообладателя запрещено. -->
+<html lang="ru" data-theme="dark"><head><meta charset="utf-8"><script src="../../assets/j/b82b602a49.js"></script><meta name="author" content="DrillHarmony, ИП Шайсламова А. В."><meta name="copyright" content="© ИП Шайсламова А. В., drillharmony.com"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ориентирование отклонителя и реактивный момент в слайде | DrillHarmony</title>
+<meta name="description" content="Как ориентировать отклонитель при бурении слайдом: GTF и MTF, как угол установки делит набор между зенитом и азимутом, учёт реактивного момента. Формулы и пример.">
+<link rel="canonical" href="https://drillharmony.com/articles/toolface/">
+<meta property="og:type" content="website"><meta property="og:locale" content="ru_RU"><meta property="og:site_name" content="DrillHarmony.com">
+<meta property="og:url" content="https://drillharmony.com/articles/toolface/"><meta property="og:title" content="Ориентирование отклонителя и реактивный момент в слайде | DrillHarmony"><meta property="og:description" content="Как ориентировать отклонитель при бурении слайдом: GTF и MTF, как угол установки делит набор между зенитом и азимутом, учёт реактивного момента. Формулы и пример.">
+<meta property="og:image" content="https://drillharmony.com/og/article-tf.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../../favicon.ico" sizes="any"><link rel="icon" href="../../favicon.svg" type="image/svg+xml"><link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="../../apple-touch-icon.png"><meta name="theme-color" content="#080d10">
+<link rel="stylesheet" href="../../fonts/fonts.css"><link rel="stylesheet" href="../../assets/page.css">
+<script src="../../assets/j/8963aff236.js"></script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://drillharmony.com/#org", "name": "DrillHarmony", "url": "https://drillharmony.com/", "logo": "https://drillharmony.com/icon-512.png", "email": "info@drillharmony.com"}, {"@type": "Article", "headline": "Ориентирование отклонителя и реактивный момент в слайде", "description": "Как ориентировать отклонитель при бурении слайдом: GTF и MTF, как угол установки делит набор между зенитом и азимутом, учёт реактивного момента. Формулы и пример.", "inLanguage": "ru", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "author": {"@id": "https://drillharmony.com/#org"}, "publisher": {"@id": "https://drillharmony.com/#org"}, "mainEntityOfPage": "https://drillharmony.com/articles/toolface/", "image": "https://drillharmony.com/og/article-tf.png"}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "DrillHarmony", "item": "https://drillharmony.com/"}, {"@type": "ListItem", "position": 2, "name": "Статьи", "item": "https://drillharmony.com/articles/"}, {"@type": "ListItem", "position": 3, "name": "Ориентирование отклонителя и реактивный момент в слайде", "item": "https://drillharmony.com/articles/toolface/"}]}]}</script>
+</head><body>
+<header class="top"><div class="w"><a class="mark" href="../../" aria-label="DrillHarmony — на главную"><svg viewBox="0 0 28 28" width="26" height="26" aria-hidden="true"><g stroke="currentColor" stroke-width="1.2" opacity=".45"><path d="M2 6h24M2 10h24M2 14h24"/></g><path d="M7 3v8c0 5 3 9 8 11.5 2.5 1.2 5 1.8 8 1.8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><circle cx="23.5" cy="24.3" r="2.6" fill="currentColor"/></svg> DrillHarmony</a>
+<nav class="nav"><a href="../../etude/">Etude</a><a href="../../tempo/">Tempo</a><a href="../../slidex/">SlideX</a><a href="../../articles/" aria-current="page">Статьи</a><a href="../../calculators/">Калькуляторы</a><button class="tgl" id="theme" type="button" aria-label="Переключить тему" title="Светлая / тёмная тема"><svg class="moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="currentColor"/></svg><svg class="sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg></button></nav></div></header>
+<nav class="crumbs w" aria-label="Навигация"><a href="../../">DrillHarmony</a> / <a href="../../articles/">Статьи</a> / Ориентирование отклонителя и реактивный момент в слайде</nav>
+<main>
+<div class="w artwrap"><aside class="anav-wrap"><details class="anav" open><summary>Все статьи</summary><nav aria-label="Статьи"><div class="ang"><div class="ang-h">Траектория</div><a href="../../articles/minimum-curvature/">Метод минимальной кривизны</a><a href="../../articles/j-profile/">Расчёт J-профиля</a><a href="../../articles/dogleg-severity/">Интенсивность искривления</a><a href="../../articles/azimuth-declination/">Азимуты и магнитное склонение</a><a href="../../articles/separation-factor/">Коэффициент разделения SF</a><a href="../../articles/magnetic-qc/">Магнитные помехи и контроль замеров</a><a href="../../articles/geosteering/">Геонавигация</a><a href="../../articles/landing/">Посадка горизонтали</a><a href="../../articles/gyro/">Гироскоп: когда обязателен</a><a href="../../articles/sidetrack/">Боковой ствол и зарезка</a></div><div class="ang"><div class="ang-h">Ориентирование и КНБК</div><a href="../../articles/toolface/" aria-current="page">Отклонитель и реактивный момент</a><a href="../../articles/bha-build/">КНБК для набора кривизны</a><a href="../../articles/rss-vs-motor/">РУС или ВЗД</a><a href="../../articles/weight-transfer/">Передача нагрузки в слайде</a><a href="../../articles/wob-loss/">Нагрузка не доходит до долота</a><a href="../../articles/slide-hacks/">Лайфхаки слайда</a><a href="../../articles/motor-curve/">Характеристика ВЗД и срыв</a></div><div class="ang"><div class="ang-h">Бурение, долото, колонна</div><a href="../../articles/mse/">MSE: эффективность бурения</a><a href="../../articles/bit-hydraulics/">Гидравлика долота</a><a href="../../articles/broomstick/">«Метла»: вес на крюке</a><a href="../../articles/casing-run/">Спуск колонны в горизонталь</a></div><div class="ang"><div class="ang-h">Гидравлика и осложнения</div><a href="../../articles/ecd/">ЭЦП</a><a href="../../articles/hole-cleaning/">Очистка ствола</a><a href="../../articles/kick/">ГНВП и глушение</a><a href="../../articles/stuck-pipe/">Прихват колонны</a><a href="../../articles/vibration/">Вибрации и stick-slip</a><a href="../../articles/mwd-telemetry/">Сбои телесистемы</a></div><div class="ang"><div class="ang-h">Данные, программы, обучение</div><a href="../../articles/wits-witsml/">WITS: поток с буровой</a><a href="../../articles/witsml/">WITSML с нуля</a><a href="../../articles/migration/">Переход на новое ПО</a><a href="../../articles/ai-well-planning/">ИИ в проектировании</a><a href="../../articles/nnb-training/">Обучение инженеров ННБ</a><a href="../../articles/reporting/">Отчётность инженера ННБ</a><a href="../../articles/interview/">Вопросы на собеседовании</a><a href="../../articles/glossary/">Словарь терминов</a><a href="../../articles/dictionary/">Словарь RU–EN</a></div><div class="ang ang-more"><a href="../../articles/">Все статьи</a><a href="../../calculators/">Калькуляторы</a></div></nav></details></aside>
+<article class="article">
+<div class="eyebrow">Статьи · ориентирование</div>
+<h1>Ориентирование отклонителя и реактивный момент в слайде</h1>
+<p class="lead">В слайде направление набора задаёт положение отклонителя, угол установки (toolface). Ошибиться в нём на 30–40° значит потратить интервал впустую или уйти от проекта. Ниже о том, какой отклонитель смотреть, как угол установки делит набор между зенитом и азимутом и откуда берётся реактивный момент.</p>
+<div class="tldr"><b>Коротко</b><ul><li>Toolface — куда смотрит отклонитель: 0° — набор зенита, 180° — спад, 90° — вправо, 270° — влево.</li><li>Почти в вертикали работают по магнитному отклонителю, после выхода из вертикали по гравитационному.</li><li>Под нагрузкой двигатель закручивает корпус влево, поэтому отклонитель ставят с упреждением вправо.</li><li>Повернуть по азимуту легко на малом зените и трудно на большом.</li></ul><div class="tldr-act"><button type="button" class="fx-all" aria-pressed="false">Подробнее на формулах</button></div></div>
+<section class="wx ia" id="ia-tf" aria-label="Интерактивная 3D-модель ориентирования отклонителя">
+<div class="wx-top"><div class="eyebrow">Интерактивная 3D-модель</div><b>Куда пойдёт ствол при заданном toolface</b><p>Выберите угол установки, и оранжевая дуга покажет, куда уйдёт ствол за интервал слайда. Нажмите «Нагрузить долото», чтобы увидеть, как реактивный момент уводит отклонитель влево.</p></div>
+<div class="ia-grid"><canvas class="ia-cv" aria-label="3D-вид ствола, циферблата отклонителя и дуг набора"></canvas>
+<div class="ia-side">
+<label class="ia-sl">Нужный toolface<output></output><input type="range" id="tf-tf" min="0" max="359" step="1" value="45" data-u="°"></label>
+<label class="ia-sl">Зенит<output></output><input type="range" id="tf-i" min="1" max="90" step="1" value="30" data-u="°"></label>
+<label class="ia-sl">Азимут<output></output><input type="range" id="tf-a" min="0" max="359" step="1" value="60" data-u="°"></label>
+<label class="ia-sl">Интенсивность компоновки<output></output><input type="range" id="tf-dls" min=".5" max="4" step=".1" value="2" data-u="°/10 м" data-d="1"></label>
+<label class="ia-sl">Длина слайда<output></output><input type="range" id="tf-dm" min="5" max="30" step="1" value="10" data-u=" м"></label>
+<label class="ia-sl">Реактивный угол<output></output><input type="range" id="tf-ra" min="0" max="90" step="5" value="30" data-u="°"></label>
+<div class="ia-btns"><button type="button" class="wx-b on" data-c="1">С упреждением</button><button type="button" class="wx-b" data-c="0">Без упреждения</button></div>
+<button type="button" class="wx-b pri" id="tf-go">Нагрузить долото</button>
+</div></div>
+<p class="ia-leg"><span><i style="background:var(--amber)"></i>куда нужно</span><span style="color:var(--bad,#ff8a6b)"><i class="d"></i>куда пойдёт без упреждения</span><span><i class="d"></i>дуги для 0°, 90°, 180°, 270°</span><span>стрелка на кольце — положение отклонителя от верхней стенки</span></p>
+<p class="ia-note" id="tf-o-msg"></p>
+<div class="ia-outs"><div class="ia-o key"><span>Выставить на пульте</span><b id="tf-o-set">—</b><small>°</small></div><div class="ia-o"><span>Изменение зенита</span><b id="tf-o-di">—</b><small>°</small></div><div class="ia-o"><span>Изменение азимута</span><b id="tf-o-da">—</b><small>°</small></div><div class="ia-o"><span>Зенит в конце</span><b id="tf-o-i2">—</b><small>°</small></div><div class="ia-o"><span>Азимут в конце</span><b id="tf-o-a2">—</b><small>°</small></div></div>
+<p class="ia-hint">Изменения зенита и азимута считаются по приближённым формулам из статьи, значения «в конце» точно по дуге. Реактивный угол здесь задаётся вручную: на буровой его уточняют по телесистеме после выхода на режим.</p>
+</section>
+
+<h2>Гравитационный и магнитный отклонитель</h2>
+<ul><li><b>Магнитный (MTF)</b> отсчитывается от магнитного севера. Его используют почти в вертикальном стволе, при зените примерно до 5–8°, где гравитационный угол неустойчив.</li>
+<li><b>Гравитационный (GTF)</b> отсчитывается от верхней стенки ствола: 0° — набор зенита, 180° — спад, 90° — поворот вправо, 270° (−90°) — влево. После выхода из вертикали работают по нему.</li></ul>
+<h2>Как угол установки делит набор</h2>
+<p>На интервале ΔMD с интенсивностью i (°/10 м) приближённо:</p>
+<details class="fx"><summary>Показать формулу</summary><div class="formula">ΔI ≈ i · ΔMD/10 · cos(TF)
+ΔA ≈ i · ΔMD/10 · sin(TF) / sin I</div></details>
+<p>Пример: интенсивность компоновки 2°/10 м, интервал 10 м, зенит 30°.</p>
+<div class="tablewrap"><table><thead><tr><th>Угол установки</th><th>Изменение зенита</th><th>Изменение азимута</th></tr></thead><tbody><tr><td>0°</td><td>2,00°</td><td>0,00°</td></tr><tr><td>45°</td><td>1,41°</td><td>2,83°</td></tr><tr><td>90°</td><td>0,00°</td><td>4,00°</td></tr><tr><td>135°</td><td>−1,41°</td><td>2,83°</td></tr><tr><td>180°</td><td>−2,00°</td><td>0,00°</td></tr></tbody></table></div>
+<p>На малых зенитах азимут поворачивается очень легко (делим на sin I), на больших тяжело. Поэтому разворот по азимуту выгоднее делать раньше, пока зенит небольшой.</p>
+<h2>Реактивный момент</h2>
+<p>Когда долото нагружено, двигатель закручивает свой корпус в обратную сторону, против часовой стрелки, если смотреть сверху. Отклонитель уходит влево от установленного положения, и тем сильнее, чем больше нагрузка, перепад давления на двигателе и длина колонны.</p>
+<ul><li>Перед нагрузкой отклонитель выставляют правее нужного на величину реактивного угла.</li>
+<li>Угол уточняют по показаниям телесистемы после выхода на режим и корректируют поворотом ротора небольшими шагами.</li>
+<li>Изменение нагрузки меняет и реактивный момент, и отклонитель «гуляет». Для стабильного слайда главное ровная подача.</li></ul>
+<h2>Частые ошибки</h2>
+<ul><li>Поворот ротора без снятия натяжения колонны: отклонитель «догоняет» команду с опозданием.</li>
+<li>Работа по GTF почти в вертикали, когда угол установки ещё не определён надёжно.</li>
+<li>Оценка по одному замеру: отклонитель нужно смотреть в динамике, за несколько кадров телесистемы.</li></ul>
+<div class="note"><b>Где отработать.</b> В <a href="../../slidex/">SlideX</a> на пульте учитывается реактивный момент: слушатель выставляет отклонитель с упреждением, держит его при изменении нагрузки, а разбор показывает, где ушли от проекта.</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<section class="rel" aria-label="Связанные материалы"><h2>Связанные материалы</h2><div class="rel-g"><a href="../../calculators/toolface/"><small>Калькулятор</small>Положение отклонителя</a><a href="../../calculators/projection/"><small>Калькулятор</small>Прогноз на долото</a><a href="../../articles/slide-hacks/"><small>Статья</small>Лайфхаки слайда</a><a href="../../articles/motor-curve/"><small>Статья</small>Характеристика ВЗД и срыв</a><a href="../../tests/#orientation"><small>Тест</small>Ориентирование и слайд</a><a class="prod" href="../../slidex/"><small>Программа</small>SlideX — тренажёр инженера ННБ</a></div></section>
+<nav class="apn" aria-label="Соседние статьи"><a class="prev" href="../../articles/sidetrack/"><small>Предыдущая</small>Боковой ствол и зарезка</a><a class="next" href="../../articles/bha-build/"><small>Следующая</small>КНБК для набора кривизны</a></nav>
+</article></div>
+<script src="../../assets/j/4431636cc5.js"></script>
+<div class="w"><div class="cta"><div><h2>Ориентирование на пульте SlideX</h2><p>Тренажёр инженера ННБ: КНБК, ориентирование, замеры и осложнения, которые лучше встретить на тренажёре, чем на буровой.</p></div><div class="btns"><a class="btn pri" href="../../slidex/">Подробнее о SlideX</a></div></div></div>
+<script src="../../assets/j/2d6f05688a.js"></script>
+<script src="../../assets/j/82ef5376c6.js" data-ia="dh3d"></script>
+<script src="../../assets/j/0f2711bf87.js" data-ia="ia-tf"></script>
+</main>
+<footer><div class="w">
+<div><b style="color:var(--ink)">DrillHarmony</b> · Etude · Tempo · SlideX<br>ИП Шайсламова Анастасия Васильевна · ИНН 780445570608 · <a href="../../privacy.html">Политика обработки персональных данных</a><br>© 2026 DrillHarmony. Материалы сайта защищены авторским правом. При цитировании нужна ссылка на drillharmony.com.</div>
+<div><a href="mailto:info@drillharmony.com">info@drillharmony.com</a></div>
+</div></footer>
+<script src="../../assets/j/c7b6858526.js"></script>
+<script src="../../bg.js" defer></script>
+</body></html>

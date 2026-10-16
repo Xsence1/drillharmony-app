@@ -1,0 +1,1 @@
+window.calc=function(){if(!1===window.dhOK)return;const n=N("v"),o=N("r1"),t=N("r2"),e=N("rb"),c=n>0&&t>o&&e>t,d=n*e*(t-o)/(e-t),i=(n,o,t)=>document.getElementById(n).textContent=c?F(o,t):"—";i("o_m",d,2),i("o_dv",d/e,2),i("o_v2",n+d/e,2),i("o_bags",Math.ceil(d-1e-9),0)},window.calc();

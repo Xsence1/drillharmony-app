@@ -1,0 +1,32 @@
+# DrillHarmony · сборка APK приложения на серверах GitHub.
+# Запуск: вкладка Actions → «APK приложения» → Run workflow, или автоматически при изменениях в app/.
+# Готовый файл: внизу страницы запуска, блок Artifacts → DrillHarmony-apk.
+name: APK приложения
+on:
+  workflow_dispatch:
+  push:
+    paths: ["app/**", ".github/workflows/android-apk.yml"]
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - uses: android-actions/setup-android@v3
+      - name: Проекты Android, иконки, версия
+        working-directory: app
+        run: npm run setup
+      - name: Сборка APK
+        working-directory: app/android
+        run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+      - name: Имя файла с версией
+        run: |
+          V=$(node -p "require('./app/package.json').version")
+          cp app/android/app/build/outputs/apk/debug/app-debug.apk "DrillHarmony-$V.apk"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DrillHarmony-apk
+          path: DrillHarmony-*.apk

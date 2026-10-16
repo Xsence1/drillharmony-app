@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ru" data-theme="dark"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0f14"><meta name="format-detection" content="telephone=no">
+<title>Траектория из таблицы в 3D · DrillHarmony</title>
+<script src="../../assets/j/b82b602a49.js"></script><script src="../../assets/j/8963aff236.js"></script>
+<link rel="stylesheet" href="../../fonts/fonts.css"><link rel="stylesheet" href="../../assets/c/17f53e8b82.css"><link rel="stylesheet" href="../../assets/c/b31b379876.css"><link rel="stylesheet" href="../../assets/c/53fecde9f7.css"><link rel="stylesheet" href="../../assets/c/6e1a386c5f.css"><link rel="stylesheet" href="../../assets/c/37061930c4.css">
+<link rel="stylesheet" href="../../app/app.css"><script src="../../app/app.js"></script>
+</head><body class="in-app k-tool" data-slug="trajectory" data-path="tools/trajectory/" data-kind="tool" data-name="Траектория из таблицы в 3D">
+<header class="abar"><a class="ib" href="../../index.html" data-back aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></a>
+<div class="ttl"><small>Инструменты</small><span>Траектория из таблицы в 3D</span></div><button class="ib star" type="button" aria-label="В избранное" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg></button>
+<button id="theme" type="button" hidden aria-hidden="true"></button></header>
+<main class="app-main">
+<article class="article">
+
+<h1 class="vh">Траектория из таблицы в 3D</h1>
+<p class="lead hint">Вставьте замеры из Excel (глубину, зенит и азимут) и получите траекторию методом минимальной кривизны: координаты, вертикаль, интенсивность, 3D-вид, разрез и план. Добавьте соседний ствол, и инструмент найдёт место наибольшего сближения.</p>
+<section aria-label="Траектория из таблицы" class="wx tt" id="tt">
+<div class="tt-in">
+<div><label class="tt-l" for="tt-a">Ствол: MD, зенит, азимут</label><textarea id="tt-a" rows="9" spellcheck="false"></textarea>
+<div class="tt-row"><label>TVD первой станции <input id="tt-tvd" inputmode="decimal" value="0"/></label></div></div>
+<div><label class="tt-l" for="tt-b">Соседний ствол (необязательно)</label><textarea id="tt-b" placeholder="MD  зенит  азимут" rows="9" spellcheck="false"></textarea>
+<div class="tt-row"><label>Устье: С+ <input id="tt-n2" inputmode="decimal" value="0"/></label><label>В+ <input id="tt-e2" inputmode="decimal" value="0"/></label><label>TVD <input id="tt-tvd2" inputmode="decimal" value="0"/></label></div></div>
+</div>
+<div class="wl-ctl"><button class="wx-b pri" id="tt-go" type="button">Рассчитать</button><button class="wx-b" id="tt-sample" type="button">Пример: ствол рядом с соседней скважиной</button><label>Азимут разреза <input id="tt-vs" inputmode="decimal" style="width:70px" value="0"/></label><label class="wx-hold"><input checked="" id="tt-vsauto" type="checkbox"/> на забой</label><button class="wx-b" id="tt-csv" type="button">Скачать таблицу (CSV)</button></div>
+<p class="ia-hint" id="tt-msg"></p>
+<div class="ia-outs"><div class="ia-o key"><span>Забой по стволу</span><b id="tt-o-md">—</b><small>м</small></div><div class="ia-o key"><span>По вертикали</span><b id="tt-o-tvd">—</b><small>м</small></div><div class="ia-o"><span>Отход</span><b id="tt-o-hd">—</b><small>м</small></div><div class="ia-o"><span>Макс. интенсивность</span><b id="tt-o-dls">—</b><small>°/30 м</small></div><div class="ia-o"><span>Мин. расстояние до соседа</span><b id="tt-o-sep">—</b><small>м</small></div><div class="ia-o"><span>На глубине</span><b id="tt-o-sepmd">—</b><small>м по стволу</small></div></div>
+<canvas aria-label="3D-вид траектории" class="ia-cv" id="tt-cv" style="height:440px;margin-top:12px"></canvas>
+<canvas aria-label="Вертикальный разрез и план" class="ia-cv flat" id="tt-2d" role="img" style="height:380px;margin-top:12px"></canvas>
+<h3>Таблица</h3><div class="wl-map tablewrap tt-tab" id="tt-tab"></div>
+</section>
+<h2>Как это считается</h2>
+<p>Между соседними замерами ствол считается дугой окружности. Это метод минимальной кривизны, стандарт отрасли. Подробно с формулами в статье <a class="ext" href="https://drillharmony.com/articles/minimum-curvature/" rel="noopener">Метод минимальной кривизны</a>, расчёт одного интервала в <a href="../../calculators/minimum-curvature/index.html">калькуляторе</a>.</p>
+<ul>
+<li><b>Координаты</b> считаются от устья своего ствола: север плюс, восток плюс. Для соседнего ствола задайте положение его устья относительно первого.</li>
+<li><b>Азимут</b> используется тот, что в таблице: магнитный, истинный или дирекционный. Для сравнения стволов азимуты должны быть приведены к одному северу, см. <a class="ext" href="https://drillharmony.com/articles/azimuth-declination/" rel="noopener">Азимуты и склонение</a>.</li>
+<li><b>Расстояние между стволами</b> считается между осями, без эллипсов неопределённости. Это не замена антиколлизии по ISCWSA, см. <a class="ext" href="https://drillharmony.com/articles/separation-factor/" rel="noopener">коэффициент разделения SF</a>.</li>
+</ul>
+<div class="note"><b>Весь куст и месторождение</b> с эллипсами ISCWSA, коэффициентом разделения и проектированием ведутся в <a class="ext" href="https://drillharmony.com/etude/" rel="noopener">Etude</a>.</div>
+</article>
+<p class="src">На сайте: <a class="ext" href="https://drillharmony.com/tools/trajectory/" rel="noopener">drillharmony.com/tools/trajectory/</a></p>
+</main>
+
+<script src="../../assets/j/82ef5376c6.js"></script><script src="../../assets/j/d8aef5be6f.js"></script><script src="../../assets/j/c7b6858526.js"></script>
+</body></html>
