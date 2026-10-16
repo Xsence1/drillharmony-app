@@ -15,8 +15,11 @@ html[data-theme=light] {
 html { background: var(--bg); -webkit-text-size-adjust: 100%; }
 html[data-size=s] body { zoom: .9; }
 html[data-size=l] body { zoom: 1.12; }
-html, body.in-app { overflow-x: hidden; max-width: 100%; }
-body.in-app { background: var(--bg); color: var(--ink); margin: 0; min-height: 100vh; overflow-wrap: break-word; overscroll-behavior-y: none;
+/* Прокрутка как у обычной страницы: листает только окно. Стили сайта делали body отдельным прокручиваемым
+   блоком (overflow-x: hidden), а WebView Android на таком body и с запретом «перетягивания» не листал страницу. */
+html { overflow-x: clip !important; overflow-y: visible !important; overscroll-behavior: auto !important; height: auto !important; }
+body.in-app { overflow: visible !important; overscroll-behavior: auto !important; height: auto !important; max-width: 100%; }
+body.in-app { background: var(--bg); color: var(--ink); margin: 0; min-height: 100vh; overflow-wrap: break-word;
   -webkit-tap-highlight-color: transparent; font: 400 14px/1.4 var(--body); }
 body.in-app::before, body.in-app::after { display: none !important; }
 :root { --sat: var(--safe-area-inset-top, env(safe-area-inset-top, 0px)); --sab: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
@@ -85,9 +88,9 @@ body.in-app::before, body.in-app::after { display: none !important; }
 
 .sect-h { display: flex; align-items: center; gap: 4px; margin: 0 0 6px -6px; }
 .sect-h b { font: 700 16px var(--body); } .sect-h small { color: var(--muted); font: 600 12px var(--mono); margin-left: 4px; }
-.list { display: grid; gap: 5px; }
-@media (min-width: 640px) { .list { grid-template-columns: 1fr 1fr; } }
-.it { display: flex; align-items: center; gap: 10px; padding: 7px 8px 7px 8px; border-radius: 11px; border: 1px solid var(--line);
+.list { display: grid; gap: 5px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 640px) { .list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.it { min-width: 0; max-width: 100%; display: flex; align-items: center; gap: 10px; padding: 7px 8px 7px 8px; border-radius: 11px; border: 1px solid var(--line);
   background: var(--panel); color: var(--ink); text-decoration: none; min-height: 50px; box-sizing: border-box; }
 .it:active { border-color: var(--amber); }
 .it .tx { flex: 1; min-width: 0; }
