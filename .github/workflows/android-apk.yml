@@ -6,6 +6,8 @@ on:
   workflow_dispatch:
   push:
     paths: ["app/**", ".github/workflows/android-apk.yml"]
+permissions:
+  contents: write
 jobs:
   apk:
     runs-on: ubuntu-24.04
@@ -39,6 +41,18 @@ jobs:
         with:
           name: DrillHarmony-apk
           path: DrillHarmony-*.apk
+      - name: Выпуск на GitHub и ветка apk
+        shell: bash
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          V=$(node -p "require('./app/package.json').version")
+          TAG="v$V-build$GITHUB_RUN_NUMBER"
+          gh release create "$TAG" "DrillHarmony-$V.apk" --title "DrillHarmony $V (сборка $GITHUB_RUN_NUMBER)" \
+            --notes "Тестовая сборка для установки на телефон, подписана отладочным ключом." --prerelease
+          mkdir /tmp/apkb && cp "DrillHarmony-$V.apk" /tmp/apkb/ && cd /tmp/apkb
+          git init -q && git checkout -q -b apk && git add . \
+            && git -c user.name=github-actions -c user.email=actions@github.com commit -qm "APK $TAG"
+          git push -f "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY" apk
       - name: Причина ошибки
         if: failure()
         shell: bash
