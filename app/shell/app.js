@@ -204,7 +204,7 @@
     }
     // запоминаются только поля, изменённые вручную
     ins.forEach((i) => i.addEventListener("input", (e) => {
-      if (!e.isTrusted) return;
+      if (!e.isTrusted && !e.dhUser) return;            // dhUser — ввод с панели над клавиатурой
       const l = i.closest("label"); if (l) l.classList.remove("fromp");
       const o = ls.get(key, {}) || {};
       if (i.value === i.dataset.def) delete o[i.id]; else o[i.id] = i.value;

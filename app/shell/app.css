@@ -286,3 +286,107 @@ body.in-app .wx button, body.in-app .article .btn, body.in-app .article button.b
 .app-main .article :is(p, li) { font-size: 13.5px; line-height: 1.5; }
 .app-main .article ul, .app-main .article ol { padding-left: 18px; }
 .app-main .article h2 { font-size: 16px !important; }
+
+/* =================== стекло, свет и движение (v1.2) =================== */
+html[data-theme=dark] { --glass-bg: linear-gradient(140deg, rgba(255,255,255,.11), rgba(255,255,255,.025) 55%, rgba(255,255,255,.05));
+  --glass-br: rgba(255,255,255,.13); --glass-hi: inset 0 1px 0 rgba(255,255,255,.16), inset 0 -1px 0 rgba(0,0,0,.25); --glass-sh: 0 12px 30px -18px rgba(0,0,0,.95); }
+html[data-theme=light] { --glass-bg: linear-gradient(140deg, rgba(255,255,255,.92), rgba(255,255,255,.62) 60%, rgba(255,255,255,.78));
+  --glass-br: rgba(20,40,60,.10); --glass-hi: inset 0 1px 0 rgba(255,255,255,.9); --glass-sh: 0 12px 28px -18px rgba(20,40,60,.45); }
+
+/* живой фон за стеклом */
+.aurora { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; background: var(--bg); }
+.aurora i { position: absolute; width: 70vmax; height: 70vmax; border-radius: 50%; filter: blur(60px); opacity: .32; will-change: transform; }
+.aurora i:nth-child(1) { background: radial-gradient(circle, #f2a541 0, transparent 62%); left: -30vmax; top: -34vmax; }
+.aurora i:nth-child(2) { background: radial-gradient(circle, var(--teal) 0, transparent 62%); right: -36vmax; top: 18vh; opacity: .22; }
+.aurora i:nth-child(3) { background: radial-gradient(circle, #6b5cff 0, transparent 60%); left: -20vmax; bottom: -40vmax; opacity: .14; }
+html[data-theme=light] .aurora i { opacity: .2; }
+.fx .aurora i:nth-child(1) { animation: dhDrift1 22s ease-in-out infinite alternate; }
+.fx .aurora i:nth-child(2) { animation: dhDrift2 27s ease-in-out infinite alternate; }
+.fx .aurora i:nth-child(3) { animation: dhDrift1 31s ease-in-out infinite alternate-reverse; }
+@keyframes dhDrift1 { to { transform: translate(18vmax, 12vmax) scale(1.15); } }
+@keyframes dhDrift2 { to { transform: translate(-16vmax, 20vmax) scale(.9); } }
+body.in-app, html { background: transparent !important; }
+html { background-color: var(--bg) !important; }
+
+/* стеклянные поверхности */
+.tile, .it, .card, .chip, .srch input, .he, details.fold, .wellchip, .slide, .hero, body.in-app .cout, .seg, .live-b, body.in-app .wx {
+  background: var(--glass-bg) !important; border-color: var(--glass-br) !important; box-shadow: var(--glass-hi), var(--glass-sh) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4); }
+.abar, .tabs, .actbar { background: color-mix(in srgb, var(--bg) 62%, transparent) !important; -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6);
+  box-shadow: 0 1px 0 var(--glass-br) inset; }
+.btn.pri, .slide em, .kp-next { background: linear-gradient(180deg, #ffc163, #f2a541 55%, #d98a1f) !important; color: #1b1204 !important; border: 0 !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 8px 18px -8px rgba(242,165,65,.75) !important; }
+.btn { box-shadow: var(--glass-hi); }
+
+/* нажатие: 3D-наклон и блик под пальцем */
+.fx .tile, .fx .it, .fx .slide, .fx .chip, .fx .btn, .fx .actbar button, .fx .he a { transition: transform .22s cubic-bezier(.2,.8,.2,1), box-shadow .22s; transform-style: preserve-3d; }
+.fx .pressed { transform: perspective(600px) rotateX(var(--rx, 0)) rotateY(var(--ry, 0)) scale(.965) !important; }
+.tile, .it, .slide { position: relative; overflow: hidden; }
+.tile::before, .it::before, .slide::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .25s;
+  background: radial-gradient(160px circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,.22), transparent 60%); }
+.pressed::before { opacity: 1; }
+
+/* появление: экран въезжает, плитки — волной */
+.fx .home > section:not(.hidden), .fx .app-main { animation: dhIn .42s cubic-bezier(.2,.8,.2,1) both; }
+.fx .grid .tile, .fx .list .it, .fx .slide { animation: dhPop .5s cubic-bezier(.2,.9,.25,1.2) both; animation-delay: calc(var(--i, 0) * 38ms); }
+@keyframes dhIn { from { opacity: 0; transform: translateY(14px) scale(.985); } }
+@keyframes dhPop { from { opacity: 0; transform: translateY(16px) scale(.92) rotateX(12deg); } }
+.fx.leaving .home, .fx.leaving .app-main { transition: opacity .15s, transform .15s; opacity: 0; transform: translateX(-18px) scale(.985); }
+.fx .tile .ti { animation: dhFloat 5s ease-in-out infinite; animation-delay: calc(var(--i, 0) * -0.6s); }
+@keyframes dhFloat { 50% { transform: translateY(-2px) rotate(-3deg); } }
+
+/* 3D-сцена на главном экране */
+.hero { position: relative; height: 150px; margin: 0 0 8px; border-radius: 16px; border: 1px solid; overflow: hidden; }
+.hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: pan-y; }
+.hero-t { position: absolute; left: 12px; bottom: 10px; pointer-events: none; text-shadow: 0 1px 8px rgba(0,0,0,.6); }
+.hero-t small { display: block; font: 700 9.5px var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--amber); }
+.hero-t b { display: block; font: 800 17px/1.15 var(--body); color: #fff; } html[data-theme=light] .hero-t b { color: var(--ink); text-shadow: none; }
+.hero-t span { font-size: 11px; color: var(--muted); }
+
+/* слайдер карточек */
+.slider { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -10px 4px; padding: 2px 10px 6px; scrollbar-width: none; }
+.slider::-webkit-scrollbar { display: none; }
+.slide { flex: 0 0 78%; scroll-snap-align: start; min-height: 86px; box-sizing: border-box; padding: 11px 12px; border-radius: 15px; border: 1px solid;
+  color: var(--ink); text-decoration: none; display: flex; flex-direction: column; gap: 3px; cursor: pointer; text-align: left; font: inherit; }
+.slide b { font: 800 15.5px var(--body); letter-spacing: -.01em; } .slide span { font-size: 12px; color: var(--muted); line-height: 1.35; }
+.slide em { margin-top: auto; align-self: flex-start; font: 700 12px var(--body); font-style: normal; padding: 6px 11px; border-radius: 999px; }
+.slide .em2 { background: var(--glass-bg) !important; color: var(--ink) !important; box-shadow: var(--glass-hi) !important; border: 1px solid var(--glass-br) !important; }
+.slide.s-game { background: linear-gradient(135deg, rgba(242,165,65,.30), rgba(107,92,255,.22) 60%, rgba(76,201,176,.18)), var(--glass-bg) !important; }
+.slide.s-live { background: linear-gradient(135deg, rgba(76,201,176,.26), rgba(255,255,255,.04)), var(--glass-bg) !important; }
+.slide .pulse { position: absolute; right: 12px; top: 12px; }
+.dots { display: flex; justify-content: center; gap: 5px; margin: 0 0 8px; } .dots i { width: 6px; height: 6px; border-radius: 3px; background: var(--muted); opacity: .4; transition: all .3s; }
+.dots i.on { width: 18px; opacity: 1; background: var(--amber); }
+.tile.wide { grid-column: 1 / -1; min-height: 64px; flex-direction: row; align-items: center; gap: 12px;
+  background: linear-gradient(110deg, rgba(242,165,65,.28), rgba(107,92,255,.2) 70%), var(--glass-bg) !important; }
+.tile.wide .ti { margin: 0; } .tile.wide b { font-size: 15px; } .tile.wide small { margin-left: auto; color: var(--amber); font-weight: 700; }
+
+/* результат: вспышка при пересчёте */
+.fx body.in-app .co.flash { animation: dhFlash .5s ease-out; }
+@keyframes dhFlash { 0% { box-shadow: 0 0 0 1px var(--amber), 0 0 18px -2px color-mix(in srgb, var(--amber) 70%, transparent); } }
+
+/* поля ввода: крупная цель, изменённое значение, ошибка */
+body.in-app .ci input, .pf-grid input { height: 42px !important; font-size: 16.5px !important; border-radius: 11px !important;
+  background: color-mix(in srgb, var(--panel) 70%, transparent) !important; box-shadow: inset 0 1px 2px rgba(0,0,0,.25) !important; transition: border-color .15s, box-shadow .15s; }
+body.in-app .ci input:focus, .pf-grid input:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--amber) 28%, transparent), inset 0 1px 2px rgba(0,0,0,.2) !important; }
+body.in-app .ci label.chg input { border-left: 3px solid var(--amber) !important; padding-left: 6px !important; }
+body.in-app .ci label.bad input, .pf-grid label.bad input { border-color: var(--red) !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 25%, transparent) !important; }
+label.bad > span { color: var(--red) !important; }
+.shake { animation: dhShake .35s; } @keyframes dhShake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+
+/* панель над клавиатурой */
+.kpad { position: fixed; left: 0; right: 0; bottom: 0; z-index: 90; display: flex; align-items: center; gap: 6px; padding: 7px 8px calc(7px + var(--sab));
+  background: color-mix(in srgb, var(--bg) 70%, transparent); -webkit-backdrop-filter: blur(22px) saturate(1.6); backdrop-filter: blur(22px) saturate(1.6);
+  border-top: 1px solid var(--glass-br); touch-action: none; }
+.kp-on .kpad { padding-bottom: 7px; }
+.kpad > button { flex: none; width: 44px; height: 40px; border-radius: 11px; border: 1px solid var(--glass-br); background: var(--glass-bg); color: var(--ink);
+  font: 600 22px/1 var(--body); box-shadow: var(--glass-hi); }
+.kpad > button:active { transform: scale(.92); }
+.kpad .kp-next { width: auto; padding: 0 14px; font-size: 14px; font-weight: 700; }
+.kp-track { position: relative; flex: 1; height: 40px; border-radius: 11px; background: var(--glass-bg); border: 1px solid var(--glass-br); overflow: hidden; touch-action: none; }
+.kp-fill { position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--k, 0) * 100%); background: linear-gradient(90deg, rgba(242,165,65,.15), rgba(242,165,65,.45)); }
+.kp-thumb { position: absolute; top: 4px; bottom: 4px; width: 6px; border-radius: 3px; left: calc(var(--k, 0) * (100% - 6px)); background: #f2a541; box-shadow: 0 0 10px rgba(242,165,65,.8); }
+.kp-val { position: absolute; inset: 0; display: grid; place-items: center; font: 700 14px var(--mono); color: var(--ink); pointer-events: none; text-shadow: 0 1px 4px var(--bg); }
+.kp-on .actbar, .kp-on .tabs { display: none; }
+
+@media (prefers-reduced-motion: reduce) { .fx * { animation-duration: .01ms !important; } }
+a.tile { text-decoration: none; color: var(--ink); }

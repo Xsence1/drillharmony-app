@@ -35,6 +35,7 @@ GROUPS = [
     ("tools", "Инструменты", ["live", "trajectory", "las-viewer", "npt-cost", "units", "cheatsheet"]),
     ("models", "Модели", []),            # заполняется моделями из статей
     ("learn", "Обучение", ["tests", "tasks", "play"]),
+    ("game", "Вахта · игра", ["game"]),
 ]
 
 TOOLS = [  # путь на сайте, slug, имя, значок, раздел
@@ -94,6 +95,7 @@ ICONS = {
     "test": I('<path d="M9 11l2 2 4-4"/><rect x="4" y="3" width="16" height="18" rx="3"/>'),
     "task": I('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17.5h.01"/>'),
     "play": I('<path d="M3 9c5 0 8 2 10 6"/><path d="M3 15h18M3 19h18" opacity=".45"/><circle cx="13.5" cy="15" r="2" fill="currentColor"/>', "2"),
+    "game": I('<path d="M6 10h4M8 8v4M15 9h.01M18 11h.01"/><path d="M7 5h10a5 5 0 0 1 5 5v1a5 5 0 0 1-9 3h-2a5 5 0 0 1-9-3v-1a5 5 0 0 1 5-5z"/>'),
     "model": I('<path d="M12 2l8.5 5v10L12 22l-8.5-5V7z"/><path d="M12 22V12M3.5 7L12 12l8.5-5"/>'),
     # вкладки и панель действий
     "t_calc": I('<rect x="5" y="3" width="14" height="18" rx="3"/><path d="M8 7h8M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01"/>'),
@@ -216,7 +218,7 @@ def write_page(path, title, group, slug, kind, body, css, head_js, body_js, extr
 <title>{esc(title)} · DrillHarmony</title>
 {"".join(f'<script src="{x}"></script>' for x in head_js)}
 {"".join(f'<link rel="stylesheet" href="{x}">' for x in css)}
-<link rel="stylesheet" href="{up}app/app.css"><script src="{up}app/app.js"></script>
+<link rel="stylesheet" href="{up}app/app.css"><script src="{up}app/app.js"></script><script src="{up}app/fx.js"></script>
 </head><body class="in-app k-{kind}{" has-act" if actbar else ""}" data-slug="{slug}" data-path="{src_path or ""}" data-kind="{kind}" data-name="{esc(title)}">
 <header class="abar"><a class="ib" href="{up}index.html" data-back aria-label="Назад">{ICONS["back"]}</a>
 <div class="ttl"><small>{esc(group)}</small><span>{esc(title)}</span></div>{star}
@@ -421,14 +423,20 @@ def home(items, groups, css_links):
 <meta name="theme-color" content="#0a0f14"><meta name="format-detection" content="telephone=no">
 <title>DrillHarmony</title>
 <link rel="stylesheet" href="fonts/fonts.css">{css_links}
-<link rel="stylesheet" href="app/app.css"><script src="app/app.js"></script>
+<link rel="stylesheet" href="app/app.css"><script src="app/app.js"></script><script src="app/fx.js"></script>
 </head><body class="in-app home-b">
 <header class="abar">{WORDMARK}<button class="wellchip" id="wellchip" type="button" data-go="prof"></button></header>
 <main class="home">
 <section data-pane="calc">
 <div class="srch">{ICONS["search"]}<input id="q" type="search" placeholder="Поиск: зенит, ЭЦП, барит…" autocomplete="off" enterkeyhint="search" aria-label="Поиск"><button type="button" id="q-x" class="hidden" aria-label="Очистить">×</button></div>
 <div id="quick" class="chips"></div>
-<div class="live-b"><a class="live-i" href="tools/live/index.html"><i class="pulse"></i><span><b>Онлайн-данные</b><small>WITS0 и WITSML с буровой: приборы, планшет, отклонитель</small></span></a><button type="button" class="btn pri" data-live>Открыть</button></div>
+<div class="hero"><canvas id="hero3d" aria-label="3D-сцена: вышка, пласты и ствол скважины"></canvas><div class="hero-t"><small>DrillHarmony · 3D</small><b>Буровая в кармане</b><span>40 расчётов · 20 моделей · без интернета</span></div></div>
+<div class="slider" id="slider">
+<a class="slide s-game" href="game/index.html"><b>Вахта</b><span>RPG на буровой: выбери героя, выполняй задания, не опоздай в баню</span><em>Играть</em></a>
+<div class="slide s-live" role="button" tabindex="0" data-live><i class="pulse"></i><b>Онлайн-данные</b><span>WITS0 и WITSML с буровой: приборы, планшет, отклонитель</span><em>Открыть</em></div>
+<a class="slide" href="index.html#t=calc&amp;s=models"><b>3D-модели</b><span>Слайд-шит, прихват, stick-slip, газ в затрубье и ещё 16</span><em class="em2">Смотреть</em></a>
+<a class="slide" href="index.html#t=prof"><b>Профиль скважины</b><span>Конструкция и раствор один раз, дальше подставляются сами</span><em class="em2">Заполнить</em></a>
+</div><div class="dots" id="dots"></div>
 <div id="grid" class="grid"></div>
 <div id="sect" class="hidden"><div class="sect-h"><button type="button" class="ib" id="sect-back" aria-label="К разделам">{ICONS["back"]}</button><b id="sect-t"></b><small id="sect-n"></small></div><div class="list" id="sect-l"></div></div>
 <div id="found" class="list hidden"></div><p id="none" class="empty hidden">Ничего не нашлось. Попробуйте другое слово, например «зенит» или «ppg».</p>
@@ -449,6 +457,7 @@ def home(items, groups, css_links):
 MORE = f'''
 <div class="card brandcard">{MARK}<div><b>DrillHarmony</b><span>Расчёты и инструменты инженера ННБ, бурового и ГТИ. Работают без интернета. Версия {VERSION}.</span></div></div>
 <div class="card"><h2>Оформление</h2><div class="seg" id="themes"><button type="button" data-t="dark">Тёмная</button><button type="button" data-t="light">Светлая</button></div>
+<h2 class="mt">Анимации и 3D</h2><div class="seg" id="anims"><button type="button" data-f="1">Включены</button><button type="button" data-f="0">Выключены</button></div>
 <h2 class="mt">Размер текста</h2><div class="seg" id="sizes"><button type="button" data-s="s">Мельче</button><button type="button" data-s="m">Обычный</button><button type="button" data-s="l">Крупнее</button></div></div>
 <div class="card"><h2>Избранное</h2><div class="list" id="favs"></div><p id="fav-none" class="muted">Отметьте расчёт звёздочкой в его заголовке.</p></div>
 <div class="card"><h2>Данные</h2>
@@ -498,6 +507,10 @@ def main():
     for path, slug, n, ic in TOOLS:
         src = convert(path, path, n, group_of.get(slug, "Инструменты"), slug, "tool", app_paths)
         items.append({"slug": slug, "name": n, "desc": page_desc(src), "href": path + "index.html", "icon": ic, "kind": "tool"})
+    # игра «Вахта»: отдельная страница без стилей сайта
+    os.makedirs(os.path.join(WWW, "game"), exist_ok=True)
+    shutil.copy(os.path.join(SHELL, "game.html"), os.path.join(WWW, "game", "index.html"))
+    items.append({"slug": "game", "name": "Вахта: смена на буровой", "desc": "RPG: выбери героя, выполняй задания, успей в баню", "href": "game/index.html", "icon": "game", "kind": "game"})
     for m in mods:
         convert(m["src"], m["out"], m["name"], "Модели", m["slug"], "model", app_paths, section=m["sid"])
         items.append({k: m[k] for k in ("slug", "name", "desc", "href", "icon", "kind")})

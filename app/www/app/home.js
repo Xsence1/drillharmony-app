@@ -22,9 +22,11 @@
 
   // ---------- расчёты: сетка разделов ----------
   const grid = $("#grid");
-  grid.innerHTML = groups.map((g) => {
+  grid.innerHTML = groups.map((g, i) => {
     const n = g.s.length, w = g.k === "models" ? plural(n, "модель", "модели", "моделей") : g.k === "tools" || g.k === "learn" ? plural(n, "раздел", "раздела", "разделов") : plural(n, "расчёт", "расчёта", "расчётов");
-    return `<button type="button" class="tile t-${g.k}" data-g="${g.k}"><span class="ti">${GI[g.k]}</span><b>${esc(g.t).replace("Инклинометрия", "Инклино&shy;метрия").replace("Инструменты", "Инстру&shy;менты")}</b><small>${n} ${w}</small></button>`;
+    const title = esc(g.t).replace("Инклинометрия", "Инклино&shy;метрия").replace("Инструменты", "Инстру&shy;менты");
+    if (g.k === "game") return `<a class="tile wide t-game" href="${by.game.href}" style="--i:${i}"><span class="ti">${GI.game}</span><b>${esc(by.game.name)}</b><small>Играть →</small></a>`;
+    return `<button type="button" class="tile t-${g.k}" data-g="${g.k}" style="--i:${i}"><span class="ti">${GI[g.k]}</span><b>${title}</b><small>${n} ${w}</small></button>`;
   }).join("");
   grid.addEventListener("click", (e) => { const b = e.target.closest("[data-g]"); if (b) go("calc", b.dataset.g); });
   $("#sect-back").addEventListener("click", () => history.length > 1 && location.hash ? history.back() : go("calc", "", false));
@@ -33,8 +35,21 @@
     const g = groups.find((x) => x.k === k); if (!g) return false;
     $("#sect-t").textContent = g.t; $("#sect-n").textContent = g.s.length;
     $("#sect-l").innerHTML = g.s.map((s) => row(by[s])).join("");
+    $$("#sect-l .it").forEach((a, i) => a.style.setProperty("--i", i));
     return true;
   };
+
+  // ---------- слайдер карточек: точки и автопрокрутка ----------
+  const sl = $("#slider"), dots = $("#dots");
+  if (sl && dots) {
+    const n = sl.children.length; dots.innerHTML = "<i></i>".repeat(n); [...sl.children].forEach((c, i) => c.style.setProperty("--i", i));
+    const cur = () => Math.round(sl.scrollLeft / (sl.children[1].offsetLeft - sl.children[0].offsetLeft || 1));
+    const mark = () => $$("i", dots).forEach((d, i) => d.classList.toggle("on", i === Math.min(n - 1, cur())));
+    sl.addEventListener("scroll", mark, { passive: true }); mark();
+    let idle = 0; const auto = setInterval(() => { if (document.hidden || !document.documentElement.classList.contains("fx") || state().tab !== "calc") return;
+      if (++idle < 2) return; const k = (cur() + 1) % n; sl.scrollTo({ left: sl.children[k].offsetLeft - sl.children[0].offsetLeft, behavior: "smooth" }); }, 4500);
+    ["pointerdown", "touchstart"].forEach((ev) => sl.addEventListener(ev, () => { idle = -3; }, { passive: true }));
+  }
 
   // ---------- быстрый доступ: избранное и недавние ----------
   const quick = () => {
@@ -55,6 +70,7 @@
     $("#found").classList.toggle("hidden", !on);
     $("#grid").classList.toggle("hidden", on || !!s.sect); $("#sect").classList.toggle("hidden", on || !s.sect);
     $("#quick").classList.toggle("hidden", on || !!s.sect || !$("#quick").innerHTML);
+    [".hero", "#slider", "#dots"].forEach((q) => { const el = $(q); if (el) el.classList.toggle("hidden", on || !!s.sect); });
     if (!on) { $("#none").classList.add("hidden"); return; }
     const hit = idx.filter(([, t]) => words.every((w) => t.includes(w))).map(([x]) => x);
     $("#found").innerHTML = hit.map(row).join("");
@@ -144,9 +160,11 @@
   const seg = () => {
     $$("#themes [data-t]").forEach((b) => b.setAttribute("aria-pressed", document.documentElement.dataset.theme === b.dataset.t ? "true" : "false"));
     $$("#sizes [data-s]").forEach((b) => b.setAttribute("aria-pressed", document.documentElement.dataset.size === b.dataset.s ? "true" : "false"));
+    $$("#anims [data-f]").forEach((b) => b.setAttribute("aria-pressed", String(document.documentElement.classList.contains("fx") === (b.dataset.f === "1"))));
   };
   $$("#themes [data-t]").forEach((b) => b.addEventListener("click", () => { A.setTheme(b.dataset.t); seg(); }));
   $$("#sizes [data-s]").forEach((b) => b.addEventListener("click", () => { A.setSize(b.dataset.s); seg(); }));
+  $$("#anims [data-f]").forEach((b) => b.addEventListener("click", () => { window.dhFx && window.dhFx.set(b.dataset.f === "1"); seg(); }));
   const favs = () => {
     const f = A.fav().filter((s) => by[s]);
     $("#favs").innerHTML = f.map((s) => row(by[s])).join(""); $("#fav-none").classList.toggle("hidden", f.length > 0);

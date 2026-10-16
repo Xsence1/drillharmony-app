@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#05080c"><meta name="format-detection" content="telephone=no">
+<title>Вахта · DrillHarmony</title>
+<link rel="stylesheet" href="../fonts/fonts.css"><link rel="stylesheet" href="../app/game.css">
+</head><body>
+<canvas id="scene" aria-label="Куст скважин: буровая, вагоны, столовая, баня"></canvas>
+<div id="tags" class="tags"></div>
+<div id="hud" class="hud hidden">
+  <a class="back glass" href="../index.html" aria-label="Выйти из игры">‹</a>
+  <div class="stats glass"><div class="clock" id="clock">08:00</div>
+    <div class="bar en">⚡<i><b id="b-en"></b></i></div><span class="num" id="n-xp">⭐ 0</span>
+    <div class="bar mo">😊<i><b id="b-mo"></b></i></div><span class="num" id="n-rub">₽ 0</span></div>
+  <button class="snd glass" id="snd" type="button" aria-label="Звук">🔊</button>
+</div>
+<div id="objective" class="objective hidden">
+  <button class="obj glass" type="button"><span class="q-ic">🎯</span><div><b id="obj-t"></b><span id="obj-d"></span></div></button>
+  <button class="jbtn glass" id="jbtn" type="button" aria-label="Журнал заданий">📒<em id="jn"></em></button>
+</div>
+<div id="ui"></div>
+<div id="toast" class="toast" role="status"></div>
+<div id="fade" class="fade"></div>
+<script>if(!CanvasRenderingContext2D.prototype.roundRect)CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){this.moveTo(x+r,y);this.arcTo(x+w,y,x+w,y+h,r);this.arcTo(x+w,y+h,x,y+h,r);this.arcTo(x,y+h,x,y,r);this.arcTo(x,y,x+w,y,r);this.closePath();};</script>
+<script src="../app/game.js"></script>
+</body></html>

@@ -1,6 +1,6 @@
 {
   "name": "drillharmony-app",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "private": true,
   "description": "DrillHarmony: калькуляторы и инструменты инженера ННБ для Android и iOS",
   "scripts": {
@@ -13,6 +13,7 @@
     "apk": "cd android && ./gradlew assembleDebug"
   },
   "dependencies": {
+    "@capacitor-community/text-to-speech": "^8.0.2",
     "@capacitor/android": "^8.0.0",
     "@capacitor/app": "^8.0.0",
     "@capacitor/clipboard": "^8.0.0",
