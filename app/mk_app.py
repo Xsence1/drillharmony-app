@@ -105,11 +105,11 @@ ICONS = {
     "a_share": I('<path d="M12 3v12M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>'),
     "a_save": I('<path d="M6 3h12v18l-6-4-6 4z"/>'),
 }
-# товарный знак DrillHarmony (как favicon сайта): плашка, линии пластов, траектория со входом в пласт
-MARK = ('<svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="var(--amber)"/>'
-        '<path d="M8 17H56M8 25H56" stroke="var(--accent-ink)" stroke-opacity=".25" stroke-width="2.5" stroke-linecap="round"/>'
-        '<path d="M19 7V24C19 36 27 45 39 50.5C43.5 52.5 47.5 53.5 51 53.6" fill="none" stroke="var(--accent-ink)" stroke-width="7.5" stroke-linecap="round"/>'
-        '<circle cx="51.5" cy="53.6" r="6.2" fill="var(--accent-ink)"/></svg>')
+# официальный знак DrillHarmony (favicon.svg сайта, цвета не меняются): плашка, линии пластов, траектория со входом в пласт
+MARK = ('<svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#f2a541"/>'
+        '<path d="M8 17H56M8 25H56" stroke="rgba(27,18,4,.25)" stroke-width="2.5" stroke-linecap="round"/>'
+        '<path d="M19 7V24C19 36 27 45 39 50.5C43.5 52.5 47.5 53.5 51 53.6" fill="none" stroke="#1b1204" stroke-width="7.5" stroke-linecap="round"/>'
+        '<circle cx="51.5" cy="53.6" r="6.2" fill="#1b1204"/></svg>')
 WORDMARK = f'<span class="brand">{MARK}<span class="wm">Drill<b>Harmony</b></span></span>'
 
 

@@ -63,6 +63,30 @@ patch("android/app/src/main/AndroidManifest.xml", (t) => t
   .replace('android:allowBackup="true"', 'android:allowBackup="false"')
   .replace(/(<activity\b(?![^>]*screenOrientation))/, '$1\n            android:screenOrientation="portrait"'));
 
+// Android масштабирует текст WebView по системному размеру шрифта, и подписи уезжают вправо.
+// Масштаб текста фиксируется на 100 %, размер выбирается в приложении («Ещё» → «Размер текста»).
+{
+  const id = JSON.parse(readFileSync(join(APP, "capacitor.config.json"), "utf8")).appId;
+  const f = join(APP, "android/app/src/main/java", ...id.split("."), "MainActivity.java");
+  if (existsSync(f) && !readFileSync(f, "utf8").includes("setTextZoom")) {
+    writeFileSync(f, `package ${id};
+
+import android.os.Bundle;
+import com.getcapacitor.BridgeActivity;
+
+public class MainActivity extends BridgeActivity {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // системный размер шрифта не меняет вёрстку; размер текста выбирается в самом приложении
+        getBridge().getWebView().getSettings().setTextZoom(100);
+    }
+}
+`);
+    console.log("  обновлён MainActivity.java (масштаб текста 100 %)");
+  }
+}
+
 console.log(`
 Готово. Версия ${pkg.version} (${code}).
   Android: npx cap open android  → Run, либо Build → Generate Signed App Bundle

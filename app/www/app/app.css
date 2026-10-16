@@ -15,7 +15,8 @@ html[data-theme=light] {
 html { background: var(--bg); -webkit-text-size-adjust: 100%; }
 html[data-size=s] body { zoom: .9; }
 html[data-size=l] body { zoom: 1.12; }
-body.in-app { background: var(--bg); color: var(--ink); margin: 0; min-height: 100vh; overscroll-behavior-y: none;
+html, body.in-app { overflow-x: hidden; max-width: 100%; }
+body.in-app { background: var(--bg); color: var(--ink); margin: 0; min-height: 100vh; overflow-wrap: break-word; overscroll-behavior-y: none;
   -webkit-tap-highlight-color: transparent; font: 400 14px/1.4 var(--body); }
 body.in-app::before, body.in-app::after { display: none !important; }
 :root { --sat: var(--safe-area-inset-top, env(safe-area-inset-top, 0px)); --sab: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
@@ -164,7 +165,11 @@ body.in-app::before, body.in-app::after { display: none !important; }
 /* ---------- страницы расчётов, инструментов и моделей ---------- */
 .app-main { padding: 8px 10px calc(var(--sab) + 24px); max-width: 760px; margin: 0 auto; box-sizing: border-box; }
 .has-act .app-main { padding-bottom: calc(var(--sab) + 70px); }
-.app-main .article { max-width: none; padding: 0; margin: 0; font-size: 14px; }
+.app-main .article { max-width: none; padding: 0; margin: 0; font-size: 14px; min-width: 0; }
+.app-main .article * { max-width: 100%; box-sizing: border-box; }
+.app-main .article :is(p, li, h1, h2, h3, b, span, label, dd, dt, td, th, summary) { overflow-wrap: anywhere; }
+.app-main .tablewrap, .app-main .formula, .app-main pre { overflow-x: auto; }
+.app-main canvas, .app-main svg, .app-main img { max-width: 100%; }
 .app-main .article p, .app-main .article li { text-align: left; hyphens: auto; -webkit-hyphens: auto; }
 .app-main .article > h1 { font-size: 20px; line-height: 1.15; margin: 4px 0 6px; }
 .app-main .article h2 { font-size: 16.5px; margin: 16px 0 6px; }
@@ -235,7 +240,9 @@ body.in-app .wx { margin: 0 !important; padding: 10px !important; border-radius:
   background: var(--panel) !important; box-shadow: none !important; }
 body.in-app .wx .ia-grid { gap: 8px !important; }
 body.in-app .ia-sl { font-size: 12px !important; margin: 0 0 4px !important; }
-body.in-app .ia-cv { max-height: 46vh; }
+/* 3D-окна: вертикальный свайп листает страницу, горизонтальный и двумя пальцами вращает модель */
+body.in-app .ia-cv { height: min(40vh, 340px) !important; max-height: 340px; touch-action: pan-y !important; }
+body.in-app .pg-cv { height: min(52vh, 440px) !important; }
 body.in-app .wx button, body.in-app .article .btn, body.in-app .article button.b { font-size: 13px; }
 
 /* панель действий расчёта */
