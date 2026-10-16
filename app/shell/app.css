@@ -460,3 +460,52 @@ body.in-app .co.verdict > b { flex: 1; text-align: left; }
 .it .tx > b .nm { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .it .tx > b .tag { flex: none; }
 .toast { white-space: nowrap; }
+
+/* =================== 1.5: главный экран как в iOS — крупный заголовок, поиск, сгруппированные списки =================== */
+html[data-theme=dark] { --cell: #151c23; --sep: rgba(255,255,255,.085); --fill: rgba(118,118,128,.24); --press: rgba(255,255,255,.07); }
+html[data-theme=light] { --cell: #ffffff; --sep: rgba(60,60,67,.16); --fill: rgba(118,118,128,.12); --press: rgba(0,0,0,.05); --bg: #f2f2f7; }
+.home-b .aurora { display: none; }
+.home-b { background: var(--bg) !important; }
+.home { padding: calc(var(--sat) + 10px) 16px calc(var(--sab) + 84px); }
+.lt { margin: 4px 0 10px; font: 800 30px/1.1 var(--body); letter-spacing: -.03em; color: var(--ink); }
+.lt-brand { display: flex; align-items: center; gap: 10px; } .lt-brand .mark { width: 34px; height: 34px; border-radius: 9px; }
+.lt-brand > span { font-weight: 400; } .lt-brand b { font-weight: 800; }
+.ios-srch { margin: 0 0 6px; }
+.ios-srch input, .home .srch input { height: 38px !important; border: 0 !important; border-radius: 10px !important; background: var(--fill) !important; box-shadow: none !important;
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important; font-size: 16px !important; padding-left: 34px !important; }
+.home .srch > svg { left: 10px; top: 10px; width: 18px; height: 18px; }
+.gh { margin: 22px 16px 7px; font: 500 13px var(--body); letter-spacing: .02em; text-transform: uppercase; color: var(--muted); }
+#grid > .glist:first-child { margin-top: 14px; }
+.glist { background: var(--cell) !important; border-radius: 12px; overflow: hidden; border: 0 !important; box-shadow: none !important; display: block; }
+.r { position: relative; display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 7px 12px 7px 14px; box-sizing: border-box;
+  background: none; border: 0; color: var(--ink); text-decoration: none; text-align: left; font: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.r + .r::before { content: ""; position: absolute; top: 0; left: 56px; right: 0; height: 1px; transform: scaleY(.6); transform-origin: 0 0; background: var(--sep); }
+.r:active { background: var(--press); }
+.ri { flex: none; width: 30px; height: 30px; border-radius: 7.5px; display: grid; place-items: center; background: var(--c); color: #fff; }
+.ri svg { width: 18px; height: 18px; } .ri .ab { font: 700 9.5px var(--mono); font-style: normal; letter-spacing: -.04em; color: #fff; max-width: 28px; overflow: hidden; }
+.rt { flex: 1; min-width: 0; } .rt b { display: flex; align-items: center; font: 500 16px/1.25 var(--body); letter-spacing: -.01em; }
+.rt b .nm { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .rt b .tag { flex: none; }
+.rt small { display: block; margin-top: 1px; font: 400 12.5px/1.3 var(--body); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rv { flex: none; max-width: 40%; font: 400 15px var(--body); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chev { flex: none; width: 14px; height: 14px; color: color-mix(in srgb, var(--muted) 70%, transparent); margin-right: -2px; }
+.nav-back { display: flex; align-items: center; gap: 2px; height: 44px; margin: 0 0 0 -8px; padding: 0 8px 0 0; border: 0; background: none; color: var(--amber); font: 400 17px var(--body); cursor: pointer; }
+.nav-back svg { width: 24px; height: 24px; }
+.lt-h { margin: 2px 0 2px; font: 800 30px/1.1 var(--body); letter-spacing: -.03em; } .lt-sub { margin: 0 0 14px; color: var(--muted); font-size: 13.5px; }
+#found { margin-top: 10px; }
+.home .foot { margin: 22px 0 0; }
+/* вкладки как в iOS: без подложек, активная — цветом */
+.tabs button svg { width: 26px !important; height: 26px !important; padding: 0 !important; background: none !important; }
+.tabs { background: color-mix(in srgb, var(--bg) 80%, transparent) !important; }
+/* остальные вкладки — тот же ритм: крупный заголовок и карточки без стекла */
+.home .card, .home .he, .home details.fold { background: var(--cell) !important; border: 0 !important; box-shadow: none !important; -webkit-backdrop-filter: none; backdrop-filter: none; border-radius: 12px; }
+.home .row { background: var(--cell) !important; border: 0 !important; box-shadow: none !important; }
+.home .seg { background: var(--fill) !important; border: 0 !important; box-shadow: none !important; }
+.home .seg button[aria-pressed=true] { background: var(--cell) !important; }
+.home .chip { background: var(--cell) !important; box-shadow: none !important; border: 1px solid var(--sep) !important; }
+.home .chip.on { border-color: var(--amber) !important; }
+.home .pf-grid input, .home .pf-name input { background: var(--cell) !important; border: 1px solid var(--sep) !important; box-shadow: none !important; }
+.card a.r, .card .r { color: var(--ink); }
+.card #favs { margin: 6px -12px -12px; }
+.card #favs .r { padding-left: 12px; }
+.home .rows2 { gap: 0; margin: 10px -12px -12px; } .home .rows2 .row { border-radius: 0 !important; }
+.home .rows2 .row + .row { border-top: 1px solid var(--sep) !important; }

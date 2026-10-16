@@ -15,49 +15,46 @@
   };
   window.addEventListener("popstate", () => render());
   $$(".tabs [data-tab]").forEach((b) => b.addEventListener("click", () => { const s = state(); if (s.tab !== b.dataset.tab || s.sect) go(b.dataset.tab, "", s.tab !== b.dataset.tab); }));
-  $("#wellchip").addEventListener("click", () => go("prof"));
+  // ---------- оформление строк в стиле iOS: цветной значок, название, значение справа, стрелка ----------
+  const COL = { traj: "#ff9f0a", survey: "#0a84ff", drill: "#5e5ce6", hyd: "#30b0c7", mud: "#a2845e", gti: "#34c759",
+    tools: "#8e8e93", models: "#bf5af2", learn: "#ff375f", game: "#ff453a", live: "#30d158", well: "#64d2ff", fav: "#ffcc00", recent: "#8e8e93" };
+  const gOf = Object.fromEntries(groups.flatMap((g) => g.s.map((s) => [s, g.k])));
+  const chev = IC.go.replace("<svg", '<svg class="chev"');
+  const cell = ({ tag = "a", href, attrs = "", ic, c, title, sub, val, badge }) =>
+    `<${tag} class="r"${href ? ` href="${href}"` : ""}${tag === "button" ? ' type="button"' : ""} ${attrs}><span class="ri" style="--c:${c}">${ic}</span>` +
+    `<span class="rt"><b><span class="nm">${title}</span>${badge || ""}</b>${sub ? `<small>${sub}</small>` : ""}</span>${val != null ? `<span class="rv">${val}</span>` : ""}${chev}</${tag}>`;
+  const row = (x) => cell({ href: x.href, attrs: `data-slug="${x.slug}"`, c: COL[gOf[x.slug]] || "#8e8e93",
+    ic: x.svg ? x.svg : `<i class="ab">${esc(x.icon)}</i>`, title: esc(x.name), sub: esc(x.desc) });
+  const word = (k, n) => k === "models" ? plural(n, "модель", "модели", "моделей") : k === "tools" || k === "learn" ? plural(n, "раздел", "раздела", "разделов") : plural(n, "расчёт", "расчёта", "расчётов");
+  const SUB = { traj: "Минимальная кривизна, отклонитель, посадка на цель", survey: "Сырые оси, НУБТ, SAG, длина немагнитных", drill: "MSE, гидравлика долота, ВЗД, вес на крюке",
+    hyd: "Потери давления, ЭЦП, репрессия, затрубье", mud: "Барит, разбавление, реология, реторта, насос", gti: "Lag, d-экспонента, поровое давление, окно",
+    tools: "3D-траектория, LAS, НПВ, единицы, шпаргалка", models: "Интерактивные 3D-модели из статей", learn: "Тесты, задача недели, игра «Посади горизонталь»" };
+  const group = (h, rows) => rows.length ? `${h ? `<div class="gh">${h}</div>` : ""}<div class="glist">${rows.join("")}</div>` : "";
 
-  const row = (x) => `<a class="it" href="${x.href}" data-slug="${x.slug}"><span class="ic">${x.svg || esc(x.icon)}</span>` +
-    `<span class="tx"><b><span class="nm">${esc(x.name)}</span>${x.app ? '<i class="tag">новое</i>' : ""}</b><span>${esc(x.desc)}</span></span>${IC.go.replace("<svg", '<svg class="go"')}</a>`;
-
-  // ---------- расчёты: сетка разделов ----------
+  // ---------- главный экран ----------
   const grid = $("#grid");
-  grid.innerHTML = groups.map((g, i) => {
-    const n = g.s.length, w = g.k === "models" ? plural(n, "модель", "модели", "моделей") : g.k === "tools" || g.k === "learn" ? plural(n, "раздел", "раздела", "разделов") : plural(n, "расчёт", "расчёта", "расчётов");
-    const title = esc(g.t).replace("Инклинометрия", "Инклино&shy;метрия").replace("Инструменты", "Инстру&shy;менты");
-    if (g.k === "game") return `<a class="tile wide t-game" href="${by.game.href}" style="--i:${i}"><span class="ti">${GI.game}</span><b>${esc(by.game.name)}</b><small>Играть →</small></a>`;
-    return `<button type="button" class="tile t-${g.k}" data-g="${g.k}" style="--i:${i}"><span class="ti">${GI[g.k]}</span><b>${title}</b><small>${n} ${w}</small></button>`;
-  }).join("");
-  grid.addEventListener("click", (e) => { const b = e.target.closest("[data-g]"); if (b) go("calc", b.dataset.g); });
+  const home = () => {
+    const w = A.activeWell(), f = A.fav().filter((s) => by[s]), r = A.recent().filter((s) => by[s] && !f.includes(s)).slice(0, 3);
+    const top = [cell({ tag: "button", attrs: "data-live", c: COL.live, ic: GI.live, title: "Онлайн-данные", sub: "WITS0 и WITSML с буровой" }),
+      cell({ tag: "button", attrs: 'data-go="prof"', c: COL.well, ic: GI.well, title: "Скважина", sub: w ? "" : "Конструкция и раствор один раз", val: esc(w ? w.name || "Без названия" : "Не задана") })];
+    const calc = groups.filter((g) => !["tools", "models", "learn", "game"].includes(g.k)).map((g) =>
+      cell({ tag: "button", attrs: `data-g="${g.k}"`, c: COL[g.k], ic: GI[g.k], title: esc(g.t), sub: SUB[g.k], val: g.s.length }));
+    const more = groups.filter((g) => ["tools", "models", "learn"].includes(g.k)).map((g) =>
+      cell({ tag: "button", attrs: `data-g="${g.k}"`, c: COL[g.k], ic: GI[g.k], title: esc(g.t === "Модели" ? "3D-модели" : g.t), sub: SUB[g.k], val: g.s.length }))
+      .concat(by.game ? [cell({ href: by.game.href, c: COL.game, ic: GI.game, title: "Вахта", sub: "Игра: смена на буровой" })] : []);
+    grid.innerHTML = group("", top) + group("Избранное", f.map((s) => row(by[s]))) + group("Недавние", r.map((s) => row(by[s]))) +
+      group("Расчёты", calc) + group("Инструменты и обучение", more) + `<p class="foot">DrillHarmony.com · расчёты справочные</p>`;
+  };
+  grid.addEventListener("click", (e) => { const b = e.target.closest("[data-g]"); if (b) return go("calc", b.dataset.g); const p = e.target.closest("[data-go]"); if (p) go(p.dataset.go); });
   $("#sect-back").addEventListener("click", () => history.length > 1 && location.hash ? history.back() : go("calc", "", false));
 
   const sect = (k) => {
     const g = groups.find((x) => x.k === k); if (!g) return false;
-    $("#sect-t").textContent = g.t; $("#sect-n").textContent = g.s.length;
+    $("#sect-t").textContent = g.t === "Модели" ? "3D-модели" : g.t; $("#sect-n").textContent = g.s.length + " " + word(k, g.s.length) + (SUB[k] ? " · " + SUB[k] : "");
     $("#sect-l").innerHTML = g.s.map((s) => row(by[s])).join("");
-    $$("#sect-l .it").forEach((a, i) => a.style.setProperty("--i", i));
     return true;
   };
-
-  // ---------- слайдер карточек: точки и автопрокрутка ----------
-  const sl = $("#slider"), dots = $("#dots");
-  if (sl && dots) {
-    const n = sl.children.length; dots.innerHTML = "<i></i>".repeat(n); [...sl.children].forEach((c, i) => c.style.setProperty("--i", i));
-    const cur = () => Math.round(sl.scrollLeft / (sl.children[1].offsetLeft - sl.children[0].offsetLeft || 1));
-    const mark = () => $$("i", dots).forEach((d, i) => d.classList.toggle("on", i === Math.min(n - 1, cur())));
-    sl.addEventListener("scroll", mark, { passive: true }); mark();
-    let idle = 0; const auto = setInterval(() => { if (document.hidden || !document.documentElement.classList.contains("fx") || state().tab !== "calc") return;
-      if (++idle < 2) return; const k = (cur() + 1) % n; sl.scrollTo({ left: sl.children[k].offsetLeft - sl.children[0].offsetLeft, behavior: "smooth" }); }, 4500);
-    ["pointerdown", "touchstart"].forEach((ev) => sl.addEventListener(ev, () => { idle = -3; }, { passive: true }));
-  }
-
-  // ---------- быстрый доступ: избранное и недавние ----------
-  const quick = () => {
-    const f = A.fav().filter((s) => by[s]), r = A.recent().filter((s) => by[s] && !f.includes(s)).slice(0, 6);
-    $("#quick").innerHTML = f.map((s) => `<a class="chip fav" href="${by[s].href}">${IC.star}${esc(by[s].name)}</a>`).join("") +
-      r.map((s) => `<a class="chip" href="${by[s].href}">${esc(by[s].name)}</a>`).join("");
-    $("#quick").classList.toggle("hidden", !(f.length + r.length));
-  };
+  const quick = home;              // избранное и недавние живут в списке главного экрана
 
   // ---------- поиск ----------
   const norm = (s) => s.toLowerCase().replace(/ё/g, "е").replace(/[^a-zа-я0-9°/ ]+/g, " ");
@@ -68,12 +65,12 @@
     const words = norm(q.value).split(/\s+/).filter(Boolean), on = words.length > 0, s = state();
     $("#q-x").classList.toggle("hidden", !q.value);
     $("#found").classList.toggle("hidden", !on);
-    $("#grid").classList.toggle("hidden", on || !!s.sect); $("#sect").classList.toggle("hidden", on || !s.sect);
-    $("#quick").classList.toggle("hidden", on || !!s.sect || !$("#quick").innerHTML);
-    [".hero", "#slider", "#dots", "#feat-h"].forEach((q) => { const el = $(q); if (el) el.classList.toggle("hidden", on || !!s.sect); });
+    grid.classList.toggle("hidden", on || !!s.sect); $("#sect").classList.toggle("hidden", on || !s.sect);
+    $("#lt").classList.toggle("hidden", !!s.sect && !on); $(".ios-srch").classList.toggle("hidden", !!s.sect && !on);
     if (!on) { $("#none").classList.add("hidden"); return; }
     const hit = idx.filter(([, t]) => words.every((w) => t.includes(w))).map(([x]) => x);
     $("#found").innerHTML = hit.map(row).join("");
+    $("#found").classList.toggle("hidden", !hit.length);
     $("#none").classList.toggle("hidden", hit.length > 0);
   };
   q.addEventListener("input", search);
@@ -82,8 +79,7 @@
 
   // ---------- профиль скважины ----------
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  const wellchip = () => { const w = A.activeWell(); $("#wellchip").innerHTML = w ? `<i></i>${esc(w.name || "Скважина")}` : "+ Скважина"; $("#wellchip").classList.toggle("empty", !w);
-    $("#wellchip").setAttribute("aria-label", w ? "Активная скважина: " + (w.name || "без названия") : "Создать профиль скважины"); };
+  const wellchip = () => { if (state().tab === "calc") home(); };
   const EX = { md: "3200", tvd: "2650", bit: "215,9", csg_id: "224,4", shoe: "1350", dp_od: "127", dp_id: "108,6", dp_w: "31", dc_od: "172", dc_id: "71", dc_len: "150",
     rho: "1,18", mud_v: "120", q: "30", pump_l: "18,5", tfa: "350", t600: "52", t300: "32", t6: "7", t3: "6", pp: "1,12", fg: "1,65", bt: "58420", dip: "74,6", decl: "15,4" };
   const prof = () => {
@@ -183,12 +179,15 @@
   });
 
   // ---------- отрисовка ----------
+  const LT0 = $("#lt").innerHTML;
   const render = () => {
     let { tab, sect: s } = state();
     if (!["calc", "prof", "hist", "ref", "more"].includes(tab)) tab = "calc";
     $$(".tabs [data-tab]").forEach((b) => b.setAttribute("aria-selected", b.dataset.tab === tab ? "true" : "false"));
     $$("[data-pane]").forEach((p) => p.classList.toggle("hidden", p.dataset.pane !== tab));
-    if (tab === "calc") { if (s && !sect(s)) s = ""; quick(); search(); }
+    const TT = { prof: "Скважина", hist: "История", ref: "Справочник", more: "Ещё" };
+    $("#lt").innerHTML = tab === "calc" ? LT0 : `<span>${TT[tab]}</span>`; $("#lt").classList.remove("hidden");
+    if (tab === "calc") { if (s && !sect(s)) s = ""; home(); search(); }
     if (tab === "prof") prof();
     if (tab === "hist") hist();
     if (tab === "ref") ref();

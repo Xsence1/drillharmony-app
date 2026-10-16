@@ -419,6 +419,7 @@ def home(items, groups, css_links):
     data = json.dumps({"items": items, "groups": groups, "version": VERSION}, ensure_ascii=False, separators=(",", ":"))
     tab = lambda k, ic, name, sel: f'<button type="button" role="tab" data-tab="{k}" aria-selected="{sel}">{ICONS[ic]}<span>{name}</span></button>'
     gi = {k: ICONS[k] for k, _, _ in GROUPS}
+    gi.update(live=ICONS["live"], well=ICONS["t_prof"], fav=ICONS["star"], recent=ICONS["t_hist"])
     return f'''<!doctype html>
 <html lang="ru" data-theme="dark"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -427,21 +428,13 @@ def home(items, groups, css_links):
 <link rel="stylesheet" href="fonts/fonts.css">{css_links}
 <link rel="stylesheet" href="app/app.css"><script src="app/app.js"></script><script src="app/fx.js"></script>
 </head><body class="in-app home-b">
-<header class="abar">{WORDMARK}<button class="wellchip" id="wellchip" type="button" data-go="prof"></button></header>
 <main class="home">
+<h1 class="lt" id="lt"><span class="lt-brand">{MARK}<span>Drill<b>Harmony</b></span></span></h1>
 <section data-pane="calc">
-<div class="hero"><canvas id="hero3d" aria-label="3D-сцена: вышка, пласты и ствол скважины"></canvas><div class="hero-t"><small>DrillHarmony · 3D</small><b>Буровая в кармане</b><span>40 расчётов · 20 моделей · без интернета</span></div></div>
-<div class="srch hero-srch">{ICONS["search"]}<input id="q" type="search" placeholder="Поиск: зенит, ЭЦП, барит…" autocomplete="off" enterkeyhint="search" aria-label="Поиск"><button type="button" id="q-x" class="hidden" aria-label="Очистить">×</button></div>
-<div id="quick" class="chips"></div>
-<div id="grid" class="grid"></div>
-<div class="sec-h" id="feat-h">Подборка</div>
-<div class="slider" id="slider">
-<div class="slide s-live" role="button" tabindex="0" data-live><i class="pulse"></i><b>Онлайн-данные</b><span>WITS0 и WITSML с буровой: приборы, планшет, отклонитель</span><em>Открыть</em></div>
-<a class="slide" href="index.html#t=calc&amp;s=models"><b>3D-модели</b><span>Слайд-шит, прихват, stick-slip, газ в затрубье и ещё 16</span><em class="em2">Смотреть</em></a>
-<a class="slide" href="index.html#t=prof"><b>Профиль скважины</b><span>Конструкция и раствор один раз, дальше подставляются сами</span><em class="em2">Заполнить</em></a>
-</div><div class="dots" id="dots"></div>
-<div id="sect" class="hidden"><div class="sect-h"><button type="button" class="ib" id="sect-back" aria-label="К разделам">{ICONS["back"]}</button><b id="sect-t"></b><small id="sect-n"></small></div><div class="list" id="sect-l"></div></div>
-<div id="found" class="list hidden"></div><p id="none" class="empty hidden">Ничего не нашлось. Попробуйте другое слово, например «зенит» или «ppg».</p>
+<div class="srch ios-srch">{ICONS["search"]}<input id="q" type="search" placeholder="Поиск по расчётам" autocomplete="off" enterkeyhint="search" aria-label="Поиск"><button type="button" id="q-x" class="hidden" aria-label="Очистить">×</button></div>
+<div id="grid"></div>
+<div id="sect" class="hidden"><button type="button" class="nav-back" id="sect-back">{ICONS["back"]}<span>Расчёты</span></button><h2 class="lt-h" id="sect-t"></h2><p class="lt-sub" id="sect-n"></p><div class="glist" id="sect-l"></div></div>
+<div id="found" class="glist hidden"></div><p id="none" class="empty hidden">Ничего не нашлось. Попробуйте другое слово, например «зенит» или «ppg».</p>
 </section>
 <section data-pane="prof" class="hidden"></section>
 <section data-pane="hist" class="hidden"></section>
