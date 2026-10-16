@@ -694,3 +694,49 @@ html[data-theme=light] .surface { background: radial-gradient(90% 120% at 10% 0%
 .bit b { left: -4px; top: auto; bottom: 27px; transform: none; font-size: 10px; padding: 2px 6px; }
 .st-h { flex-wrap: wrap; row-gap: 0; padding-right: 22px; position: relative; } .st-h span { white-space: nowrap; }
 .st-h .chev { position: absolute; right: 0; top: 50%; transform: translateY(-50%); margin: 0; }
+
+/* =================== 1.9: порядок кнопок и движение =================== */
+.cgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.cb, .qc { position: relative; display: flex; align-items: center; gap: 9px; min-height: 58px; padding: 8px 10px; box-sizing: border-box; border-radius: 13px;
+  border: 1px solid var(--line); background: var(--panel); color: var(--ink); text-decoration: none; text-align: left; font: inherit; cursor: pointer; overflow: hidden; }
+.cb-a { flex: none; width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; background: color-mix(in srgb, var(--amber) 13%, transparent); color: var(--amber);
+  font: 700 9.5px var(--mono); letter-spacing: -.04em; overflow: hidden; }
+.cb-a svg { width: 18px; height: 18px; } .cb-a .ab { font-style: normal; max-width: 30px; overflow: hidden; }
+.cb-n { flex: 1; min-width: 0; font: 600 13px/1.22 var(--body); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.cb-all { border-style: dashed; background: none; } .cb-all .cb-a { font-size: 13px; background: var(--amber); color: #1b1204; } .cb-all .cb-n { color: var(--amber); }
+.cb:active, .qc:active, .cbtn:active { border-color: var(--amber); }
+.qh { margin: 14px 0 7px; font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.quick { display: flex; gap: 8px; margin: 0 -16px 0 0; padding: 0 16px 4px 0; flex-wrap: nowrap; overflow-x: auto; scroll-snap-type: x proximity; }
+.qc { flex: 0 0 150px; scroll-snap-align: start; }
+.st-h { min-height: 44px; align-items: center; margin: 4px 0 0; }
+.st-s { margin: 2px 0 11px; }
+.cbtn { min-height: 62px; }
+/* появление станции при прокрутке */
+.fx .st { animation: none; opacity: 0; transform: translateX(26px); transition: opacity .55s ease, transform .6s cubic-bezier(.2,.8,.2,1); }
+.fx .st.in { opacity: 1; transform: none; }
+.fx .st .cb { opacity: 0; transform: translateY(10px) scale(.96); transition: opacity .4s ease, transform .45s cubic-bezier(.2,.9,.25,1.2); }
+.fx .st.in .cb { opacity: 1; transform: none; }
+.fx .st.in .cb:nth-child(2) { transition-delay: .06s; } .fx .st.in .cb:nth-child(3) { transition-delay: .12s; } .fx .st.in .cb:nth-child(4) { transition-delay: .18s; }
+.st0 { opacity: 1 !important; transform: none !important; }
+/* кольцо на узле, когда долото дошло */
+.st.hit .node::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--amber); animation: ring .7s ease-out forwards; }
+@keyframes ring { from { transform: scale(.6); opacity: 1; } to { transform: scale(2.4); opacity: 0; } }
+/* поток раствора по пробуренной части ствола */
+.fx .well::after { background: repeating-linear-gradient(180deg, var(--amber) 0 14px, color-mix(in srgb, var(--amber) 45%, transparent) 14px 22px) !important; background-size: 4px 22px !important;
+  animation: mud 0.9s linear infinite; }
+@keyframes mud { to { background-position: 0 22px; } }
+/* круг от касания */
+.rip { position: absolute; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, color-mix(in srgb, var(--amber) 35%, transparent) 0, transparent 65%);
+  transform: scale(0); animation: rip .62s ease-out forwards; z-index: 0; }
+@keyframes rip { to { transform: scale(1); opacity: 0; } }
+/* индикатор активной вкладки */
+.tabs { position: fixed; } .tab-ind { position: absolute; left: 0; top: 0; height: 3px; border-radius: 0 0 3px 3px; background: var(--amber); box-shadow: 0 0 12px var(--amber);
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), width .35s; }
+.tabs button svg { transition: transform .25s cubic-bezier(.2,.9,.25,1.4); } .tabs button[aria-selected=true] svg { transform: translateY(-2px) scale(1.08); }
+/* ячейка: значок сверху, название на всю ширину, переносы только между словами */
+.cb, .qc { flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 7px; min-height: 84px; padding: 10px 11px; }
+.cb-n { flex: none; width: 100%; font: 600 13.5px/1.25 var(--body); overflow-wrap: normal; word-break: normal; hyphens: manual; -webkit-hyphens: manual; }
+.cb-a { width: 30px; height: 30px; border-radius: 8px; }
+.cb-all { justify-content: space-between; } .cb-all .cb-a { font: 700 16px var(--body); } .cb-all .cb-n { font-weight: 700; }
+.qc { flex-basis: 132px; min-height: 84px; }
+.cbtn { overflow-wrap: normal; word-break: normal; }

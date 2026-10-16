@@ -28,7 +28,7 @@
     document.querySelectorAll("[data-back]").forEach((b) => b.addEventListener("click", () => D.classList.add("leaving"), true));
 
     // ---------- 3D-наклон стеклянных карточек под пальцем ----------
-    const TILT = ".tile, .tile2, .it, .slide, .chip, .btn, .actbar button, .he a, .sc, .r";
+    const TILT = ".tile, .tile2, .it, .slide, .chip, .btn, .actbar button, .he a, .sc, .cb, .qc, .cbtn, .game-b";
     let cur = null;
     document.addEventListener("pointerdown", (e) => {
       const el = e.target.closest(TILT); if (!el || !D.classList.contains("fx")) return;
@@ -37,6 +37,13 @@
       el.style.setProperty("--rx", (-y * 10).toFixed(1) + "deg"); el.style.setProperty("--ry", (x * 12).toFixed(1) + "deg");
       el.style.setProperty("--mx", ((x + 0.5) * 100).toFixed(0) + "%"); el.style.setProperty("--my", ((y + 0.5) * 100).toFixed(0) + "%");
       el.classList.add("pressed");
+    }, { passive: true });
+    // круг от точки касания на кнопках и строках
+    document.addEventListener("pointerdown", (e) => {
+      const el = e.target.closest(".cb, .qc, .cbtn, .st-h, .r, .btn, .row, .act-pri, .game-b, .tabs button, .actbar button"); if (!el || !D.classList.contains("fx")) return;
+      const r = el.getBoundingClientRect(), s = Math.max(r.width, r.height) * 2.2, rp = document.createElement("i"); rp.className = "rip";
+      rp.style.cssText = `width:${s}px;height:${s}px;left:${e.clientX - r.left - s / 2}px;top:${e.clientY - r.top - s / 2}px`;
+      if (getComputedStyle(el).position === "static") el.style.position = "relative"; el.style.overflow = "hidden"; el.appendChild(rp); setTimeout(() => rp.remove(), 650);
     }, { passive: true });
     const up = () => { if (cur) { cur.classList.remove("pressed"); cur = null; } };
     ["pointerup", "pointercancel", "pointerleave", "scroll"].forEach((ev) => document.addEventListener(ev, up, { passive: true, capture: true }));

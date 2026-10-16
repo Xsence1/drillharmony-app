@@ -36,27 +36,32 @@
   const STATION = [   // раздел, глубина, порода
     ["traj", 300, "песчаник"], ["survey", 800, "аргиллит"], ["drill", 1400, "известняк"], ["hyd", 1900, "глина"], ["mud", 2400, "соль"],
     ["gti", 2800, "алевролит"], ["tools", 3100, "доломит"], ["models", 3300, "мергель"], ["learn", 3450, "коллектор"]];
-  const pills = (g, n) => g.s.slice(0, n).map((s) => `<a class="pill" href="${by[s].href}">${esc(by[s].name)}</a>`).join("") +
-    (g.s.length > n ? `<button type="button" class="pill more" data-g="${g.k}">ещё ${g.s.length - n}</button>` : "");
+  // ровная сетка 2×2: три расчёта и «Все N», все кнопки одного размера
+  const ab = (x) => x.svg ? x.svg : `<i class="ab">${esc(x.icon)}</i>`;
+  const cbtn = (x) => `<a class="cb" href="${x.href}"><span class="cb-a">${ab(x)}</span><span class="cb-n">${esc(x.name)}</span></a>`;
+  const pills = (g) => { const n = g.s.length <= 4 ? 4 : 3;
+    return g.s.slice(0, n).map((s) => cbtn(by[s])).join("") + (g.s.length > n ? `<button type="button" class="cb cb-all" data-g="${g.k}"><span class="cb-a">→</span><span class="cb-n">Все ${g.s.length}</span></button>` : ""); };
+  const qcard = (x, star) => `<a class="qc" href="${x.href}"><span class="cb-a">${ab(x)}</span><span class="cb-n">${star ? "★ " : ""}${esc(x.name)}</span></a>`;
   const home = () => {
     const w = A.activeWell(), f = A.fav().filter((s) => by[s]), r = A.recent().filter((s) => by[s] && !f.includes(s)).slice(0, 6);
     const G = (k) => groups.find((g) => g.k === k);
     const head = `<section class="st st0" data-d="0"><i class="node"></i><div class="depth">0000 м · устье</div>
       <div class="console"><button type="button" class="cbtn" data-live><span class="led"></span><b>Онлайн-данные</b><small>WITS0 / WITSML</small></button>
       <button type="button" class="cbtn" data-go="prof"><span class="led ${w ? "" : "off"}"></span><b>${esc(w ? w.name || "Скважина" : "Скважина")}</b><small>${w ? "профиль активен" : "задать профиль"}</small></button></div>
-      ${f.length + r.length ? `<div class="quick">${f.map((s) => `<a class="pill star" href="${by[s].href}">★ ${esc(by[s].name)}</a>`).join("")}${r.map((s) => `<a class="pill" href="${by[s].href}">${esc(by[s].name)}</a>`).join("")}</div>` : ""}</section>`;
+      ${f.length + r.length ? `<div class="qh">Быстрый доступ</div><div class="quick">${f.map((s) => qcard(by[s], 1)).join("")}${r.map((s) => qcard(by[s])).join("")}</div>` : ""}</section>`;
     const sts = STATION.map(([k, d, rock], i) => { const g = G(k); if (!g) return "";
-      return `<section class="st" data-d="${d}" style="--i:${i}"><i class="node"></i><div class="depth">${String(d).padStart(4, "0")} м · ${rock}</div>
+      return `<section class="st" data-d="${d}" style="--i:${i}"><i class="node"></i><div class="depth"><b>${String(d).padStart(4, "0")}</b> м · ${rock}</div>
         <button type="button" class="st-h" data-g="${k}"><b>${esc(g.t === "Модели" ? "3D-модели" : g.t)}</b><span>${g.s.length} ${word(k, g.s.length)}</span>${chev}</button>
-        <p class="st-s">${SUB[k] || ""}</p><div class="pills">${pills(g, 3)}</div></section>`; }).join("");
+        <p class="st-s">${SUB[k] || ""}</p><div class="cgrid">${pills(g)}</div></section>`; }).join("");
     const end = by.game ? `<section class="st st-end" data-d="3500"><i class="node bitnode"></i><div class="depth">3500 м · забой</div>
       <a class="game-b" href="${by.game.href}"><b>Вахта</b><span>Смена на буровой: герои, задания, баня и снежная битва</span><em>Играть</em></a></section>` : "";
     grid.innerHTML = head + sts + end + `<p class="foot">DrillHarmony.com · расчёты справочные</p>`;
-    drill();
+    reveal(); drill();
   };
   // долото идёт по стволу вместе с прокруткой, глубина считается между станциями
   const bit = $("#bit"), bitd = $("#bitd");
-  const drill = () => {
+  const drill = () => { try { drill0(); } catch (e) {} };
+  const drill0 = () => {
     const st = $$(".st", grid); if (!st.length || grid.classList.contains("hidden")) { bit.classList.add("hidden"); return; }
     const gr = grid.getBoundingClientRect(), y = innerHeight * 0.42;
     const vis = gr.top < y && gr.bottom > y; bit.classList.toggle("hidden", !vis);
@@ -64,10 +69,21 @@
     let d = 0; for (let i = 0; i < pts.length; i++) { if (y >= pts[i][0]) { const nx = pts[i + 1]; d = nx ? pts[i][1] + (nx[1] - pts[i][1]) * Math.min(1, (y - pts[i][0]) / (nx[0] - pts[i][0])) : pts[i][1]; } }
     bitd.textContent = Math.round(d).toLocaleString("ru-RU") + " м";
     grid.style.setProperty("--p", Math.max(0, y - gr.top) + "px");
-    st.forEach((s, i) => s.classList.toggle("on", y >= pts[i][0] - 2));
+    st.forEach((s, i) => { if (!pts[i]) return; const on = y >= pts[i][0] - 2; if (on && !s.classList.contains("on")) { s.classList.add("hit"); setTimeout(() => s.classList.remove("hit"), 700); } s.classList.toggle("on", on); });
   };
   addEventListener("scroll", () => requestAnimationFrame(drill), { passive: true }); addEventListener("resize", drill);
   const coverflow = () => {};
+  let io = null;
+  const reveal = () => {
+    const sts = $$(".st", grid);
+    if (!("IntersectionObserver" in window) || !document.documentElement.classList.contains("fx")) { sts.forEach((s) => s.classList.add("in")); return; }
+    io && io.disconnect();
+    io = new IntersectionObserver((en) => en.forEach((e) => { if (!e.isIntersecting) return; const s = e.target; io.unobserve(s); s.classList.add("in");
+      const dp = s.querySelector(".depth b"), to = +s.dataset.d; if (!dp || !to) return; const t0 = performance.now();
+      const run = (t) => { const k = Math.min(1, (t - t0) / 700), v = Math.round(to * (1 - Math.pow(1 - k, 3))); dp.textContent = String(v).padStart(4, "0"); if (k < 1) requestAnimationFrame(run); };
+      requestAnimationFrame(run); }), { rootMargin: "0px 0px -8% 0px", threshold: 0.12 });
+    sts.forEach((s) => io.observe(s));
+  };
   grid.addEventListener("click", (e) => { const b = e.target.closest("[data-g]"); if (b) return go("calc", b.dataset.g); const p = e.target.closest("[data-go]"); if (p) go(p.dataset.go); });
   $("#sect-back").addEventListener("click", () => history.length > 1 && location.hash ? history.back() : go("calc", "", false));
 
@@ -208,6 +224,8 @@
     let { tab, sect: s } = state();
     if (!["calc", "prof", "hist", "ref", "more"].includes(tab)) tab = "calc";
     $$(".tabs [data-tab]").forEach((b) => b.setAttribute("aria-selected", b.dataset.tab === tab ? "true" : "false"));
+    { const tb = $(".tabs"), sel = $(".tabs [aria-selected=true]"); let ind = $(".tab-ind"); if (!ind) { ind = document.createElement("i"); ind.className = "tab-ind"; tb.appendChild(ind); }
+      if (sel) { ind.style.width = sel.offsetWidth * 0.5 + "px"; ind.style.transform = `translateX(${sel.offsetLeft + sel.offsetWidth * 0.25}px)`; } }
     $$("[data-pane]").forEach((p) => p.classList.toggle("hidden", p.dataset.pane !== tab));
     const TT = { prof: "Скважина", hist: "История", ref: "Справочник", more: "Ещё" };
     $("#lt").innerHTML = tab === "calc" ? LT0 : `<span>${TT[tab]}</span>`; $("#lt").classList.remove("hidden");
