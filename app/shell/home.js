@@ -24,7 +24,7 @@
   const grid = $("#grid");
   grid.innerHTML = groups.map((g) => {
     const n = g.s.length, w = g.k === "models" ? plural(n, "модель", "модели", "моделей") : g.k === "tools" || g.k === "learn" ? plural(n, "раздел", "раздела", "разделов") : plural(n, "расчёт", "расчёта", "расчётов");
-    return `<button type="button" class="tile t-${g.k}" data-g="${g.k}"><span class="ti">${GI[g.k]}</span><b>${esc(g.t)}</b><small>${n} ${w}</small></button>`;
+    return `<button type="button" class="tile t-${g.k}" data-g="${g.k}"><span class="ti">${GI[g.k]}</span><b>${esc(g.t).replace("Инклинометрия", "Инклино&shy;метрия").replace("Инструменты", "Инстру&shy;менты")}</b><small>${n} ${w}</small></button>`;
   }).join("");
   grid.addEventListener("click", (e) => { const b = e.target.closest("[data-g]"); if (b) go("calc", b.dataset.g); });
   $("#sect-back").addEventListener("click", () => history.length > 1 && location.hash ? history.back() : go("calc", "", false));

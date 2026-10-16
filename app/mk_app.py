@@ -32,12 +32,13 @@ GROUPS = [
     ("hyd", "Гидравлика · БРД", ["circ-loss", "ecd", "hydrostatic", "annular-velocity", "well-volume"]),
     ("mud", "Буровые растворы", ["barite", "mud-dilution", "mud-mix", "kill-mud", "rheology", "owr", "solids", "solids-eff", "moisture", "chem", "tank", "pump", "trip-fill"]),
     ("gti", "ГТИ", ["lag", "d-exponent", "eaton", "window"]),
-    ("tools", "Инструменты", ["trajectory", "las-viewer", "npt-cost", "units", "cheatsheet"]),
+    ("tools", "Инструменты", ["live", "trajectory", "las-viewer", "npt-cost", "units", "cheatsheet"]),
     ("models", "Модели", []),            # заполняется моделями из статей
     ("learn", "Обучение", ["tests", "tasks", "play"]),
 ]
 
 TOOLS = [  # путь на сайте, slug, имя, значок, раздел
+    ("tools/live/", "live", "Онлайн-данные WITS и WITSML", "live"),
     ("tools/trajectory/", "trajectory", "Траектория из таблицы в 3D", "traj"),
     ("tools/las-viewer/", "las-viewer", "Просмотр LAS", "las"),
     ("tools/npt-cost/", "npt-cost", "Сколько стоит скрытое НПВ", "npt"),
@@ -85,6 +86,7 @@ ICONS = {
     "models": I('<path d="M12 2l8.5 5v10L12 22l-8.5-5V7z"/><path d="M12 22V12M3.5 7L12 12l8.5-5"/>'),
     "learn": I('<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2.5 9 2.5 12 0v-5"/>'),
     # инструменты
+    "live": I('<path d="M3 12h3l2.5-6 4 12 3-9 2 3H21"/>', "2"),
     "las": I('<path d="M4 3v18M12 3v18M20 3v18" opacity=".35"/><path d="M7 3c2 3-2 5 0 8s-1 6 1 10M16 3c-2 4 3 6 0 9s2 5 0 9"/>', "2"),
     "npt": I('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/>', "2"),
     "sheet": I('<path d="M6 3h9l4 4v14H6z"/><path d="M9 11h7M9 15h7M9 7h3"/>'),
@@ -426,6 +428,7 @@ def home(items, groups, css_links):
 <section data-pane="calc">
 <div class="srch">{ICONS["search"]}<input id="q" type="search" placeholder="Поиск: зенит, ЭЦП, барит…" autocomplete="off" enterkeyhint="search" aria-label="Поиск"><button type="button" id="q-x" class="hidden" aria-label="Очистить">×</button></div>
 <div id="quick" class="chips"></div>
+<div class="live-b"><a class="live-i" href="tools/live/index.html"><i class="pulse"></i><span><b>Онлайн-данные</b><small>WITS0 и WITSML с буровой: приборы, планшет, отклонитель</small></span></a><button type="button" class="btn pri" data-live>Открыть</button></div>
 <div id="grid" class="grid"></div>
 <div id="sect" class="hidden"><div class="sect-h"><button type="button" class="ib" id="sect-back" aria-label="К разделам">{ICONS["back"]}</button><b id="sect-t"></b><small id="sect-n"></small></div><div class="list" id="sect-l"></div></div>
 <div id="found" class="list hidden"></div><p id="none" class="empty hidden">Ничего не нашлось. Попробуйте другое слово, например «зенит» или «ppg».</p>
@@ -454,7 +457,7 @@ MORE = f'''
 <div class="card"><h2>Важно</h2><p>Расчёты справочные. Проектные решения принимаются по утверждённым методикам, программе на бурение и регламентам вашей компании.</p></div>
 <div class="card rows">
 <a href="{SITE}articles/" rel="noopener">Статьи по ННБ</a>
-<a href="{SITE}forum/" rel="noopener">Форум DrillHarmony</a>
+<a href="{SITE}forum/" rel="noopener" data-inapp>Форум DrillHarmony</a>
 <a href="{SITE}slidex/" rel="noopener">SlideX</a>
 <a href="{SITE}tempo/" rel="noopener">Tempo</a>
 <a href="{SITE}etude/" rel="noopener">Etude</a>

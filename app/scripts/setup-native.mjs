@@ -63,6 +63,9 @@ patch("android/app/src/main/AndroidManifest.xml", (t) => t
   .replace('android:allowBackup="true"', 'android:allowBackup="false"')
   .replace(/(<activity\b(?![^>]*screenOrientation))/, '$1\n            android:screenOrientation="portrait"'));
 
+// Окно «Онлайн-данные» (@capacitor/inappbrowser) требует Android 8.0+ (minSdk 26)
+patch("android/variables.gradle", (t) => t.replace(/minSdkVersion\s*=\s*(\d+)/, (m, v) => (+v < 26 ? "minSdkVersion = 26" : m)));
+
 // Android масштабирует текст WebView по системному размеру шрифта, и подписи уезжают вправо.
 // Масштаб текста фиксируется на 100 %, размер выбирается в приложении («Ещё» → «Размер текста»).
 {

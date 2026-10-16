@@ -21,8 +21,39 @@ function bot_cfg() {
     'delay_hours'  => 3,             // в остальных разделах — если за это время никто не ответил
     'per_hour'     => 20,            // не больше ответов в час на весь форум
     'per_topic'    => 2,             // не больше ответов в одной теме
-  ], $CFG['bot'] ?? []);
+  ], $CFG['bot'] ?? [], bot_saved());
 }
+
+// настройки из кабинета владельца (Модерация → Подключение модели): _data/bot-settings.json, ключ зашифрован
+function bot_saved() {
+  static $s = null; if ($s !== null) return $s;
+  $f = __DIR__ . '/_data/bot-settings.json';
+  $s = is_file($f) ? (json_decode((string)@file_get_contents($f), true) ?: []) : [];
+  if (isset($s['key_enc'])) { $s['key'] = bot_dec($s['key_enc']); unset($s['key_enc']); }
+  return $s;
+}
+function bot_save($new) {
+  $old = bot_saved(); $all = array_merge($old, $new);
+  if (isset($all['key'])) { $all['key_enc'] = bot_enc((string)$all['key']); unset($all['key']); }
+  @mkdir(__DIR__ . '/_data', 0700, true);
+  $ok = @file_put_contents(__DIR__ . '/_data/bot-settings.json', json_encode($all, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), LOCK_EX) !== false;
+  @unlink(__DIR__ . '/_data/gigachat-token.json');
+  return $ok;
+}
+function bot_enc($v) {
+  if ($v === '' || !function_exists('openssl_encrypt')) return $v === '' ? '' : 'p:' . base64_encode($v);
+  $k = hash('sha256', 'dh-bot|' . bot_secret(), true); $iv = random_bytes(12);
+  $c = openssl_encrypt($v, 'aes-256-gcm', $k, OPENSSL_RAW_DATA, $iv, $tag);
+  return 'g:' . base64_encode($iv . $tag . $c);
+}
+function bot_dec($v) {
+  if ($v === '') return '';
+  if (strncmp($v, 'p:', 2) === 0) return (string)base64_decode(substr($v, 2));
+  $b = base64_decode(substr($v, 2)); if (strlen($b) < 29 || !function_exists('openssl_decrypt')) return '';
+  $k = hash('sha256', 'dh-bot|' . bot_secret(), true);
+  return (string)openssl_decrypt(substr($b, 28), 'aes-256-gcm', $k, OPENSSL_RAW_DATA, substr($b, 0, 12), substr($b, 12, 16));
+}
+function bot_mask($k) { $n = mb_strlen($k); return $n ? str_repeat('•', 8) . ($n > 12 ? mb_substr($k, -4) : '') : ''; }
 
 function bot_user() {
   $id = val('SELECT id FROM users WHERE name=?', [BOT_NAME]);
@@ -108,6 +139,7 @@ function bot_answer($job) {
   $text = trim($text) . "\n\n*Ответ бота по материалам DrillHarmony. Проверьте по ссылкам; решения на буровой принимаются по инструкциям компании.*";
   $now = time();
   q('INSERT INTO posts (topic_id, user_id, body, created) VALUES (?,?,?,?)', [$t['id'], $bot, $text, $now]);
+  fts_put((int)db()->lastInsertId());
   q('UPDATE topics SET replies=replies+1, last_at=?, last_user=? WHERE id=?', [$now, $bot, $t['id']]);
   q('UPDATE users SET posts=posts+1 WHERE id=?', [$bot]);
   return true;
@@ -253,6 +285,7 @@ function bot_news($title, $body, $pin) {
   q('INSERT INTO topics (cat_id, user_id, title, created, last_at, last_user, pinned) VALUES (?,?,?,?,?,?,?)', [$cid, $bot, $title, $now, $now, $bot, $pin ? 1 : 0]);
   $tid = db()->lastInsertId();
   q('INSERT INTO posts (topic_id, user_id, body, created) VALUES (?,?,?,?)', [$tid, $bot, $body . "\n\nВопросы и пожелания пишите ответом в эту тему.", $now]);
+  fts_put((int)db()->lastInsertId()); tags_set((int)$tid, tags_suggest($title . "\n" . $body, 3));
   q('UPDATE users SET posts=posts+1 WHERE id=?', [$bot]);
   return $tid;
 }

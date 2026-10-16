@@ -97,6 +97,32 @@
       .catch((e) => { if (!/cancel/i.test(String(e && e.message))) toast("Не удалось сохранить файл"); });
   };
 
+  // ---------- онлайн-данные и форум внутри приложения ----------
+  // Вход по учётной записи DrillHarmony: форум выдаёт одноразовый пропуск и переводит на live.drillharmony.com.
+  // Окно открывается поверх приложения с кнопкой «Закрыть»; вход хранится в нём 30 дней, как на сайте.
+  const LIVE = SITE + "forum/sso/live";
+  const inApp = (u) => /^https:\/\/(live\.)?drillharmony\.com\/(forum\/|sso|$)/.test(u) || /^https:\/\/live\.drillharmony\.com\//.test(u);
+  window.dhApp.openWeb = (url) => {
+    const ib = P().InAppBrowser;
+    if (ib && native()) {
+      return ib.openInWebView({ url, options: {
+        showURL: false, showToolbar: true, closeButtonText: "Закрыть", showNavigationButtons: true, toolbarPosition: "TOP", leftToRight: false,
+        clearCache: false, clearSessionCache: false, mediaPlaybackRequiresUserAction: true, customWebViewUserAgent: null,
+        android: { allowZoom: false, hardwareBack: true, pauseMedia: true },
+        iOS: { allowOverScroll: true, enableViewportScale: false, allowInLineMediaPlayback: false, surpressIncrementalRendering: false,
+          viewStyle: "FULL_SCREEN", animationEffect: "COVER_VERTICAL", allowsBackForwardNavigationGestures: true },
+      } }).catch(() => window.open(url, "_blank"));
+    }
+    window.open(url, "_blank");
+  };
+  window.dhApp.openLive = () => window.dhApp.openWeb(LIVE);
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-live]");
+    if (b) { e.preventDefault(); return window.dhApp.openLive(); }
+    const a = e.target.closest("a[href]");
+    if (a && (a.hasAttribute("data-inapp") || inApp(a.href))) { e.preventDefault(); window.dhApp.openWeb(a.href); }
+  });
+
   // ---------- избранное, недавние, история ----------
   const fav = () => ls.get("dh-fav", []);
   Object.assign(window.dhApp, {

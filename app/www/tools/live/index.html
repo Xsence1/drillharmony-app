@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ru" data-theme="dark"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0f14"><meta name="format-detection" content="telephone=no">
+<title>Онлайн-данные WITS и WITSML · DrillHarmony</title>
+<script src="../../assets/j/b82b602a49.js"></script><script src="../../assets/j/8963aff236.js"></script>
+<link rel="stylesheet" href="../../fonts/fonts.css"><link rel="stylesheet" href="../../assets/c/17f53e8b82.css"><link rel="stylesheet" href="../../assets/c/613fde672d.css"><link rel="stylesheet" href="../../assets/c/53fecde9f7.css"><link rel="stylesheet" href="../../assets/c/fdae04d857.css">
+<link rel="stylesheet" href="../../app/app.css"><script src="../../app/app.js"></script>
+</head><body class="in-app k-tool" data-slug="live" data-path="tools/live/" data-kind="tool" data-name="Онлайн-данные WITS и WITSML">
+<header class="abar"><a class="ib" href="../../index.html" data-back aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></a>
+<div class="ttl"><small>Инструменты</small><span>Онлайн-данные WITS и WITSML</span></div><button class="ib star" type="button" aria-label="В избранное" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg></button>
+<button id="theme" type="button" hidden aria-hidden="true"></button></header>
+<main class="app-main">
+<article class="article">
+
+<h1 class="vh">Онлайн-данные WITS и WITSML</h1>
+<p class="lead hint">Поток WITS0 или WITSML с буровой прямо в приложении: стрелочные и цифровые приборы, планшет параметров по времени и положение отклонителя. Каждый видит только свои данные. Нужна учётная запись DrillHarmony — та же, что на форуме.</p>
+<div class="actions-row"><a class="btn pri ext" href="https://drillharmony.com/forum/sso/live" rel="noopener">Открыть онлайн-данные</a><a class="btn ext" href="https://drillharmony.com/forum/register?next=%2Fforum%2Fsso%2Flive" rel="noopener">Создать учётную запись</a></div>
+<h2>Как подключить буровую</h2>
+<div class="alist">
+<div class="card"><b>Станция подключается к сервису</b><span>Создайте профиль: сервис выделит адрес и порт. В программе станции ГТИ или телесистемы включите вывод WITS0 по TCP/IP в режиме клиента на этот адрес. Подходит, если на буровой нет белого IP. Можно разрешить приём только с адреса станции.</span></div>
+<div class="card"><b>Сервис подключается к станции</b><span>Если у станции или ретранслятора есть внешний адрес, укажите IP и порт WITS-сервера. Сервис подключится сам и переподключится при обрыве.</span></div>
+<div class="card"><b>Опрос WITSML</b><span>Адрес WITSML-сервера подрядчика 1.4.1.1 или 1.3.1.1, логин и пароль. Скважину, ствол и каротаж по времени выбираете из списка, опрос каждые 5–60 секунд.</span></div>
+</div>
+<h2>Что видно</h2>
+<ul>
+<li><b>Приборы.</b> Стрелочные, цифровые с мини-трендом, шкалы и тренд за 30 минут. Любой элемент любой записи WITS (01–25 и нестандартные): свои подписи, единицы, шкала, множитель и сдвиг, пороги сигнала.</li>
+<li><b>Отклонитель.</b> Круговая шкала GTF или MTF, прошлые положения точками, целевой сектор, рядом зенит, азимут и глубина замера.</li>
+<li><b>Планшет.</b> До шести треков по четыре кривые, время сверху вниз, окно от 15 минут до 72 часов, листание истории колесом мыши.</li>
+<li><b>Каналы.</b> Все элементы, которые приходят от источника, с русскими названиями по стандарту WITS.</li>
+<li><b>На буровой.</b> Полноэкранный режим для планшета или монитора бурильщика, тёмная и светлая тема.</li>
+</ul>
+<h2>Хранение и безопасность</h2>
+<ul>
+<li>Данные профиля видит только его владелец. Вход — по учётной записи DrillHarmony, пароль на сервис не передаётся: форум выдаёт одноразовый подписанный пропуск.</li>
+<li>Данные хранятся 6, 24 или 72 часа (выбираете в профиле), потом удаляются. Это не архив: нужное выгрузите в CSV.</li>
+<li>У каждой учётной записи до трёх профилей и до 100 МБ данных. Общий объём на сервере ограничен 1 ГБ: при заполнении сервис сам удаляет самые старые данные.</li>
+<li>Пароль WITSML-сервера хранится в зашифрованном виде. Сервис подключается только к внешним адресам.</li>
+<li>Сервис для ознакомления и личной работы. Для мониторинга буровых компании, с отчётами, балансом времени и правами сотрудников, есть <a class="ext" href="https://drillharmony.com/tempo/" rel="noopener">Tempo</a>.</li>
+</ul>
+<div class="note"><b>Не передавайте</b> через сервис данные, которые вам запрещено выносить за периметр компании. Решения на буровой принимаются по инструкциям вашей компании.</div>
+</article>
+<p class="src">На сайте: <a class="ext" href="https://drillharmony.com/tools/live/" rel="noopener">drillharmony.com/tools/live/</a></p>
+</main>
+
+<script src="../../assets/j/c7b6858526.js"></script>
+</body></html>

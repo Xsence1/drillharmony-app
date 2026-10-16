@@ -3,6 +3,7 @@
 if (!defined('FORUM')) { http_response_code(403); exit; }
 date_default_timezone_set('Asia/Yekaterinburg');
 mb_internal_encoding('UTF-8');
+require_once __DIR__ . '/gamify.php';
 
 $CFG = array_merge([
   'base'          => '/forum/',          // адрес форума от корня сайта
@@ -12,6 +13,8 @@ $CFG = array_merge([
   'confirm_email' => true,               // подтверждение почты перед первой публикацией
   'mail_from'     => 'info@drillharmony.com',
   'per_page'      => 20,
+  'live_url'      => 'https://live.drillharmony.com',   // сервис онлайн-данных WITS/WITSML на VPS
+  'live_secret'   => '',                 // общий секрет с сервисом (LIVE_SSO_SECRET); пусто — сервис не подключён
 ], is_file(__DIR__ . '/forum-config.php') ? (include __DIR__ . '/forum-config.php') : []);
 
 // ---------- база ----------
@@ -27,7 +30,16 @@ function db() {
     $pdo->beginTransaction();
     try { install($pdo); $pdo->commit(); } catch (Throwable $e) { $pdo->rollBack(); throw $e; }
   }
-  if ((int)$pdo->query('PRAGMA user_version')->fetchColumn() < CATS_VERSION) { sync_cats($pdo); seed_gti($pdo); seed_gti($pdo, 'topics.php', 0); $pdo->exec('PRAGMA user_version = ' . CATS_VERSION); }
+  $ver = (int)$pdo->query('PRAGMA user_version')->fetchColumn();
+  if ($ver < CATS_VERSION) {
+    $pdo->beginTransaction();
+    try {
+      if ($ver < 4) { sync_cats($pdo); seed_gti($pdo); seed_gti($pdo, 'topics.php', 0); }
+      if ($ver < 5) g_migrate($pdo);          // репутация, бейджи, теги, уведомления, поиск
+      $pdo->commit();
+    } catch (Throwable $e) { $pdo->rollBack(); throw $e; }
+    $pdo->exec('PRAGMA user_version = ' . CATS_VERSION);
+  }
   return $pdo;
 }
 function q($sql, $a = []) { $s = db()->prepare($sql); $s->execute($a); return $s; }
@@ -61,7 +73,7 @@ function sync_cats($pdo) {
   $upd = $pdo->prepare('UPDATE cats SET ord=?, grp=? WHERE slug=?');
   foreach (cat_list() as $i => $c) { $ins->execute([$c[0], $c[1], $c[2], $c[3], $c[4], $i + 1]); $upd->execute([$i + 1, $c[3], $c[1]]); }
 }
-const CATS_VERSION = 4;
+const CATS_VERSION = 5;
 // справки ГТИ от имени владельца, если их ещё нет
 function seed_gti($pdo, $file = 'kb_gti.php', $pin = 1) {
   $uid = $pdo->query("SELECT id FROM users WHERE name='DrillHarmony'")->fetchColumn();
@@ -185,21 +197,35 @@ function page($title, $main, $desc = 'Форум DrillHarmony: траектор�
 }
 function userbar() {
   $u = me();
-  $s = '<form class="f-search" action="' . h(url('search')) . '" method="get" role="search">' . (url('search') === url('') . '?r=search' ? '<input type="hidden" name="r" value="search">' : '')
-     . '<input type="search" name="q" placeholder="Поиск по форуму" aria-label="Поиск по форуму" value="' . h($_GET['q'] ?? '') . '"></form>';
+  $s = '<form class="f-search" action="' . h(url('search')) . '" method="get" role="search" data-suggest="' . h(url('suggest')) . '">' . (url('search') === url('') . '?r=search' ? '<input type="hidden" name="r" value="search">' : '')
+     . '<input type="search" name="q" placeholder="Поиск: темы, теги, формулы" aria-label="Поиск по форуму" autocomplete="off" value="' . h($_GET['q'] ?? '') . '"><div class="f-sugg" hidden></div></form>';
   if ($u) {
-    $s .= '<a class="f-me" href="' . h(url('u/' . rawurlencode($u['name']))) . '">' . avatar($u, 26) . h($u['name']) . '</a>';
+    $n = notes_unseen($u['id']);
+    $s .= '<a class="f-bell' . ($n ? ' on' : '') . '" href="' . h(url('notes')) . '" title="Уведомления" aria-label="Уведомления' . ($n ? ": $n новых" : '') . '"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>' . ($n ? '<b>' . ($n > 99 ? '99+' : $n) . '</b>' : '') . '</a>';
+    $s .= '<a class="f-me" href="' . h(url('u/' . rawurlencode($u['name']))) . '">' . avatar($u, 26) . '<span>' . h($u['name']) . '<small>' . (int)$u['rep'] . ' реп.</small></span></a>';
+    global $CFG;
+    if (!empty($CFG['live_secret'])) $s .= '<a class="f-modlink" href="' . h(url('sso/live')) . '" title="Приборы, планшет и отклонитель по WITS и WITSML">Онлайн-данные</a>';
     if (is_mod()) {
-      $n = (int)val('SELECT COUNT(*) FROM reports WHERE done=0');
-      $s .= '<a class="f-modlink" href="' . h(url('mod')) . '">Модерация' . ($n ? " <b>$n</b>" : '') . '</a>';
+      $m = (int)val('SELECT COUNT(*) FROM reports WHERE done=0');
+      $s .= '<a class="f-modlink" href="' . h(url('mod')) . '">Модерация' . ($m ? " <b>$m</b>" : '') . '</a>';
     }
     $s .= '<form method="post" action="' . h(url('logout')) . '" class="f-inline">' . csrf_field() . '<button type="submit" class="f-link">Выйти</button></form>';
   } else {
     $s .= '<a class="btn" href="' . h(url('login', ['next' => $_SERVER['REQUEST_URI'] ?? ''])) . '">Войти</a><a class="btn pri" href="' . h(url('register')) . '">Регистрация</a>';
   }
-  return '<div class="f-bar">' . $s . '</div>';
+  $r = trim((string)($_GET['r'] ?? ''), '/'); $r0 = explode('/', $r)[0];
+  $nav = ['' => 'Разделы', 'latest' => 'Лента', 'latest?f=open' => 'Ждут ответа', 'tags' => 'Теги', 'top' => 'Рейтинг', 'badges' => 'Бейджи'];
+  $cur = $r0 === 'latest' && ($_GET['f'] ?? '') === 'open' ? 'latest?f=open' : $r0;
+  $sub = '<nav class="f-subnav" aria-label="Разделы форума">';
+  foreach ($nav as $k => $t) {
+    $href = strpos($k, '?') !== false ? url(strtok($k, '?'), ['f' => 'open']) : url($k);
+    $sub .= '<a href="' . h($href) . '"' . ($k === $cur || ($k === 'tags' && $r0 === 'tag') ? ' aria-current="page"' : '') . '>' . $t . '</a>';
+  }
+  $sub .= '</nav>';
+  return '<div class="f-bar">' . $s . '</div>' . $sub;
 }
 function avatar($u, $size = 40) {
+  if ($img = avatar_html($u, $size)) return $img;
   $n = $u['name'] ?? '?'; $hue = hexdec(substr(md5(mb_strtolower($n)), 0, 2)) / 255 * 360;
   $ch = mb_strtoupper(mb_substr($n, 0, 1));
   return '<span class="f-ava" style="--s:' . (int)$size . 'px;--h:' . round($hue) . '" aria-hidden="true">' . h($ch) . '</span>';
@@ -211,6 +237,20 @@ function start_session() {
   session_name('dhforum');
   session_set_cookie_params(['lifetime' => 60 * 60 * 24 * 30, 'path' => '/forum/', 'secure' => $secure, 'httponly' => true, 'samesite' => 'Lax']);
   session_start();
+}
+// метка входа для шапки сайта: статичные страницы спрашивают /forum/api/me, только если метка есть
+function sync_marker() {
+  $on = (bool)me(); $has = ($_COOKIE['dh_u'] ?? '') === '1';
+  if ($on === $has || headers_sent()) return;
+  $secure = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+  setcookie('dh_u', $on ? '1' : '', ['expires' => $on ? time() + 60 * 60 * 24 * 30 : time() - 3600, 'path' => '/', 'secure' => $secure, 'httponly' => false, 'samesite' => 'Lax']);
+}
+// единый вход: подписанный пропуск для сервиса онлайн-данных (live.drillharmony.com), живёт 2 минуты
+function b64u($s) { return rtrim(strtr(base64_encode($s), '+/', '-_'), '='); }
+function sso_ticket($u, $aud) {
+  global $CFG;
+  $p = b64u(json_encode(['uid' => (int)$u['id'], 'name' => $u['name'], 'role' => $u['role'], 'aud' => $aud, 'exp' => time() + 120, 'n' => bin2hex(random_bytes(12))], JSON_UNESCAPED_UNICODE));
+  return $p . '.' . b64u(hash_hmac('sha256', $p, (string)$CFG['live_secret'], true));
 }
 function me() {
   static $u = false;
@@ -256,6 +296,20 @@ function txt($k, $max) {
 // Хранится текст с простой разметкой, HTML экранируется целиком:
 // **жирный**, *курсив*, ~~зачёркнутый~~, `код`, ```блок кода```, ## заголовок, > цитата, - и 1. списки,
 // [текст](https://…), ![подпись](/forum/uploads/…), таблицы | a | b |, голые ссылки.
+// текст без разметки: для фрагментов в поиске, профиле и списках
+function plain_text($md) {
+  $t = preg_replace('/!\[[^\]]*\]\([^)]*\)/u', ' [картинка] ', (string)$md);
+  $t = preg_replace('/\[([^\]]+)\]\((https?:[^)\s]+)\)/u', '$1', $t);
+  $t = preg_replace('/^\s*```.*$/mu', ' ', $t);
+  $t = preg_replace('/^\s*\|?\s*:?-{2,}.*$/mu', ' ', $t);
+  $t = preg_replace('/^\s{0,3}(#{1,6}|>+|[-*•]|\d+[.)])\s+/mu', '', $t);
+  $t = preg_replace('/^\s*-{3,}\s*$/mu', ' ', $t);
+  $t = str_replace(['**', '~~', '`'], '', $t);
+  $t = preg_replace('/(?<![\p{L}\p{N}*])\*(?=\S)([^*\n]+?)\*(?![\p{L}\p{N}])/u', '$1', $t);
+  $t = preg_replace('/\s*\|\s*/u', ' · ', $t);
+  $t = preg_replace('/(\s·\s)+/u', ' · ', $t);
+  return trim(preg_replace('/\s+/u', ' ', $t), " ·");
+}
 function render($src) {
   $src = str_replace("\r", '', $src);
   $blocks = []; $i = 0;

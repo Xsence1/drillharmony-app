@@ -3,8 +3,10 @@
 define('FORUM', 1);
 require __DIR__ . '/lib.php';
 require __DIR__ . '/bot.php';
+require __DIR__ . '/pages.php';
 try { db(); } catch (Throwable $e) { http_response_code(500); echo 'Форум временно недоступен: не удалось открыть базу (нужен PHP с PDO SQLite и право записи в папку forum/_data).'; exit; }
 start_session();
+sync_marker();
 try { bot_kick(); } catch (Throwable $e) {}
 
 $r = trim((string)($_GET['r'] ?? ''), '/');
@@ -23,10 +25,22 @@ switch ($route) {
   case 'reply': if ($post) reply(); break;
   case 'edit': edit_post((int)$arg, $post); break;
   case 'like': if ($post) like(); break;
+  case 'solve': if ($post) solve(); break;
+  case 'latest': latest(); break;
+  case 'tags': tags_page(); break;
+  case 'tag': tag_page($arg); break;
+  case 'top': top_page(); break;
+  case 'badges': badges_page(); break;
+  case 'notes': notes_page(); break;
+  case 'suggest': suggest_json(); break;
+  case 'tagsuggest': if ($post) tag_suggest_json(); break;
   case 'upload': if ($post) upload(); break;
   case 'preview': if ($post) { header('Content-Type: text/html; charset=utf-8'); echo render(txt('body', 20000)); exit; } break;
   case 'report': if ($post) report(); break;
+  case 'api': api_route($arg); break;
+  case 'sso': sso_route($arg); break;
   case 'mod': mod_page(); break;
+  case 'bot': bot_page($post); break;
   case 'modact': if ($post) mod_action(); break;
   case 'login': $post ? do_login() : login_form(); break;
   case 'register': $post ? do_register() : register_form(); break;
@@ -49,43 +63,7 @@ function crumbs(...$items) {
   return $s;
 }
 
-function home() {
-  $cats = q("SELECT c.*, (SELECT COUNT(*) FROM topics t WHERE t.cat_id=c.id AND t.deleted=0) topics,
-                    (SELECT COUNT(*) FROM posts p JOIN topics t ON t.id=p.topic_id WHERE t.cat_id=c.id AND p.deleted=0 AND t.deleted=0) posts,
-                    (SELECT t.id FROM topics t WHERE t.cat_id=c.id AND t.deleted=0 ORDER BY t.last_at DESC LIMIT 1) last_tid
-             FROM cats c ORDER BY c.ord")->fetchAll();
-  $groups = [];
-  foreach ($cats as $c) $groups[$c['grp']][] = $c;
-  $m = '<div class="f-head"><div><h1>Форум DrillHarmony</h1><p class="f-sub">Вопросы, опыт и разборы задач: траектория, слайд, телеметрия, геонавигация, режимы бурения, данные и карьера.</p></div>'
-     . (me() ? '<a class="btn pri" href="' . h(url('new')) . '">Новая тема</a>' : '') . '</div>' . flash();
-  $m .= '<div class="f-grid"><div>';
-  foreach ($groups as $g => $list) {
-    $m .= '<section class="f-group"><h2>' . h($g) . '</h2><div class="f-cats">';
-    foreach ($list as $c) {
-      $last = $c['last_tid'] ? one('SELECT t.id, t.title, t.last_at, u.name FROM topics t LEFT JOIN users u ON u.id=t.last_user WHERE t.id=?', [$c['last_tid']]) : null;
-      $m .= '<a class="f-cat' . ($c['slug'] === 'kb' ? ' kb' : '') . '" href="' . h(url('c/' . $c['slug'])) . '"><span class="f-cat-i" aria-hidden="true">' . cat_icon($c['slug']) . '</span>'
-          . '<span class="f-cat-t"><b>' . h($c['name']) . '</b><small>' . h($c['descr']) . '</small></span>'
-          . '<span class="f-cat-n"><b>' . (int)$c['topics'] . '</b> ' . plural($c['topics'], 'тема', 'темы', 'тем') . '<br><b>' . (int)$c['posts'] . '</b> ' . plural($c['posts'], 'сообщение', 'сообщения', 'сообщений') . '</span>'
-          . '<span class="f-cat-l">' . ($last ? h(mb_strimwidth($last['title'], 0, 48, '…')) . '<small>' . h($last['name']) . ', ' . ago($last['last_at']) . '</small>' : '<small>Пока нет тем</small>') . '</span></a>';
-    }
-    $m .= '</div></section>';
-  }
-  $m .= '</div><aside class="f-side">' . side_box() . '</aside></div>';
-  page('Форум DrillHarmony', $m, 'Форум DrillHarmony о наклонно-направленном бурении: траектория, слайд и КНБК, телеметрия, геонавигация, режимы бурения, данные, обучение и карьера.', crumbs());
-}
 
-function side_box() {
-  $s = '';
-  if (!me()) $s .= '<div class="f-box f-join"><h3>Присоединяйтесь</h3><p>Задавайте вопросы и делитесь опытом с инженерами ННБ, телеметристами и геонавигаторами.</p><a class="btn pri" href="' . h(url('register')) . '">Зарегистрироваться</a></div>';
-  $new = q("SELECT t.id, t.title, t.last_at, c.name cname FROM topics t JOIN cats c ON c.id=t.cat_id WHERE t.deleted=0 ORDER BY t.last_at DESC LIMIT 7")->fetchAll();
-  $s .= '<div class="f-box"><h3>Последние обсуждения</h3><ul class="f-recent">';
-  foreach ($new as $t) $s .= '<li><a href="' . h(url('t/' . $t['id'])) . '">' . h($t['title']) . '</a><small>' . h($t['cname']) . ' · ' . ago($t['last_at']) . '</small></li>';
-  $s .= '</ul></div>';
-  $st = one("SELECT (SELECT COUNT(*) FROM users WHERE pass<>'!') u, (SELECT COUNT(*) FROM topics WHERE deleted=0) t, (SELECT COUNT(*) FROM posts WHERE deleted=0) p");
-  $s .= '<div class="f-box f-stats"><div><b>' . (int)$st['t'] . '</b>' . plural($st['t'], 'тема', 'темы', 'тем') . '</div><div><b>' . (int)$st['p'] . '</b>' . plural($st['p'], 'сообщение', 'сообщения', 'сообщений') . '</div><div><b>' . (int)$st['u'] . '</b>' . plural($st['u'], 'участник', 'участника', 'участников') . '</div></div>';
-  $s .= '<div class="f-box"><h3>Перед тем как писать</h3><p>Не публикуйте данные заказчиков и названия скважин без разрешения, обсуждайте осложнения обезличенно. <a href="' . h(url('rules')) . '">Правила форума</a></p></div>';
-  return $s;
-}
 
 function cat_icon($slug) {
   $p = [
@@ -121,30 +99,6 @@ function pager($total, $page, $base, $extra = []) {
   return $s . '</nav>';
 }
 
-function category($slug) {
-  global $CFG;
-  $c = one('SELECT * FROM cats WHERE slug=?', [$slug]);
-  if (!$c) return;
-  $page = max(1, (int)($_GET['p'] ?? 1));
-  $total = (int)val('SELECT COUNT(*) FROM topics WHERE cat_id=? AND deleted=0', [$c['id']]);
-  $ts = q('SELECT t.*, u.name author, lu.name lname FROM topics t JOIN users u ON u.id=t.user_id LEFT JOIN users lu ON lu.id=t.last_user
-           WHERE t.cat_id=? AND t.deleted=0 ORDER BY t.pinned DESC, t.last_at DESC LIMIT ? OFFSET ?', [$c['id'], $CFG['per_page'], ($page - 1) * $CFG['per_page']])->fetchAll();
-  $canNew = me() && (!$c['admin_only'] || is_mod());
-  $m = '<div class="f-head"><div><h1>' . h($c['name']) . '</h1><p class="f-sub">' . h($c['descr']) . '</p></div>'
-     . ($canNew ? '<a class="btn pri" href="' . h(url('new', ['c' => $c['slug']])) . '">Новая тема</a>' : (!me() && !$c['admin_only'] ? '<a class="btn" href="' . h(url('login', ['next' => url('new', ['c' => $c['slug']])])) . '">Войдите, чтобы создать тему</a>' : '')) . '</div>' . flash();
-  if (!$ts) $m .= '<div class="f-box f-empty"><p>В этом разделе пока нет тем.' . ($canNew ? ' Начните первую.' : '') . '</p></div>';
-  else {
-    $m .= '<div class="f-topics" role="list">';
-    foreach ($ts as $t) {
-      $m .= '<div class="f-topic" role="listitem"><div class="f-topic-t"><a href="' . h(url('t/' . $t['id'])) . '">' . ($t['pinned'] ? '<i class="f-pin">Закреплено</i>' : '') . ($t['locked'] ? '<i class="f-lock">Закрыто</i>' : '') . h($t['title']) . '</a>'
-          . '<small>' . h($t['author']) . ' · ' . ago($t['created']) . '</small></div>'
-          . '<div class="f-topic-n"><b>' . (int)$t['replies'] . '</b> ' . plural($t['replies'], 'ответ', 'ответа', 'ответов') . '<small>' . (int)$t['views'] . ' ' . plural($t['views'], 'просмотр', 'просмотра', 'просмотров') . '</small></div>'
-          . '<div class="f-topic-l">' . h($t['lname']) . '<small>' . ago($t['last_at']) . '</small></div></div>';
-    }
-    $m .= '</div>' . pager($total, $page, 'c/' . $c['slug']);
-  }
-  page($c['name'] . ' | Форум', $m, $c['descr'], crumbs($c['name']));
-}
 
 function role_badge($u) {
   if ($u['role'] === 'admin') return '<i class="f-role own">' . ($u['name'] === 'DrillHarmony' ? 'Владелец' : 'Администратор') . '</i>';
@@ -153,56 +107,8 @@ function role_badge($u) {
   return '';
 }
 
-function topic($id) {
-  global $CFG;
-  $t = one('SELECT t.*, c.name cname, c.slug cslug FROM topics t JOIN cats c ON c.id=t.cat_id WHERE t.id=?', [$id]);
-  if (!$t || ($t['deleted'] && !is_mod())) return;
-  if (empty($_SESSION['seen'][$id])) { q('UPDATE topics SET views=views+1 WHERE id=?', [$id]); $_SESSION['seen'][$id] = 1; }
-  $total = (int)val('SELECT COUNT(*) FROM posts WHERE topic_id=? AND deleted=0', [$id]);
-  $pages = max(1, (int)ceil($total / $CFG['per_page']));
-  $page = isset($_GET['p']) && $_GET['p'] === 'last' ? $pages : max(1, min($pages, (int)($_GET['p'] ?? 1)));
-  $ps = q('SELECT p.*, u.name, u.title utitle, u.role, u.posts uposts, u.created ucreated FROM posts p JOIN users u ON u.id=p.user_id
-           WHERE p.topic_id=? AND (p.deleted=0 OR ?) ORDER BY p.id LIMIT ? OFFSET ?', [$id, is_mod() ? 1 : 0, $CFG['per_page'], ($page - 1) * $CFG['per_page']])->fetchAll();
-  $me = me();
-  $liked = $me ? array_column(q('SELECT post_id FROM likes WHERE user_id=?', [$me['id']])->fetchAll(), 'post_id') : [];
-  $m = '<div class="f-head"><div><h1>' . h($t['title']) . '</h1><p class="f-sub"><a href="' . h(url('c/' . $t['cslug'])) . '">' . h($t['cname']) . '</a> · ' . (int)$t['replies'] . ' ' . plural($t['replies'], 'ответ', 'ответа', 'ответов') . ' · ' . (int)$t['views'] . ' ' . plural($t['views'], 'просмотр', 'просмотра', 'просмотров') . '</p></div>';
-  if (is_mod()) {
-    $m .= '<form method="post" action="' . h(url('modact')) . '" class="f-modbar">' . csrf_field() . '<input type="hidden" name="tid" value="' . $id . '">'
-        . '<button name="a" value="pin">' . ($t['pinned'] ? 'Открепить' : 'Закрепить') . '</button><button name="a" value="lock">' . ($t['locked'] ? 'Открыть' : 'Закрыть') . '</button>'
-        . '<button name="a" value="deltopic" class="danger" data-confirm="Удалить тему целиком?">Удалить тему</button></form>';
-  }
-  $m .= '</div>' . flash() . pager($total, $page, 't/' . $id);
-  $first = (int)val('SELECT MIN(id) FROM posts WHERE topic_id=?', [$id]);
-  foreach ($ps as $p) {
-    $own = $me && $me['id'] == $p['user_id'];
-    $m .= '<article class="f-post' . ($p['deleted'] ? ' del' : '') . ($p['id'] == $first ? ' first' : '') . '" id="p' . $p['id'] . '">'
-        . '<div class="f-post-h">' . avatar($p, 40) . '<div><a class="f-name" href="' . h(url('u/' . rawurlencode($p['name']))) . '">' . h($p['name']) . '</a>' . role_badge($p)
-        . '<small>' . h($p['utitle'] ?: 'Участник') . ' · ' . (int)$p['uposts'] . ' ' . plural($p['uposts'], 'сообщение', 'сообщения', 'сообщений') . '</small></div>'
-        . '<a class="f-date" href="#p' . $p['id'] . '">' . ago($p['created']) . ($p['edited'] ? ' · изменено' : '') . '</a></div>'
-        . '<div class="f-body">' . ($p['deleted'] ? '<p class="f-muted">Сообщение удалено модератором.</p>' : render($p['body'])) . '</div>';
-    if (!$p['deleted']) {
-      $m .= '<div class="f-post-f">';
-      if ($me && !$own) $m .= '<form method="post" action="' . h(url('like')) . '" class="f-inline">' . csrf_field() . '<input type="hidden" name="pid" value="' . $p['id'] . '"><button class="f-like' . (in_array($p['id'], $liked) ? ' on' : '') . '" type="submit">Спасибо' . ($p['likes'] ? ' · ' . (int)$p['likes'] : '') . '</button></form>';
-      elseif ($p['likes']) $m .= '<span class="f-like-n">Спасибо · ' . (int)$p['likes'] . '</span>';
-      if ($me && !$t['locked']) $m .= '<button type="button" class="f-link" data-quote="' . h($p['name']) . '" data-body="' . h(mb_substr($p['body'], 0, 600)) . '">Цитировать</button>';
-      if (($own && time() - $p['created'] < 86400) || is_mod()) $m .= '<a class="f-link" href="' . h(url('edit/' . $p['id'])) . '">Изменить</a>';
-      if ($me && !$own) $m .= '<details class="f-rep"><summary class="f-link">Пожаловаться</summary><form method="post" action="' . h(url('report')) . '">' . csrf_field() . '<input type="hidden" name="pid" value="' . $p['id'] . '"><input name="reason" maxlength="300" placeholder="Что не так с сообщением" required><button type="submit" class="btn">Отправить</button></form></details>';
-      if (is_mod()) $m .= '<form method="post" action="' . h(url('modact')) . '" class="f-inline">' . csrf_field() . '<input type="hidden" name="pid" value="' . $p['id'] . '"><button class="f-link danger" name="a" value="delpost" data-confirm="Удалить сообщение?">Удалить</button></form>';
-      $m .= '</div>';
-    }
-    $m .= '</article>';
-  }
-  $m .= pager($total, $page, 't/' . $id);
-  if ($t['locked']) $m .= '<div class="f-box f-muted">Тема закрыта для ответов.</div>';
-  elseif (!$me) $m .= '<div class="f-box f-cta"><p>Чтобы ответить, <a href="' . h(url('login', ['next' => url('t/' . $id, ['p' => 'last'])])) . '">войдите</a> или <a href="' . h(url('register')) . '">зарегистрируйтесь</a>.</p></div>';
-  elseif ($why = can_post()) $m .= '<div class="f-box f-warn">' . $why . '</div>';
-  else $m .= '<form class="f-box f-form" method="post" action="' . h(url('reply')) . '" id="reply">' . csrf_field() . '<input type="hidden" name="tid" value="' . $id . '"><h2>Ваш ответ</h2>' . editor('body', '') . '<div class="f-actions"><button class="btn pri" type="submit">Ответить</button></div></form>';
-  $m .= '<p class="f-note">Ответы на форуме — мнение участников. Решения на буровой принимаются по инструкциям компании и программе на бурение.</p>';
-  $first = one('SELECT body FROM posts WHERE topic_id=? ORDER BY id LIMIT 1', [$id]);
-  page($t['title'] . ' | Форум', $m, mb_strimwidth(preg_replace('/\s+/u', ' ', strip_tags(render($first['body'] ?? ''))), 0, 180, '…'), crumbs([$t['cname'], url('c/' . $t['cslug'])], $t['title']), (bool)$t['deleted']);
-}
 
-function editor($name, $value, $rows = 8) {
+function editor($name, $value, $rows = 8, $required = true) {
   $ic = fn($d) => '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $d . '</svg>';
   $btn = fn($act, $title, $icon) => '<button type="button" data-act="' . $act . '" title="' . h($title) . '" aria-label="' . h($title) . '">' . $icon . '</button>';
   $tools = $btn('h', 'Заголовок', $ic('<path d="M6 4v16M18 4v16M6 12h12"/>'))
@@ -224,7 +130,7 @@ function editor($name, $value, $rows = 8) {
   return '<div class="f-ed" data-preview="' . h(url('preview')) . '" data-upload="' . h(url('upload')) . '">'
     . '<div class="f-ed-top"><div class="f-tabs" role="tablist"><button type="button" class="on" data-tab="write" role="tab">Текст</button><button type="button" data-tab="view" role="tab">Просмотр</button></div>'
     . '<div class="f-tools" role="toolbar" aria-label="Форматирование">' . $tools . '</div></div>'
-    . '<div class="f-ed-area"><textarea name="' . h($name) . '" rows="' . (int)$rows . '" required minlength="2" maxlength="20000" placeholder="Текст сообщения. Картинку можно вставить из буфера обмена или перетащить сюда.">' . h($value) . '</textarea>'
+    . '<div class="f-ed-area"><textarea name="' . h($name) . '" rows="' . (int)$rows . '"' . ($required ? ' required minlength="2"' : '') . ' maxlength="20000" placeholder="' . ($required ? 'Текст сообщения. Картинку можно вставить из буфера обмена или перетащить сюда.' : 'Расскажите о себе') . '">' . h($value) . '</textarea>'
     . '<div class="f-view f-body" hidden></div><div class="f-drop" hidden>Отпустите, чтобы загрузить картинку</div></div>'
     . '<div class="f-ed-foot"><small class="f-hint">**жирный** · *курсив* · `код` · ``` формула ``` · > цитата · ## заголовок</small><small class="f-count"></small></div></div>';
 }
@@ -237,78 +143,9 @@ function goto_post($pid) {
   redirect(url('t/' . $p['topic_id'], $pg > 1 ? ['p' => $pg] : []) . '#p' . $pid);
 }
 
-function new_topic_form($slug, $err = '', $title = '', $body = '') {
-  need_login();
-  if ($why = can_post()) { page('Новая тема', '<div class="f-box f-warn">' . $why . '</div>', '', crumbs('Новая тема'), true); }
-  $cats = q('SELECT * FROM cats ' . (is_mod() ? '' : 'WHERE admin_only=0') . ' ORDER BY ord')->fetchAll();
-  $opt = ''; foreach ($cats as $c) $opt .= '<option value="' . h($c['slug']) . '"' . ($c['slug'] === $slug ? ' selected' : '') . '>' . h($c['name']) . '</option>';
-  $m = '<div class="f-head"><h1>Новая тема</h1></div>' . ($err ? '<div class="f-flash warn">' . h($err) . '</div>' : '')
-     . '<form class="f-box f-form" method="post" action="' . h(url('new')) . '">' . csrf_field()
-     . '<label>Раздел<select name="c" required>' . $opt . '</select></label>'
-     . '<label>Заголовок<input name="title" required minlength="5" maxlength="140" value="' . h($title) . '" placeholder="Коротко о сути вопроса"></label>'
-     . '<label>Сообщение</label>' . editor('body', $body, 12)
-     . '<p class="f-hint">Без названий скважин, месторождений и данных заказчика без разрешения. <a href="' . h(url('rules')) . '" target="_blank">Правила</a></p>'
-     . '<div class="f-actions"><button class="btn pri" type="submit">Создать тему</button></div></form>';
-  page('Новая тема | Форум', $m, '', crumbs('Новая тема'), true);
-}
 
-function create_topic() {
-  need_login(); if (can_post()) redirect(url('new'));
-  $me = me();
-  $c = one('SELECT * FROM cats WHERE slug=?', [$_POST['c'] ?? '']);
-  $title = txt('title', 140); $body = txt('body', 20000);
-  if (!$c || ($c['admin_only'] && !is_mod())) new_topic_form('', 'Выберите раздел.', $title, $body);
-  if (mb_strlen($title) < 5) new_topic_form($c['slug'], 'Заголовок слишком короткий.', $title, $body);
-  if (mb_strlen($body) < 10) new_topic_form($c['slug'], 'Сообщение слишком короткое.', $title, $body);
-  if (!is_mod() && !rate('topic:' . $me['id'], 5, 3600)) new_topic_form($c['slug'], 'Не больше пяти тем в час. Попробуйте позже.', $title, $body);
-  $now = time();
-  q('INSERT INTO topics (cat_id, user_id, title, created, last_at, last_user) VALUES (?,?,?,?,?,?)', [$c['id'], $me['id'], $title, $now, $now, $me['id']]);
-  $tid = db()->lastInsertId();
-  q('INSERT INTO posts (topic_id, user_id, body, created, ip) VALUES (?,?,?,?,?)', [$tid, $me['id'], $body, $now, ip()]);
-  q('UPDATE users SET posts=posts+1 WHERE id=?', [$me['id']]);
-  if ($c['slug'] !== 'kb' && $c['slug'] !== 'about') bot_on_topic($tid, $c['slug']);
-  redirect(url('t/' . $tid));
-}
 
-function reply() {
-  need_login(); $me = me();
-  $tid = (int)($_POST['tid'] ?? 0);
-  $t = one('SELECT * FROM topics WHERE id=? AND deleted=0', [$tid]);
-  if (!$t) redirect(url(''));
-  if ($why = can_post()) { flash(strip_tags($why), 'warn'); redirect(url('t/' . $tid)); }
-  if ($t['locked'] && !is_mod()) { flash('Тема закрыта.', 'warn'); redirect(url('t/' . $tid)); }
-  $body = txt('body', 20000);
-  if (mb_strlen($body) < 2) { flash('Пустое сообщение.', 'warn'); redirect(url('t/' . $tid)); }
-  if (!is_mod() && !rate('post:' . $me['id'], 1, 15)) { flash('Слишком часто. Подождите несколько секунд.', 'warn'); redirect(url('t/' . $tid, ['p' => 'last'])); }
-  if (!is_mod() && !rate('posth:' . $me['id'], 60, 3600)) { flash('Не больше 60 сообщений в час.', 'warn'); redirect(url('t/' . $tid, ['p' => 'last'])); }
-  $now = time();
-  q('INSERT INTO posts (topic_id, user_id, body, created, ip) VALUES (?,?,?,?,?)', [$tid, $me['id'], $body, $now, ip()]);
-  $pid = db()->lastInsertId();
-  q('UPDATE topics SET replies=replies+1, last_at=?, last_user=? WHERE id=?', [$now, $me['id'], $tid]);
-  q('UPDATE users SET posts=posts+1 WHERE id=?', [$me['id']]);
-  bot_on_reply($tid, $pid, $body);
-  goto_post($pid);
-}
 
-function edit_post($pid, $post) {
-  need_login(); $me = me();
-  $p = one('SELECT p.*, t.title, t.id tid FROM posts p JOIN topics t ON t.id=p.topic_id WHERE p.id=? AND p.deleted=0', [$pid]);
-  if (!$p) return;
-  $first = (int)val('SELECT MIN(id) FROM posts WHERE topic_id=?', [$p['tid']]) === $pid;
-  if (!is_mod() && !($p['user_id'] == $me['id'] && time() - $p['created'] < 86400)) { flash('Изменять сообщение можно в течение суток.', 'warn'); goto_post($pid); }
-  if ($post) {
-    $body = txt('body', 20000);
-    if (mb_strlen($body) >= 2) {
-      q('UPDATE posts SET body=?, edited=? WHERE id=?', [$body, time(), $pid]);
-      if ($first && mb_strlen($nt = txt('title', 140)) >= 5) q('UPDATE topics SET title=? WHERE id=?', [$nt, $p['tid']]);
-    }
-    goto_post($pid);
-  }
-  $m = '<div class="f-head"><h1>Изменить сообщение</h1></div><form class="f-box f-form" method="post" action="' . h(url('edit/' . $pid)) . '">' . csrf_field()
-     . ($first ? '<label>Заголовок темы<input name="title" required minlength="5" maxlength="140" value="' . h($p['title']) . '"></label>' : '')
-     . editor('body', $p['body'], 12) . '<div class="f-actions"><button class="btn pri" type="submit">Сохранить</button><a class="btn" href="' . h(url('post/' . $pid)) . '">Отмена</a></div></form>';
-  page('Изменить сообщение', $m, '', crumbs([$p['title'], url('t/' . $p['tid'])], 'Изменить'), true);
-}
 
 function upload() {
   header('Content-Type: application/json; charset=utf-8');
@@ -353,15 +190,6 @@ function upload() {
   echo json_encode(['url' => $url, 'md' => '![](' . $url . ')'], JSON_UNESCAPED_UNICODE); exit;
 }
 
-function like() {
-  need_login(); $me = me(); $pid = (int)($_POST['pid'] ?? 0);
-  $p = one('SELECT * FROM posts WHERE id=? AND deleted=0', [$pid]);
-  if ($p && $p['user_id'] != $me['id']) {
-    if (one('SELECT 1 FROM likes WHERE post_id=? AND user_id=?', [$pid, $me['id']])) { q('DELETE FROM likes WHERE post_id=? AND user_id=?', [$pid, $me['id']]); q('UPDATE posts SET likes=likes-1 WHERE id=?', [$pid]); }
-    else { q('INSERT INTO likes (post_id, user_id) VALUES (?,?)', [$pid, $me['id']]); q('UPDATE posts SET likes=likes+1 WHERE id=?', [$pid]); }
-  }
-  goto_post($pid);
-}
 
 function report() {
   need_login(); $me = me(); $pid = (int)($_POST['pid'] ?? 0);
@@ -382,11 +210,13 @@ function mod_page() {
         . '<form method="post" action="' . h(url('modact')) . '">' . csrf_field() . '<input type="hidden" name="rid" value="' . $r['id'] . '"><input type="hidden" name="pid" value="' . $r['post_id'] . '">'
         . '<button name="a" value="resolve">Оставить</button><button name="a" value="delpost" class="danger">Удалить сообщение</button></form></div>';
   }
+  $m .= '</section>';
   if (is_admin()) {
     $bc = bot_cfg(); bot_tables();
     $qn = (int)val('SELECT COUNT(*) FROM bot_queue WHERE done=0');
     $log = @file(__DIR__ . '/_data/bot.log') ?: [];
-    $m .= '<section class="f-box"><h2>Бот форума</h2><p class="f-muted">Видно только администратору. ' . ($bc['enabled'] ? 'Бот включён' : 'Бот выключен') . '. Модель: <b>' . h($bc['provider'] && $bc['key'] ? $bc['provider'] . ($bc['model'] ? ' · ' . $bc['model'] : '') : 'не подключена, бот отвечает подборкой ссылок') . '</b>. В очереди: ' . $qn . '.</p>'
+    $m .= '<section class="f-box"><h2>Бот форума</h2><p class="f-muted">Видно только администратору. ' . ($bc['enabled'] ? 'Бот включён' : 'Бот выключен') . '. Модель: <b>' . h($bc['provider'] && $bc['key'] ? (bot_providers()[$bc['provider']][0] ?? $bc['provider']) . ($bc['model'] ? ' · ' . $bc['model'] : '') : 'не подключена, бот отвечает подборкой ссылок') . '</b>. В очереди: ' . $qn . '.</p>'
+        . '<p><a class="btn pri" href="' . h(url('bot')) . '">Подключение модели</a></p>'
         . ($log ? '<p class="f-muted">Последняя ошибка: ' . h(trim(end($log))) . '</p>' : '')
         . '<h3>Новость продукта от имени бота</h3><form class="f-form" method="post" action="' . h(url('modact')) . '">' . csrf_field()
         . '<label>Заголовок<input name="title" required minlength="5" maxlength="140" placeholder="Например: SlideX — новые билеты по геонавигации"></label>'
@@ -394,7 +224,7 @@ function mod_page() {
         . '<div class="f-actions"><button class="btn pri" name="a" value="news" type="submit">Опубликовать в «Программы DrillHarmony»</button></div></form></section>';
   }
   $users = q("SELECT * FROM users WHERE pass<>'!' ORDER BY id DESC LIMIT 100")->fetchAll();
-  $m .= '</section><section class="f-box"><h2>Участники</h2><div class="f-users">';
+  $m .= '<section class="f-box"><h2>Участники</h2><div class="f-users">';
   foreach ($users as $u) {
     $m .= '<div class="f-modrow"><div><a href="' . h(url('u/' . rawurlencode($u['name']))) . '">' . h($u['name']) . '</a> ' . role_badge($u) . ($u['banned'] ? ' <i class="f-role ban">заблокирован</i>' : '')
         . '<small>' . h($u['email']) . ' · с ' . date('d.m.Y', $u['created']) . ' · ' . (int)$u['posts'] . ' сообщ.' . ($u['confirmed'] ? '' : ' · почта не подтверждена') . '</small></div>';
@@ -427,6 +257,8 @@ function mod_action() {
       }
       q('UPDATE users SET posts=MAX(0, posts-1) WHERE id=?', [$p['user_id']]);
       q('UPDATE reports SET done=1 WHERE post_id=?', [$pid]);
+      if ($first) { fts_topic((int)$p['topic_id']); tags_recount(); } else { fts_put($pid); q('UPDATE topics SET solved_post=NULL, solved_at=NULL WHERE solved_post=?', [$pid]); }
+      rep_calc((int)$p['user_id'], false);
       flash($first ? 'Тема удалена.' : 'Сообщение удалено.');
       if ($first) redirect(url(''));
       if (!empty($_POST['rid'])) redirect(url('mod'));
@@ -436,12 +268,101 @@ function mod_action() {
   if ($tid && in_array($a, ['pin', 'lock', 'deltopic'], true)) {
     if ($a === 'pin') q('UPDATE topics SET pinned=1-pinned WHERE id=?', [$tid]);
     if ($a === 'lock') q('UPDATE topics SET locked=1-locked WHERE id=?', [$tid]);
-    if ($a === 'deltopic') { q('UPDATE topics SET deleted=1 WHERE id=?', [$tid]); flash('Тема удалена.'); redirect(url('')); }
+    if ($a === 'deltopic') {
+      q('UPDATE topics SET deleted=1 WHERE id=?', [$tid]); fts_topic($tid); tags_recount();
+      foreach (q('SELECT DISTINCT user_id FROM posts WHERE topic_id=?', [$tid])->fetchAll(PDO::FETCH_COLUMN) as $x) rep_calc((int)$x, false);
+      flash('Тема удалена.'); redirect(url(''));
+    }
     redirect(url('t/' . $tid));
   }
   if ($uid && $a === 'ban') { q("UPDATE users SET banned=1-banned WHERE id=? AND role<>'admin'", [$uid]); redirect(url('mod')); }
   if ($uid && $a === 'mod' && is_admin()) { q("UPDATE users SET role=CASE role WHEN 'moderator' THEN 'user' ELSE 'moderator' END WHERE id=? AND role<>'admin'", [$uid]); redirect(url('mod')); }
   redirect(url('mod'));
+}
+
+// ===================== единый вход для сайта и сервисов =====================
+function api_route($what) {
+  header('Content-Type: application/json; charset=utf-8'); header('Cache-Control: no-store');
+  if ($what !== 'me') { http_response_code(404); echo '{}'; exit; }
+  $u = me();
+  if (!$u) { echo json_encode(['user' => null]); exit; }
+  echo json_encode(['user' => ['name' => $u['name'], 'avatar' => $u['avatar'] ?: null, 'rep' => (int)$u['rep'], 'admin' => is_admin($u),
+    'notes' => notes_unseen($u['id']), 'profile' => url('u/' . rawurlencode($u['name'])), 'edit' => url('me'), 'notes_url' => url('notes'),
+    'live' => url('sso/live'), 'logout' => url('logout'), 'csrf' => csrf()]], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+  exit;
+}
+function sso_route($aud) {
+  global $CFG;
+  if ($aud !== 'live') redirect(url(''));
+  if (!me()) { flash('Войдите или зарегистрируйтесь: одна учётная запись для сайта, форума и онлайн-данных.', 'warn'); redirect(url('login', ['next' => url('sso/live')])); }
+  if ($why = can_post()) page('Онлайн-данные | DrillHarmony', '<div class="f-head"><h1>Онлайн-данные</h1></div><div class="f-box f-warn">' . $why . '</div>', '', crumbs('Онлайн-данные'), true);
+  if (empty($CFG['live_secret'])) page('Онлайн-данные | DrillHarmony', '<div class="f-head"><h1>Онлайн-данные</h1></div><div class="f-box"><p>Сервис приёма WITS и WITSML ещё не подключён к сайту. Загляните чуть позже.</p></div>', '', crumbs('Онлайн-данные'), true);
+  header('Cache-Control: no-store');
+  redirect(rtrim($CFG['live_url'], '/') . '/sso?t=' . rawurlencode(sso_ticket(me(), 'live')));
+}
+
+// ===================== подключение модели (только владелец) =====================
+function bot_providers() {
+  return ['' => ['Не подключать', 'Бот отвечает подборкой ссылок на материалы сайта.'],
+    'gigachat' => ['GigaChat (Сбер)', 'Ключ авторизации из личного кабинета developers.sber.ru → проект GigaChat API → «Ключ авторизации». Данные остаются в РФ.'],
+    'yandex' => ['YandexGPT (Yandex Cloud)', 'API-ключ сервисного аккаунта с ролью ai.languageModels.user и идентификатор каталога (folder_id). Данные остаются в РФ.'],
+    'openai' => ['OpenAI-совместимый API', 'Любой сервис с методом /chat/completions: адрес API и токен. Если сервер за рубежом, это трансграничная передача: нужно изменить политику и уведомить Роскомнадзор.']];
+}
+function bot_page($post) {
+  if (!is_admin()) { http_response_code(404); page('Страница не найдена | Форум', '<h1>Страница не найдена</h1>', '', crumbs('Ошибка'), true); }
+  $c = bot_cfg(); $test = '';
+  if ($post) {
+    $a = $_POST['a'] ?? 'save';
+    $prov = (string)($_POST['provider'] ?? '');
+    if (!isset(bot_providers()[$prov])) $prov = '';
+    $new = ['enabled' => !empty($_POST['enabled']), 'provider' => $prov,
+      'model' => mb_substr(trim((string)($_POST['model'] ?? '')), 0, 80), 'folder' => mb_substr(trim((string)($_POST['folder'] ?? '')), 0, 80),
+      'base_url' => rtrim(mb_substr(trim((string)($_POST['base_url'] ?? '')), 0, 300), '/'),
+      'scope' => in_array($_POST['scope'] ?? '', ['GIGACHAT_API_PERS', 'GIGACHAT_API_B2B', 'GIGACHAT_API_CORP'], true) ? $_POST['scope'] : 'GIGACHAT_API_PERS',
+      'sections' => array_values(array_intersect((array)($_POST['sections'] ?? []), array_column(cat_list(), 1))),
+      'delay_hours' => max(0, min(72, (int)($_POST['delay_hours'] ?? 3))), 'per_hour' => max(1, min(200, (int)($_POST['per_hour'] ?? 20))),
+      'per_topic' => max(1, min(10, (int)($_POST['per_topic'] ?? 2)))];
+    if ($new['base_url'] !== '' && !preg_match('~^https?://[^\s/]+~', $new['base_url'])) { flash('Адрес API должен начинаться с https://', 'warn'); redirect(url('bot')); }
+    $k = trim((string)($_POST['key'] ?? ''));
+    if (!empty($_POST['key_clear'])) $new['key'] = ''; elseif ($k !== '') $new['key'] = $k;
+    if (!bot_save($new)) { flash('Не удалось сохранить: нет права записи в папку forum/_data.', 'warn'); redirect(url('bot')); }
+    if ($a === 'test') {
+      $err = ''; $t0 = microtime(true);
+      // перечитать сохранённое: bot_cfg кеширует
+      $GLOBALS['CFG']['bot'] = array_merge($GLOBALS['CFG']['bot'] ?? [], $new, isset($new['key']) ? [] : ['key' => $c['key']]);
+      $ans = $new['provider'] ? llm_chat('Ты помощник форума. Ответь одним коротким предложением на русском.', 'Проверка связи: сколько будет 2+2?', $err) : '';
+      $ms = (int)((microtime(true) - $t0) * 1000);
+      $_SESSION['bot_test'] = $new['provider'] === '' ? ['warn', 'Модель не выбрана: бот отвечает подборкой ссылок.']
+        : ($ans !== '' ? ['ok', 'Связь есть, ответ за ' . $ms . ' мс: «' . mb_strimwidth($ans, 0, 300, '…') . '»'] : ['warn', 'Ошибка: ' . ($err ?: 'пустой ответ')]);
+    } else flash('Настройки сохранены.');
+    redirect(url('bot'));
+  }
+  if (!empty($_SESSION['bot_test'])) { [$kind, $msg] = $_SESSION['bot_test']; unset($_SESSION['bot_test']); $test = '<div class="f-box f-' . ($kind === 'ok' ? 'ok' : 'warn') . '">' . h($msg) . '</div>'; }
+  $opt = ''; $help = '';
+  foreach (bot_providers() as $k => [$name, $hint]) {
+    $opt .= '<label class="f-radio"><input type="radio" name="provider" value="' . h($k) . '"' . ($c['provider'] === $k ? ' checked' : '') . '><span><b>' . h($name) . '</b><small>' . h($hint) . '</small></span></label>';
+  }
+  $secs = '';
+  foreach (cat_list() as $cat) { if (!empty($cat[4])) continue; $secs .= '<label class="f-check"><input type="checkbox" name="sections[]" value="' . h($cat[1]) . '"' . (in_array($cat[1], (array)$c['sections'], true) ? ' checked' : '') . '> ' . h($cat[0]) . '</label>'; }
+  $scope = ''; foreach (['GIGACHAT_API_PERS' => 'Физлицо (PERS)', 'GIGACHAT_API_B2B' => 'Юрлицо, пакеты (B2B)', 'GIGACHAT_API_CORP' => 'Юрлицо, оплата по факту (CORP)'] as $k => $n) $scope .= '<option value="' . $k . '"' . ($c['scope'] === $k ? ' selected' : '') . '>' . $n . '</option>';
+  $src = is_file(__DIR__ . '/_data/bot-settings.json') ? 'Настройки хранятся в forum/_data/bot-settings.json, ключ зашифрован.' : 'Сейчас действуют настройки из forum-config.php. После сохранения здесь они будут иметь приоритет.';
+  $m = '<div class="f-head"><h1>Подключение модели</h1></div>' . flash() . $test
+     . '<p class="f-muted">Эту страницу видит только владелец форума. Участники видят только «Бот DrillHarmony», название модели в ответах скрывается. ' . h($src) . '</p>'
+     . '<form class="f-box f-form f-botcfg" method="post" action="' . h(url('bot')) . '" autocomplete="off">' . csrf_field()
+     . '<label class="f-check"><input type="checkbox" name="enabled" value="1"' . ($c['enabled'] ? ' checked' : '') . '> Бот включён</label>'
+     . '<fieldset><legend>Провайдер</legend>' . $opt . '</fieldset>'
+     . '<label>Ключ или токен<input type="password" name="key" placeholder="' . h($c['key'] ? 'Сохранён ' . bot_mask($c['key']) . ', оставьте пустым, чтобы не менять' : 'Вставьте ключ') . '" autocomplete="new-password"></label>'
+     . ($c['key'] ? '<label class="f-check"><input type="checkbox" name="key_clear" value="1"> Удалить сохранённый ключ</label>' : '')
+     . '<div class="f-row2"><label>Модель<input name="model" value="' . h($c['model']) . '" placeholder="GigaChat, yandexgpt-lite, …"><small class="f-hint">Пусто — модель провайдера по умолчанию</small></label>'
+     . '<label>Тариф GigaChat (scope)<select name="scope">' . $scope . '</select></label></div>'
+     . '<div class="f-row2"><label>Каталог Yandex Cloud (folder_id)<input name="folder" value="' . h($c['folder']) . '"></label>'
+     . '<label>Адрес API (для OpenAI-совместимых)<input name="base_url" value="' . h($c['base_url']) . '" placeholder="https://…/v1"></label></div>'
+     . '<fieldset><legend>Где бот отвечает на новую тему сразу</legend><div class="f-checks">' . $secs . '</div></fieldset>'
+     . '<div class="f-row3"><label>В остальных разделах — если молчат, ч<input type="number" name="delay_hours" min="0" max="72" value="' . (int)$c['delay_hours'] . '"></label>'
+     . '<label>Ответов в час, не больше<input type="number" name="per_hour" min="1" max="200" value="' . (int)$c['per_hour'] . '"></label>'
+     . '<label>Ответов в одной теме<input type="number" name="per_topic" min="1" max="10" value="' . (int)$c['per_topic'] . '"></label></div>'
+     . '<div class="f-actions"><button class="btn pri" type="submit" name="a" value="save">Сохранить</button><button class="btn" type="submit" name="a" value="test">Сохранить и проверить связь</button><a href="' . h(url('mod')) . '">К модерации</a></div></form>';
+  page('Подключение модели | Форум', $m, '', crumbs(['Модерация', url('mod')], 'Подключение модели'), true);
 }
 
 // ===================== вход и регистрация =====================
@@ -451,13 +372,14 @@ function form_page($title, $inner, $crumb) {
 function safe_next() { $n = (string)($_POST['next'] ?? $_GET['next'] ?? ''); global $CFG; return (strpos($n, $CFG['base']) === 0 && strpos($n, '//') === false) ? $n : url(''); }
 
 function login_form($err = '', $login = '') {
-  if (me()) redirect(url(''));
+  if (me()) redirect(safe_next());
   form_page('Вход', ($err ? '<div class="f-flash warn">' . h($err) . '</div>' : '') . '<form method="post" action="' . h(url('login')) . '">' . csrf_field()
     . '<input type="hidden" name="next" value="' . h(safe_next()) . '">'
     . '<label>Имя или e-mail<input name="login" required autocomplete="username" value="' . h($login) . '"></label>'
     . '<label>Пароль<input name="pass" type="password" required autocomplete="current-password"></label>'
     . '<div class="f-actions"><button class="btn pri" type="submit">Войти</button><a href="' . h(url('reset')) . '">Забыли пароль?</a></div></form>'
-    . '<p class="f-alt">Нет аккаунта? <a href="' . h(url('register')) . '">Зарегистрируйтесь</a></p>', 'Вход');
+    . '<p class="f-alt">Нет аккаунта? <a href="' . h(url('register', isset($_GET['next']) ? ['next' => safe_next()] : [])) . '">Зарегистрируйтесь</a></p>'
+    . '<p class="f-alt">Одна учётная запись для сайта DrillHarmony, форума и онлайн-данных WITS/WITSML. Программы SlideX, Tempo и Etude входят по своим логинам.</p>', 'Вход');
 }
 function do_login() {
   $login = txt('login', 120); $pass = (string)($_POST['pass'] ?? '');
@@ -472,15 +394,15 @@ function do_login() {
 }
 
 function register_form($err = '', $v = []) {
-  if (me()) redirect(url(''));
+  if (me()) redirect(safe_next());
   $_SESSION['reg_t'] = time();
-  form_page('Регистрация', ($err ? '<div class="f-flash warn">' . h($err) . '</div>' : '') . '<form method="post" action="' . h(url('register')) . '" autocomplete="on">' . csrf_field()
+  form_page('Регистрация', ($err ? '<div class="f-flash warn">' . h($err) . '</div>' : '') . '<p class="f-alt" style="margin-top:0">Учётная запись DrillHarmony: форум, онлайн-данные WITS/WITSML и профиль участника.</p><form method="post" action="' . h(url('register')) . '" autocomplete="on">' . csrf_field() . '<input type="hidden" name="next" value="' . h(safe_next()) . '">'
     . '<label>Имя на форуме<input name="name" required minlength="3" maxlength="24" pattern="[A-Za-zА-Яа-яЁё0-9 _.\-]{3,24}" value="' . h($v['name'] ?? '') . '" autocomplete="nickname"><small>3–24 символа: буквы, цифры, пробел, точка, дефис</small></label>'
     . '<label>E-mail<input name="email" type="email" required maxlength="120" value="' . h($v['email'] ?? '') . '" autocomplete="email"><small>На него придёт письмо для подтверждения. Другим участникам не показывается</small></label>'
     . '<label>Пароль<input name="pass" type="password" required minlength="8" autocomplete="new-password"><small>Не меньше 8 символов</small></label>'
     . '<label>Должность, необязательно<input name="title" maxlength="60" value="' . h($v['title'] ?? '') . '" placeholder="Например: инженер ННБ, телеметрист, студент"></label>'
     . '<label class="f-hp" aria-hidden="true">Сайт<input name="website" tabindex="-1" autocomplete="off"></label>'
-    . '<label class="f-check"><input type="checkbox" name="consent" value="1" required> Принимаю <a href="' . h(url('rules')) . '" target="_blank">правила форума</a> и даю согласие ИП Шайсламовой А. В. на обработку моих персональных данных (имя на форуме, e-mail, сведения профиля, сообщения, IP-адрес) для участия в форуме на условиях <a href="/privacy.html" target="_blank">политики обработки персональных данных</a>. Согласие можно отозвать письмом на info@drillharmony.com</label>'
+    . '<label class="f-check"><input type="checkbox" name="consent" value="1" required><span>Принимаю <a href="' . h(url('rules')) . '" target="_blank">правила форума</a> и даю согласие ИП Шайсламовой А. В. на обработку моих персональных данных (имя на форуме, e-mail, сведения профиля, сообщения, IP-адрес) для участия в форуме на условиях <a href="/privacy.html" target="_blank">политики обработки персональных данных</a>. Согласие можно отозвать письмом на info@drillharmony.com</span></label>'
     . '<div class="f-actions"><button class="btn pri" type="submit">Зарегистрироваться</button></div></form>'
     . '<p class="f-alt">Уже есть аккаунт? <a href="' . h(url('login')) . '">Войти</a></p>', 'Регистрация');
 }
@@ -506,8 +428,8 @@ function do_register() {
   if ($CFG['confirm_email']) {
     $ok = send_mail($v['email'], 'Подтвердите e-mail на форуме DrillHarmony', "Здравствуйте, {$v['name']}!\n\nЧтобы писать на форуме, подтвердите адрес:\n" . abs_url('confirm', ['token' => $token]) . "\n\nСсылка действует 3 дня. Если вы не регистрировались, просто удалите письмо.\n\nФорум DrillHarmony");
     flash($ok ? 'Готово! Мы отправили письмо на ' . $v['email'] . '. Перейдите по ссылке из письма, чтобы писать на форуме.' : 'Аккаунт создан, но письмо отправить не удалось. Попробуйте отправить его ещё раз из любой темы.', $ok ? 'ok' : 'warn');
-  } else flash('Готово! Добро пожаловать на форум.');
-  redirect(url(''));
+  } else flash('Готово! Добро пожаловать на DrillHarmony.');
+  redirect(safe_next());
 }
 
 function confirm() {
@@ -585,67 +507,4 @@ function setup($post) {
 }
 
 // ===================== профиль и поиск =====================
-function profile($name) {
-  $u = one('SELECT * FROM users WHERE name=?', [$name]);
-  if (!$u) return;
-  $ps = q('SELECT p.id, p.body, p.created, t.title FROM posts p JOIN topics t ON t.id=p.topic_id WHERE p.user_id=? AND p.deleted=0 AND t.deleted=0 ORDER BY p.id DESC LIMIT 15', [$u['id']])->fetchAll();
-  $likes = (int)val('SELECT COALESCE(SUM(likes),0) FROM posts WHERE user_id=? AND deleted=0', [$u['id']]);
-  $self = me() && me()['id'] == $u['id'];
-  $m = '<div class="f-profile f-box">' . avatar($u, 72) . '<div><h1>' . h($u['name']) . ' ' . role_badge($u) . '</h1><p class="f-sub">' . h($u['title'] ?: 'Участник') . '</p>'
-     . '<p class="f-pstats"><span><b>' . (int)$u['posts'] . '</b> ' . plural($u['posts'], 'сообщение', 'сообщения', 'сообщений') . '</span><span><b>' . $likes . '</b> «спасибо»</span><span>на форуме с ' . date('d.m.Y', $u['created']) . '</span></p>'
-     . ($u['about'] ? '<div class="f-body">' . render($u['about']) . '</div>' : '') . ($self ? '<a class="btn" href="' . h(url('me')) . '">Изменить профиль</a>' : '') . '</div></div>';
-  $m .= '<section class="f-box"><h2>Последние сообщения</h2>';
-  if (!$ps) $m .= '<p class="f-muted">Пока нет сообщений.</p>';
-  foreach ($ps as $p) $m .= '<div class="f-hit"><a href="' . h(url('post/' . $p['id'])) . '">' . h($p['title']) . '</a><p>' . h(mb_strimwidth(preg_replace('/\s+/u', ' ', $p['body']), 0, 200, '…')) . '</p><small>' . ago($p['created']) . '</small></div>';
-  $m .= '</section>';
-  page($u['name'] . ' | Участник форума', $m, '', crumbs($u['name']), $u['posts'] == 0);
-}
-function me_form($msg = '') {
-  need_login(); $u = me();
-  $m = '<div class="f-auth"><div class="f-box f-form"><h1>Профиль</h1>' . flash() . ($msg ? '<div class="f-flash warn">' . h($msg) . '</div>' : '')
-     . '<form method="post" action="' . h(url('me')) . '">' . csrf_field()
-     . '<label>Должность<input name="title" maxlength="60" value="' . h($u['title']) . '"></label>'
-     . '<label>О себе<textarea name="about" rows="5" maxlength="1500">' . h($u['about']) . '</textarea><small>Опыт, регион, интересы. Без телефонов и личных данных</small></label>'
-     . '<h2>Смена пароля</h2><label>Текущий пароль<input name="old" type="password" autocomplete="current-password"></label><label>Новый пароль<input name="new" type="password" minlength="8" autocomplete="new-password"></label>'
-     . '<div class="f-actions"><button class="btn pri" type="submit">Сохранить</button><a class="btn" href="' . h(url('u/' . rawurlencode($u['name']))) . '">Мой профиль</a></div></form></div></div>';
-  page('Профиль', $m, '', crumbs('Профиль'), true);
-}
-function save_me() {
-  need_login(); $u = me();
-  q('UPDATE users SET title=?, about=? WHERE id=?', [txt('title', 60), txt('about', 1500), $u['id']]);
-  $new = (string)($_POST['new'] ?? '');
-  if ($new !== '') {
-    if (!password_verify((string)($_POST['old'] ?? ''), $u['pass'])) me_form('Текущий пароль указан неверно, пароль не изменён.');
-    if (mb_strlen($new) < 8) me_form('Новый пароль должен быть не короче 8 символов.');
-    q('UPDATE users SET pass=? WHERE id=?', [password_hash($new, PASSWORD_DEFAULT), $u['id']]);
-  }
-  flash('Профиль сохранён.');
-  redirect(url('me'));
-}
 
-function search() {
-  $q = trim(mb_substr((string)($_GET['q'] ?? ''), 0, 80));
-  $m = '<div class="f-head"><h1>Поиск по форуму</h1></div><form class="f-box f-searchbig" method="get" action="' . h(url('search')) . '">' . (strpos(url('search'), '?r=') !== false ? '<input type="hidden" name="r" value="search">' : '')
-     . '<input type="search" name="q" value="' . h($q) . '" placeholder="Например: реактивный момент" autofocus><button class="btn pri" type="submit">Найти</button></form>';
-  if (mb_strlen($q) >= 3) {
-    $like = '%' . str_replace(['%', '_'], ['\%', '\_'], $q) . '%';
-    $rows = q("SELECT p.id, p.body, p.created, t.title, u.name FROM posts p JOIN topics t ON t.id=p.topic_id JOIN users u ON u.id=p.user_id
-               WHERE p.deleted=0 AND t.deleted=0 AND (t.title LIKE ? ESCAPE '\\' OR p.body LIKE ? ESCAPE '\\') ORDER BY p.id DESC LIMIT 50", [$like, $like])->fetchAll();
-    // SQLite LIKE без учёта регистра работает только для латиницы — досеиваем кириллицу вручную
-    $ql = mb_strtolower($q);
-    if (!$rows) {
-      $rows = array_values(array_filter(q('SELECT p.id, p.body, p.created, t.title, u.name FROM posts p JOIN topics t ON t.id=p.topic_id JOIN users u ON u.id=p.user_id WHERE p.deleted=0 AND t.deleted=0 ORDER BY p.id DESC LIMIT 3000')->fetchAll(),
-        fn($r) => mb_strpos(mb_strtolower($r['title'] . ' ' . $r['body']), $ql) !== false));
-      $rows = array_slice($rows, 0, 50);
-    }
-    $m .= '<section class="f-box"><h2>' . ($rows ? 'Найдено: ' . count($rows) : 'Ничего не нашлось') . '</h2>';
-    foreach ($rows as $r) {
-      $plain = preg_replace('/\s+/u', ' ', $r['body']); $pos = mb_stripos($plain, $q); $start = max(0, ($pos === false ? 0 : $pos) - 60);
-      $snip = h(($start ? '…' : '') . mb_substr($plain, $start, 220) . '…');
-      $snip = preg_replace('/(' . preg_quote(h($q), '/') . ')/iu', '<mark>$1</mark>', $snip);
-      $m .= '<div class="f-hit"><a href="' . h(url('post/' . $r['id'])) . '">' . h($r['title']) . '</a><p>' . $snip . '</p><small>' . h($r['name']) . ' · ' . ago($r['created']) . '</small></div>';
-    }
-    $m .= '</section>';
-  } elseif ($q !== '') $m .= '<p class="f-muted">Введите хотя бы три символа.</p>';
-  page('Поиск по форуму', $m, '', crumbs('Поиск'), true);
-}

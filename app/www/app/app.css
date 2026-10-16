@@ -79,7 +79,7 @@ body.in-app::before, body.in-app::after { display: none !important; }
   background: color-mix(in srgb, var(--amber) 15%, transparent); color: var(--amber); }
 .tile.t-tools .ti, .tile.t-models .ti, .tile.t-learn .ti { background: color-mix(in srgb, var(--teal) 15%, transparent); color: var(--teal); }
 .tile .ti svg { width: 19px; height: 19px; }
-.tile b { font: 700 12px/1.15 var(--body); letter-spacing: -.02em; max-width: 100%; }
+.tile b { font: 700 12px/1.15 var(--body); letter-spacing: -.02em; max-width: 100%; overflow-wrap: normal; word-break: normal; hyphens: manual; -webkit-hyphens: manual; }
 .tile small { font: 500 10.5px var(--body); color: var(--muted); }
 @media (min-width: 640px) { .grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
 
@@ -170,7 +170,8 @@ body.in-app::before, body.in-app::after { display: none !important; }
 .app-main .article :is(p, li, h1, h2, h3, b, span, label, dd, dt, td, th, summary) { overflow-wrap: anywhere; }
 .app-main .tablewrap, .app-main .formula, .app-main pre { overflow-x: auto; }
 .app-main canvas, .app-main svg, .app-main img { max-width: 100%; }
-.app-main .article p, .app-main .article li { text-align: left; hyphens: auto; -webkit-hyphens: auto; }
+.app-main .article :is(p, li, dd, div, td) { text-align: left; hyphens: auto; -webkit-hyphens: auto; }
+.app-main .article h3 { font-size: 15px; line-height: 1.25; margin: 4px 0 6px; }
 .app-main .article > h1 { font-size: 20px; line-height: 1.15; margin: 4px 0 6px; }
 .app-main .article h2 { font-size: 16.5px; margin: 16px 0 6px; }
 .app-main p.lead { font-size: 13.5px; line-height: 1.45; margin: 0 0 10px; color: var(--muted); }
@@ -263,3 +264,22 @@ body.in-app .wx button, body.in-app .article .btn, body.in-app .article button.b
 .pg-card h2 { font-size: 19px; line-height: 1.15; }
 .pg-card ul { font-size: 13px; line-height: 1.4; }
 .pg-card .pg-big { font-size: 36px; }
+
+/* онлайн-данные: строка на главном экране */
+.live-b { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; padding: 8px 8px 8px 12px; border-radius: 13px;
+  border: 1px solid color-mix(in srgb, var(--teal) 45%, var(--line)); background: color-mix(in srgb, var(--teal) 8%, var(--panel)); }
+.live-i { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; }
+.live-i span { min-width: 0; } .live-i b { display: block; font: 700 14px var(--body); }
+.live-i small { display: block; font-size: 11.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pulse { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 0 color-mix(in srgb, var(--teal) 60%, transparent); animation: dhPulse 2s infinite; }
+@keyframes dhPulse { 70% { box-shadow: 0 0 0 9px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+.live-b .btn { flex: none; height: 32px; }
+
+/* списки-карточки со страниц сайта (онлайн-данные, инструменты) */
+.app-main .alist { gap: 6px !important; }
+.app-main .alist .card, .app-main .alist > a { padding: 10px 12px !important; margin: 0 !important; }
+.app-main .alist b { font-size: 14.5px !important; line-height: 1.25 !important; margin-bottom: 3px; }
+.app-main .alist span { font-size: 12.5px !important; line-height: 1.45 !important; text-align: left !important; }
+.app-main .article :is(p, li) { font-size: 13.5px; line-height: 1.5; }
+.app-main .article ul, .app-main .article ol { padding-left: 18px; }
+.app-main .article h2 { font-size: 16px !important; }

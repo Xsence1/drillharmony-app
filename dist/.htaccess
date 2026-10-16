@@ -13,6 +13,9 @@ RewriteCond %{HTTP_REFERER} !^$
 RewriteCond %{HTTP_REFERER} !^https?://([a-z0-9-]+\.)*drillharmony\.com [NC]
 RewriteCond %{HTTP_REFERER} !(google|yandex|bing)\. [NC]
 RewriteRule \.(mp4|webm)$ - [F,NC,L]
+
+# Калькуляторы — часть раздела «Инструменты» (страницы калькуляторов остаются на своих адресах)
+RewriteRule ^calculators/?$ /tools/#calc [R=301,NE,L]
 </IfModule>
 
 <IfModule mod_headers.c>

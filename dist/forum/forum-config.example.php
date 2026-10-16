@@ -22,4 +22,8 @@ return [
     'sections' => ['drillharmony', 'software', 'career'],  // где бот отвечает на новую тему сразу
     'delay_hours' => 3,    // в остальных разделах — если за это время никто не ответил; позвать бота в любой теме: «@бот вопрос»
   ],
+  // Онлайн-данные WITS/WITSML на VPS (live.drillharmony.com): один и тот же длинный случайный секрет здесь
+  // и в LIVE_SSO_SECRET сервиса. Пусто — кнопка «Онлайн-данные» покажет, что сервис ещё не подключён.
+  'live_url'    => 'https://live.drillharmony.com',
+  'live_secret' => '',
 ];

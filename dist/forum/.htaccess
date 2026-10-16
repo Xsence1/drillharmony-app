@@ -1,7 +1,7 @@
 # Форум DrillHarmony
 Options -Indexes
 DirectoryIndex index.php
-<FilesMatch "^(lib\.php|bot\.php|kb\.php|kb_gti\.php|topics\.php|forum-config.*\.php|layout\.html)$">
+<FilesMatch "^(lib\.php|bot\.php|kb\.php|kb_gti\.php|topics\.php|pages\.php|gamify\.php|forum-config.*\.php|layout\.html)$">
   Require all denied
 </FilesMatch>
 <IfModule mod_headers.c>
