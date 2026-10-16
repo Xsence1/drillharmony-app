@@ -31,20 +31,47 @@
     tools: "3D-траектория, LAS, НПВ, единицы, шпаргалка", models: "Интерактивные 3D-модели из статей", learn: "Тесты, задача недели, игра «Посади горизонталь»" };
   const group = (h, rows) => rows.length ? `${h ? `<div class="gh">${h}</div>` : ""}<div class="glist">${rows.join("")}</div>` : "";
 
-  // ---------- главный экран ----------
+  // ---------- главный экран: плитки разделов и слайдеры ----------
   const grid = $("#grid");
+  const tile = (g, i) => `<button type="button" class="tile2" data-g="${g.k}" style="--i:${i};--c:${COL[g.k]}"><span class="t2i">${GI[g.k]}</span><b>${esc(g.t === "Модели" ? "3D-модели" : g.t).replace("Инклинометрия", "Инклино&shy;метрия").replace("Инструменты", "Инстру&shy;менты")}</b><small>${g.s.length} ${word(g.k, g.s.length)}</small></button>`;
+  const card = (x, i, star) => `<a class="sc" href="${x.href}" style="--i:${i};--c:${COL[gOf[x.slug]] || "#8e8e93"}"><span class="sci">${x.svg ? x.svg : `<i class="ab">${esc(x.icon)}</i>`}</span>${star ? '<i class="scs">★</i>' : ""}<b>${esc(x.name)}</b><small>${esc(gname[x.slug] || "")}</small></a>`;
+  const cube = (x, i) => `<a class="sc mc" href="${x.href}" style="--i:${i};--c:${COL.models}"><span class="cube" style="--d:${(i % 5) * -1.3}s"><i></i><i></i><i></i><i></i><i></i><i></i></span><b>${esc(x.name)}</b></a>`;
+  const rail = (h, html, more) => html ? `<div class="gh2"><span>${h}</span>${more || ""}</div><div class="rail">${html}</div>` : "";
   const home = () => {
-    const w = A.activeWell(), f = A.fav().filter((s) => by[s]), r = A.recent().filter((s) => by[s] && !f.includes(s)).slice(0, 3);
-    const top = [cell({ tag: "button", attrs: "data-live", c: COL.live, ic: GI.live, title: "Онлайн-данные", sub: "WITS0 и WITSML с буровой" }),
-      cell({ tag: "button", attrs: 'data-go="prof"', c: COL.well, ic: GI.well, title: "Скважина", sub: w ? "" : "Конструкция и раствор один раз", val: esc(w ? w.name || "Без названия" : "Не задана") })];
-    const calc = groups.filter((g) => !["tools", "models", "learn", "game"].includes(g.k)).map((g) =>
-      cell({ tag: "button", attrs: `data-g="${g.k}"`, c: COL[g.k], ic: GI[g.k], title: esc(g.t), sub: SUB[g.k], val: g.s.length }));
-    const more = groups.filter((g) => ["tools", "models", "learn"].includes(g.k)).map((g) =>
-      cell({ tag: "button", attrs: `data-g="${g.k}"`, c: COL[g.k], ic: GI[g.k], title: esc(g.t === "Модели" ? "3D-модели" : g.t), sub: SUB[g.k], val: g.s.length }))
-      .concat(by.game ? [cell({ href: by.game.href, c: COL.game, ic: GI.game, title: "Вахта", sub: "Игра: смена на буровой" })] : []);
-    grid.innerHTML = group("", top) + group("Избранное", f.map((s) => row(by[s]))) + group("Недавние", r.map((s) => row(by[s]))) +
-      group("Расчёты", calc) + group("Инструменты и обучение", more) + `<p class="foot">DrillHarmony.com · расчёты справочные</p>`;
+    const w = A.activeWell(), f = A.fav().filter((s) => by[s]), r = A.recent().filter((s) => by[s] && !f.includes(s)).slice(0, 8);
+    const hw = $("#hs-well"), hws = $("#hs-well-s"); if (hw) { hw.textContent = w ? w.name || "Скважина" : "Скважина"; hws.textContent = w ? "Активный профиль: подставляется в расчёты" : "Конструкция и раствор один раз, дальше подставляются сами"; }
+    const G = (k) => groups.find((g) => g.k === k) || { s: [] };
+    const secs = groups.filter((g) => g.k !== "game");
+    grid.innerHTML =
+      `<div class="gh2"><span>Разделы</span></div><div class="tiles2">${secs.map(tile).join("")}</div>` +
+      rail("Быстрый доступ", f.map((s, i) => card(by[s], i, 1)).join("") + r.map((s, i) => card(by[s], i + f.length)).join("")) +
+      rail("3D-модели", G("models").s.map((s, i) => cube(by[s], i)).join(""), `<button type="button" class="gh-more" data-g="models">Все ${G("models").s.length}</button>`) +
+      rail("Инструменты", G("tools").s.map((s, i) => card(by[s], i)).join("")) +
+      rail("Обучение", G("learn").s.map((s, i) => card(by[s], i)).join("")) +
+      `<p class="foot">DrillHarmony.com · расчёты справочные</p>`;
+    coverflow();
   };
+  // слайдеры с 3D-поворотом карточек при прокрутке
+  const coverflow = () => $$(".cf, .rail").forEach((el) => {
+    if (el._cf) return el._cf(); const big = el.classList.contains("cf");
+    const upd = () => { const r = el.getBoundingClientRect(), cx = r.left + r.width / 2, fx = document.documentElement.classList.contains("fx");
+      [...el.children].forEach((c) => { const b = c.getBoundingClientRect(), o = Math.max(-1.6, Math.min(1.6, (b.left + b.width / 2 - cx) / (big ? b.width : r.width / 1.6)));
+        c.style.transform = fx ? `perspective(900px) rotateY(${(-o * (big ? 26 : 16)).toFixed(2)}deg) scale(${(1 - Math.abs(o) * (big ? 0.1 : 0.06)).toFixed(3)})` : "";
+        c.style.opacity = fx ? (1 - Math.min(0.5, Math.abs(o) * (big ? 0.45 : 0.25))).toFixed(2) : ""; }); };
+    let raf = 0; el.addEventListener("scroll", () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(upd); }, { passive: true }); el._cf = upd; upd();
+  });
+  // главный слайдер: точки и автопрокрутка
+  const cf = $("#cf"), dots = $("#dots");
+  if (cf && dots) {
+    const n = cf.children.length; dots.innerHTML = "<i></i>".repeat(n);
+    const step = () => (cf.children[1].offsetLeft - cf.children[0].offsetLeft) || 1, cur = () => Math.round(cf.scrollLeft / step());
+    const mark = () => $$("i", dots).forEach((d, i) => d.classList.toggle("on", i === Math.min(n - 1, cur())));
+    cf.addEventListener("scroll", mark, { passive: true }); mark();
+    let idle = 0; setInterval(() => { if (document.hidden || !document.documentElement.classList.contains("fx") || state().tab !== "calc" || state().sect) return;
+      if (++idle < 2) return; cf.scrollTo({ left: ((cur() + 1) % n) * step(), behavior: "smooth" }); }, 5000);
+    ["pointerdown", "touchstart"].forEach((ev) => cf.addEventListener(ev, () => { idle = -3; }, { passive: true }));
+  }
+  addEventListener("resize", () => coverflow());
   grid.addEventListener("click", (e) => { const b = e.target.closest("[data-g]"); if (b) return go("calc", b.dataset.g); const p = e.target.closest("[data-go]"); if (p) go(p.dataset.go); });
   $("#sect-back").addEventListener("click", () => history.length > 1 && location.hash ? history.back() : go("calc", "", false));
 
@@ -67,6 +94,7 @@
     $("#found").classList.toggle("hidden", !on);
     grid.classList.toggle("hidden", on || !!s.sect); $("#sect").classList.toggle("hidden", on || !s.sect);
     $("#lt").classList.toggle("hidden", !!s.sect && !on); $(".ios-srch").classList.toggle("hidden", !!s.sect && !on);
+    $("#heroes").classList.toggle("hidden", on || !!s.sect); if (!on && !s.sect) requestAnimationFrame(coverflow);
     if (!on) { $("#none").classList.add("hidden"); return; }
     const hit = idx.filter(([, t]) => words.every((w) => t.includes(w))).map(([x]) => x);
     $("#found").innerHTML = hit.map(row).join("");

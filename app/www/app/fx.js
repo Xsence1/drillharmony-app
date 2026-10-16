@@ -28,7 +28,7 @@
     document.querySelectorAll("[data-back]").forEach((b) => b.addEventListener("click", () => D.classList.add("leaving"), true));
 
     // ---------- 3D-наклон стеклянных карточек под пальцем ----------
-    const TILT = ".tile, .it, .slide, .chip, .btn, .actbar button, .he a";
+    const TILT = ".tile, .tile2, .it, .slide, .chip, .btn, .actbar button, .he a, .sc, .r";
     let cur = null;
     document.addEventListener("pointerdown", (e) => {
       const el = e.target.closest(TILT); if (!el || !D.classList.contains("fx")) return;
@@ -93,7 +93,7 @@
       const t = (now - t0) / 1000, fx = D.classList.contains("fx"); if (fx && !drag) rot += 0.0035;
       const amb = css("--amber") || "#f2a541", teal = css("--teal") || "#4cc9b0", ink = css("--ink") || "#fff", light = D.dataset.theme === "light";
       g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
-      const cx = W * 0.5, cy = H * 0.34, sc = Math.min(W, H * 2) / 210;
+      const cx = W * 0.62, cy = H * 0.3, sc = Math.min(W, H * 2) / 190;
       // пласты: полупрозрачные плиты
       const layer = (y, col, a) => { const q = [[-70, y, -70], [70, y, -70], [70, y, 70], [-70, y, 70]].map((p) => P(p, cx, cy, sc));
         g.beginPath(); q.forEach(([X, Y], i) => (i ? g.lineTo(X, Y) : g.moveTo(X, Y))); g.closePath(); g.fillStyle = col; g.globalAlpha = a; g.fill(); g.globalAlpha = 1; };

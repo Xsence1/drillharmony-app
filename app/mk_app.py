@@ -432,6 +432,12 @@ def home(items, groups, css_links):
 <h1 class="lt" id="lt"><span class="lt-brand">{MARK}<span>Drill<b>Harmony</b></span></span></h1>
 <section data-pane="calc">
 <div class="srch ios-srch">{ICONS["search"]}<input id="q" type="search" placeholder="Поиск по расчётам" autocomplete="off" enterkeyhint="search" aria-label="Поиск"><button type="button" id="q-x" class="hidden" aria-label="Очистить">×</button></div>
+<div id="heroes"><div class="cf" id="cf">
+<div class="hs hs-rig"><canvas id="hero3d" aria-label="3D-сцена: вышка, пласты и ствол скважины"></canvas><div class="hs-t"><small>DrillHarmony · 3D</small><b>Буровая в кармане</b><span>40 расчётов · 20 моделей · без интернета</span></div></div>
+<div class="hs hs-live" role="button" tabindex="0" data-live><svg class="gauge" viewBox="0 0 120 80" aria-hidden="true"><path d="M12 70a48 48 0 0 1 96 0" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="9" stroke-linecap="round"/><path class="g-arc" d="M12 70a48 48 0 0 1 96 0" fill="none" stroke="#30d158" stroke-width="9" stroke-linecap="round" pathLength="100"/><g class="g-needle"><path d="M60 70L60 30" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/><circle cx="60" cy="70" r="6" fill="#fff"/></g></svg><div class="hs-t"><small><i class="pulse"></i> Онлайн</small><b>Онлайн-данные</b><span>WITS0 и WITSML с буровой: приборы, планшет, отклонитель</span><em>Открыть</em></div></div>
+<a class="hs hs-game" href="game/index.html"><i class="aur"></i><i class="aur a2"></i><i class="snow"></i><span class="hs-rig2">🗼</span><div class="hs-t"><small>Игра</small><b>Вахта</b><span>RPG на буровой: герои, задания, баня и снежная битва</span><em>Играть</em></div></a>
+<a class="hs hs-well" href="index.html#t=prof"><div class="well3d"><i></i><i></i><i></i><i></i></div><div class="hs-t"><small>Профиль</small><b id="hs-well">Скважина</b><span id="hs-well-s">Конструкция и раствор один раз, дальше подставляются сами</span><em>Открыть</em></div></a>
+</div><div class="dots" id="dots"></div></div>
 <div id="grid"></div>
 <div id="sect" class="hidden"><button type="button" class="nav-back" id="sect-back">{ICONS["back"]}<span>Расчёты</span></button><h2 class="lt-h" id="sect-t"></h2><p class="lt-sub" id="sect-n"></p><div class="glist" id="sect-l"></div></div>
 <div id="found" class="glist hidden"></div><p id="none" class="empty hidden">Ничего не нашлось. Попробуйте другое слово, например «зенит» или «ppg».</p>
