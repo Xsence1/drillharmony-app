@@ -31,59 +31,34 @@
     tools: "3D-траектория, LAS, НПВ, единицы, шпаргалка", models: "Интерактивные 3D-модели из статей", learn: "Тесты, задача недели, игра «Посади горизонталь»" };
   const group = (h, rows) => rows.length ? `${h ? `<div class="gh">${h}</div>` : ""}<div class="glist">${rows.join("")}</div>` : "";
 
-  // ---------- главный экран: ствол скважины, разделы — станции по глубине ----------
+  // ---------- главный экран «пульт»: карточка скважины, онлайн-данные, недавние, разделы списком ----------
   const grid = $("#grid");
-  const STATION = [   // раздел, глубина, порода
-    ["traj", 300, "песчаник"], ["survey", 800, "аргиллит"], ["drill", 1400, "известняк"], ["hyd", 1900, "глина"], ["mud", 2400, "соль"],
-    ["gti", 2800, "алевролит"], ["tools", 3100, "доломит"], ["models", 3300, "мергель"], ["learn", 3450, "коллектор"]];
-  // ровная сетка 2×2: три расчёта и «Все N», все кнопки одного размера
-  const ab = (x) => x.svg ? x.svg : `<i class="ab">${esc(x.icon)}</i>`;
-  const cbtn = (x) => `<a class="cb" href="${x.href}"><span class="cb-a">${ab(x)}</span><span class="cb-n">${esc(x.name)}</span></a>`;
-  const pills = (g) => { const n = g.s.length <= 4 ? 4 : 3;
-    return g.s.slice(0, n).map((s) => cbtn(by[s])).join("") + (g.s.length > n ? `<button type="button" class="cb cb-all" data-g="${g.k}"><span class="cb-a">→</span><span class="cb-n">Все ${g.s.length}</span></button>` : ""); };
-  const qcard = (x, star) => `<a class="qc" href="${x.href}"><span class="cb-a">${ab(x)}</span><span class="cb-n">${star ? "★ " : ""}${esc(x.name)}</span></a>`;
+  const ABR = { traj: "MC", survey: "GxB", drill: "MSE", hyd: "ΔP", mud: "ρ", gti: "dc", tools: "", models: "", learn: "" };
+  const prow = (g, i) => `<button type="button" class="prow" data-g="${g.k}" style="--i:${i}"><span class="pic">${ABR[g.k] ? `<i class="ab">${ABR[g.k]}</i>` : GI[g.k]}</span>` +
+    `<span class="pt"><b>${esc(g.t === "Модели" ? "3D-модели" : g.t)}</b><small>${SUB[g.k] || ""}</small></span><span class="pn">${g.s.length}</span>${chev}</button>`;
+  const count = (el, to, dec) => { if (!el) return; if (!isFinite(to)) { el.textContent = "—"; return; } const t0 = performance.now(), fx = document.documentElement.classList.contains("fx");
+    const f = (v) => v.toFixed(dec).replace(".", ","); if (!fx) { el.textContent = f(to); return; }
+    const run = (t) => { const k = Math.min(1, (t - t0) / 900), e = 1 - Math.pow(1 - k, 3); el.textContent = f(to * e); if (k < 1) requestAnimationFrame(run); }; requestAnimationFrame(run); };
+  const num = (v) => { const n = parseFloat(String(v || "").replace(",", ".")); return isFinite(n) ? n : NaN; };
+  const dec = (v) => { const m = /[.,](\d+)/.exec(String(v || "")); return m ? m[1].length : 0; };
   const home = () => {
-    const w = A.activeWell(), f = A.fav().filter((s) => by[s]), r = A.recent().filter((s) => by[s] && !f.includes(s)).slice(0, 6);
-    const G = (k) => groups.find((g) => g.k === k);
-    const head = `<section class="st st0" data-d="0"><i class="node"></i><div class="depth">0000 м · устье</div>
-      <div class="console"><button type="button" class="cbtn" data-live><span class="led"></span><b>Онлайн-данные</b><small>WITS0 / WITSML</small></button>
-      <button type="button" class="cbtn" data-go="prof"><span class="led ${w ? "" : "off"}"></span><b>${esc(w ? w.name || "Скважина" : "Скважина")}</b><small>${w ? "профиль активен" : "задать профиль"}</small></button></div>
-      ${f.length + r.length ? `<div class="qh">Быстрый доступ</div><div class="quick">${f.map((s) => qcard(by[s], 1)).join("")}${r.map((s) => qcard(by[s])).join("")}</div>` : ""}</section>`;
-    const sts = STATION.map(([k, d, rock], i) => { const g = G(k); if (!g) return "";
-      return `<section class="st" data-d="${d}" style="--i:${i}"><i class="node"></i><div class="depth"><b>${String(d).padStart(4, "0")}</b> м · ${rock}</div>
-        <button type="button" class="st-h" data-g="${k}"><b>${esc(g.t === "Модели" ? "3D-модели" : g.t)}</b><span>${g.s.length} ${word(k, g.s.length)}</span>${chev}</button>
-        <p class="st-s">${SUB[k] || ""}</p><div class="cgrid">${pills(g)}</div></section>`; }).join("");
-    const end = by.game ? `<section class="st st-end" data-d="3500"><i class="node bitnode"></i><div class="depth">3500 м · забой</div>
-      <a class="game-b" href="${by.game.href}"><b>Вахта</b><span>Смена на буровой: герои, задания, баня и снежная битва</span><em>Играть</em></a></section>` : "";
-    grid.innerHTML = head + sts + end + `<p class="foot">DrillHarmony.com · расчёты справочные</p>`;
-    reveal(); drill();
+    const w = A.activeWell(), v = (w && w.v) || {}, f = A.fav().filter((s) => by[s]), r = A.recent().filter((s) => by[s] && !f.includes(s)).slice(0, 6);
+    $("#wc-l").textContent = w ? "Активная скважина" : "Профиль скважины";
+    $("#wc-n").textContent = w ? w.name || "Без названия" : "Задайте скважину";
+    $(".wcard").classList.toggle("empty", !w);
+    count($("#wc-1"), num(v.md), dec(v.md)); count($("#wc-2"), num(v.rho), dec(v.rho) || 2); count($("#wc-3"), num(v.q), dec(v.q));
+    const calc = groups.filter((g) => ["traj", "survey", "drill", "hyd", "mud", "gti"].includes(g.k)), more = groups.filter((g) => ["tools", "models", "learn"].includes(g.k));
+    grid.innerHTML =
+      (f.length + r.length ? `<div class="h2">Недавние</div><div class="recent">${f.map((s) => `<a class="rc" href="${by[s].href}"><i>★</i>${esc(by[s].name)}</a>`).join("")}${r.map((s) => `<a class="rc" href="${by[s].href}">${esc(by[s].name)}</a>`).join("")}</div>` : "") +
+      `<div class="h2">Расчёты</div><div class="plist">${calc.map(prow).join("")}</div>` +
+      `<div class="h2">Инструменты и обучение</div><div class="plist">${more.map((g, i) => prow(g, i + 6)).join("")}` +
+      (by.game ? `<a class="prow" href="${by.game.href}" style="--i:9"><span class="pic">${GI.game}</span><span class="pt"><b>Вахта</b><small>Игра: смена на буровой</small></span><span class="pn"></span>${chev}</a>` : "") + `</div>` +
+      `<p class="foot">DrillHarmony.com · расчёты справочные</p>`;
   };
-  // долото идёт по стволу вместе с прокруткой, глубина считается между станциями
-  const bit = $("#bit"), bitd = $("#bitd");
-  const drill = () => { try { drill0(); } catch (e) {} };
-  const drill0 = () => {
-    const st = $$(".st", grid); if (!st.length || grid.classList.contains("hidden")) { bit.classList.add("hidden"); return; }
-    const gr = grid.getBoundingClientRect(), y = innerHeight * 0.42;
-    const vis = gr.top < y && gr.bottom > y; bit.classList.toggle("hidden", !vis);
-    const pts = st.map((s) => [s.getBoundingClientRect().top + 14, +s.dataset.d]);
-    let d = 0; for (let i = 0; i < pts.length; i++) { if (y >= pts[i][0]) { const nx = pts[i + 1]; d = nx ? pts[i][1] + (nx[1] - pts[i][1]) * Math.min(1, (y - pts[i][0]) / (nx[0] - pts[i][0])) : pts[i][1]; } }
-    bitd.textContent = Math.round(d).toLocaleString("ru-RU") + " м";
-    grid.style.setProperty("--p", Math.max(0, y - gr.top) + "px");
-    st.forEach((s, i) => { if (!pts[i]) return; const on = y >= pts[i][0] - 2; if (on && !s.classList.contains("on")) { s.classList.add("hit"); setTimeout(() => s.classList.remove("hit"), 700); } s.classList.toggle("on", on); });
-  };
-  addEventListener("scroll", () => requestAnimationFrame(drill), { passive: true }); addEventListener("resize", drill);
-  const coverflow = () => {};
-  let io = null;
-  const reveal = () => {
-    const sts = $$(".st", grid);
-    if (!("IntersectionObserver" in window) || !document.documentElement.classList.contains("fx")) { sts.forEach((s) => s.classList.add("in")); return; }
-    io && io.disconnect();
-    io = new IntersectionObserver((en) => en.forEach((e) => { if (!e.isIntersecting) return; const s = e.target; io.unobserve(s); s.classList.add("in");
-      const dp = s.querySelector(".depth b"), to = +s.dataset.d; if (!dp || !to) return; const t0 = performance.now();
-      const run = (t) => { const k = Math.min(1, (t - t0) / 700), v = Math.round(to * (1 - Math.pow(1 - k, 3))); dp.textContent = String(v).padStart(4, "0"); if (k < 1) requestAnimationFrame(run); };
-      requestAnimationFrame(run); }), { rootMargin: "0px 0px -8% 0px", threshold: 0.12 });
-    sts.forEach((s) => io.observe(s));
-  };
+  const drill = () => {}; const coverflow = () => {};
+  $(".wcard").addEventListener("click", () => go("prof"));
+  // поиск по кнопке в шапке
+  document.addEventListener("click", (e) => { if (!e.target.closest("#sbtn")) return; const sb = $("#sbox"); sb.classList.toggle("open"); if (sb.classList.contains("open")) setTimeout(() => $("#q").focus(), 120); else { $("#q").value = ""; search(); } });
   grid.addEventListener("click", (e) => { const b = e.target.closest("[data-g]"); if (b) return go("calc", b.dataset.g); const p = e.target.closest("[data-go]"); if (p) go(p.dataset.go); });
   $("#sect-back").addEventListener("click", () => history.length > 1 && location.hash ? history.back() : go("calc", "", false));
 
@@ -105,8 +80,9 @@
     $("#q-x").classList.toggle("hidden", !q.value);
     $("#found").classList.toggle("hidden", !on);
     grid.classList.toggle("hidden", on || !!s.sect); $("#sect").classList.toggle("hidden", on || !s.sect);
+    if (on) $("#sbox").classList.add("open");
     $("#lt").classList.toggle("hidden", !!s.sect && !on); $(".ios-srch").classList.toggle("hidden", !!s.sect && !on);
-    $("#heroes").classList.toggle("hidden", on || !!s.sect); requestAnimationFrame(drill);
+    $("#heroes").classList.toggle("hidden", on || !!s.sect);
     if (!on) { $("#none").classList.add("hidden"); return; }
     const hit = idx.filter(([, t]) => words.every((w) => t.includes(w))).map(([x]) => x);
     $("#found").innerHTML = hit.map(row).join("");

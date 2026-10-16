@@ -28,7 +28,7 @@
     document.querySelectorAll("[data-back]").forEach((b) => b.addEventListener("click", () => D.classList.add("leaving"), true));
 
     // ---------- 3D-наклон стеклянных карточек под пальцем ----------
-    const TILT = ".tile, .tile2, .it, .slide, .chip, .btn, .actbar button, .he a, .sc, .cb, .qc, .cbtn, .game-b";
+    const TILT = ".tile, .tile2, .it, .slide, .chip, .btn, .actbar button, .he a, .sc, .cb, .qc, .cbtn, .game-b, .wcard";
     let cur = null;
     document.addEventListener("pointerdown", (e) => {
       const el = e.target.closest(TILT); if (!el || !D.classList.contains("fx")) return;
@@ -40,7 +40,7 @@
     }, { passive: true });
     // круг от точки касания на кнопках и строках
     document.addEventListener("pointerdown", (e) => {
-      const el = e.target.closest(".cb, .qc, .cbtn, .st-h, .r, .btn, .row, .act-pri, .game-b, .tabs button, .actbar button"); if (!el || !D.classList.contains("fx")) return;
+      const el = e.target.closest(".prow, .wcard, .lrow, .rc, .sbtn, .cb, .qc, .cbtn, .st-h, .r, .btn, .row, .act-pri, .game-b, .tabs button, .actbar button"); if (!el || !D.classList.contains("fx")) return;
       const r = el.getBoundingClientRect(), s = Math.max(r.width, r.height) * 2.2, rp = document.createElement("i"); rp.className = "rip";
       rp.style.cssText = `width:${s}px;height:${s}px;left:${e.clientX - r.left - s / 2}px;top:${e.clientY - r.top - s / 2}px`;
       if (getComputedStyle(el).position === "static") el.style.position = "relative"; el.style.overflow = "hidden"; el.appendChild(rp); setTimeout(() => rp.remove(), 650);
@@ -127,7 +127,7 @@
       const sp = pts.map((p) => P(p, cx, cy, sc));
       g.lineCap = "round"; g.strokeStyle = teal; g.lineWidth = 5; g.globalAlpha = 0.18; g.beginPath(); sp.forEach(([X, Y], i) => (i ? g.lineTo(X, Y) : g.moveTo(X, Y))); g.stroke();
       g.lineWidth = 2; g.globalAlpha = 1; g.beginPath(); sp.forEach(([X, Y], i) => (i ? g.lineTo(X, Y) : g.moveTo(X, Y))); g.stroke();
-      const k = fx ? (t * 0.12) % 1 : 1, bi = Math.floor(k * (sp.length - 1)), bp = sp[bi];
+      const k = fx ? (((t * 0.12) % 1) + 1) % 1 : 1, bi = Math.max(0, Math.min(sp.length - 1, Math.floor(k * (sp.length - 1)))), bp = sp[bi];
       const gb = g.createRadialGradient(bp[0], bp[1], 0, bp[0], bp[1], 10); gb.addColorStop(0, amb); gb.addColorStop(1, "rgba(0,0,0,0)");
       g.fillStyle = gb; g.beginPath(); g.arc(bp[0], bp[1], 10, 0, 7); g.fill(); g.fillStyle = amb; g.beginPath(); g.arc(bp[0], bp[1], 2.6, 0, 7); g.fill();
       // снег
