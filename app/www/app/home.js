@@ -18,7 +18,7 @@
   $("#wellchip").addEventListener("click", () => go("prof"));
 
   const row = (x) => `<a class="it" href="${x.href}" data-slug="${x.slug}"><span class="ic">${x.svg || esc(x.icon)}</span>` +
-    `<span class="tx"><b>${esc(x.name)}${x.app ? '<i class="tag">новое</i>' : ""}</b><span>${esc(x.desc)}</span></span>${IC.go.replace("<svg", '<svg class="go"')}</a>`;
+    `<span class="tx"><b><span class="nm">${esc(x.name)}</span>${x.app ? '<i class="tag">новое</i>' : ""}</b><span>${esc(x.desc)}</span></span>${IC.go.replace("<svg", '<svg class="go"')}</a>`;
 
   // ---------- расчёты: сетка разделов ----------
   const grid = $("#grid");
@@ -70,7 +70,7 @@
     $("#found").classList.toggle("hidden", !on);
     $("#grid").classList.toggle("hidden", on || !!s.sect); $("#sect").classList.toggle("hidden", on || !s.sect);
     $("#quick").classList.toggle("hidden", on || !!s.sect || !$("#quick").innerHTML);
-    [".hero", "#slider", "#dots"].forEach((q) => { const el = $(q); if (el) el.classList.toggle("hidden", on || !!s.sect); });
+    [".hero", "#slider", "#dots", "#feat-h"].forEach((q) => { const el = $(q); if (el) el.classList.toggle("hidden", on || !!s.sect); });
     if (!on) { $("#none").classList.add("hidden"); return; }
     const hit = idx.filter(([, t]) => words.every((w) => t.includes(w))).map(([x]) => x);
     $("#found").innerHTML = hit.map(row).join("");
@@ -82,7 +82,10 @@
 
   // ---------- профиль скважины ----------
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  const wellchip = () => { const w = A.activeWell(); $("#wellchip").innerHTML = `<i></i>${esc(w ? w.name || "Скважина" : "Профиль скважины")}`; $("#wellchip").classList.toggle("empty", !w); };
+  const wellchip = () => { const w = A.activeWell(); $("#wellchip").innerHTML = w ? `<i></i>${esc(w.name || "Скважина")}` : "+ Скважина"; $("#wellchip").classList.toggle("empty", !w);
+    $("#wellchip").setAttribute("aria-label", w ? "Активная скважина: " + (w.name || "без названия") : "Создать профиль скважины"); };
+  const EX = { md: "3200", tvd: "2650", bit: "215,9", csg_id: "224,4", shoe: "1350", dp_od: "127", dp_id: "108,6", dp_w: "31", dc_od: "172", dc_id: "71", dc_len: "150",
+    rho: "1,18", mud_v: "120", q: "30", pump_l: "18,5", tfa: "350", t600: "52", t300: "32", t6: "7", t3: "6", pp: "1,12", fg: "1,65", bt: "58420", dip: "74,6", decl: "15,4" };
   const prof = () => {
     const pane = $('[data-pane="prof"]'), ws = A.wells(), w = A.activeWell();
     const secs = [...new Set(A.PROF.map((p) => p[3]))];
@@ -90,8 +93,8 @@
       (!w ? `<div class="card"><h2>Профиль скважины</h2><p>Конструкция, КНБК, раствор и магнитная модель вводятся один раз и подставляются во все расчёты, где есть такие поля. Можно завести несколько скважин и переключаться между ними.</p><p><button type="button" class="btn pri" data-add>Создать профиль</button></p></div>` :
         `<div class="pf"><label class="pf-name"><span>Название</span><input id="pf-name" value="${esc(w.name || "")}" placeholder="Куст 12, скв. 1204" autocomplete="off"></label>` +
         secs.map((s) => `<div class="pf-sec">${esc(s)}</div><div class="pf-grid">` + A.PROF.filter((p) => p[3] === s).map(([k, l, u]) =>
-          `<label data-u="${esc(u)}"><span data-u="${esc(u)}">${esc(l)}</span><input data-k="${k}" inputmode="decimal" value="${esc((w.v || {})[k] || "")}"><small>${esc(u)}</small></label>`).join("") + `</div>`).join("") +
-        `<p class="pf-act"><button type="button" class="btn" data-dup>Копия</button><button type="button" class="btn warn" data-del>Удалить</button></p>` +
+          `<label data-u="${esc(u)}"><span data-u="${esc(u)}">${esc(l)}</span><input data-k="${k}" inputmode="decimal" placeholder="${EX[k] || ""}" value="${esc((w.v || {})[k] || "")}"><small>${esc(u)}</small></label>`).join("") + `</div>`).join("") +
+        `<div class="pf-act"><button type="button" class="btn" data-dup>Дублировать скважину</button><button type="button" class="btn warn" data-del>Удалить</button></div>` +
         `<p class="muted small">Поля из профиля в расчётах отмечены точкой. Значение, исправленное в самом расчёте, профиль не перезаписывает, кнопка «Профиль» внизу расчёта подставит всё заново.</p></div>`);
     const save = (fn) => { const all = A.wells(), cur = all.find((x) => x.id === (A.activeWell() || {}).id); if (cur) { fn(cur); A.saveWells(all); wellchip(); } };
     pane.onclick = (e) => {
@@ -114,18 +117,18 @@
     if (!h.length) { pane.innerHTML = `<div class="card"><h2>История расчётов</h2><p>Нажмите «В историю» внизу любого расчёта, и здесь сохранятся исходные данные и результат. Из истории расчёт открывается с теми же значениями.</p></div>`; return; }
     const day = (t) => new Date(t).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" });
     const tm = (t) => new Date(t).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
-    let cur = "", out = `<div class="hbar"><input id="hq" type="search" placeholder="Поиск по истории" aria-label="Поиск по истории"><button type="button" class="btn" id="hclear">Очистить</button></div><div id="hl">`;
+    let cur = "", out = `<div class="srch">${IC.search}<input id="hq" type="search" placeholder="Поиск по истории" aria-label="Поиск по истории"></div><div id="hl">`;
     h.forEach((e, i) => {
       const d = day(e.t); if (d !== cur) { out += `<div class="hday">${d}</div>`; cur = d; }
       out += `<div class="he" data-i="${i}"><a href="${esc(e.rel + (e.qs || ""))}"><b>${esc(e.name)}</b><small>${tm(e.t)}${e.well ? " · " + esc(e.well) : ""}</small>` +
         `<span class="hv">${e.outs.map((o) => `<i>${esc(o[0])}: <em>${esc(o[1])}</em> ${esc(o[2])}</i>`).join("")}</span>${e.v ? `<span class="hvd">${esc(e.v)}</span>` : ""}</a>` +
         `<button type="button" class="ib del" aria-label="Удалить">×</button></div>`;
     });
-    pane.innerHTML = out + "</div>";
+    pane.innerHTML = out + `</div><button type="button" class="row danger" id="hclear">Очистить историю<small>${h.length} ${plural(h.length, "запись", "записи", "записей")}</small></button>`;
     pane.onclick = (ev) => {
       const del = ev.target.closest(".del");
       if (del) { const i = +del.closest(".he").dataset.i, all = A.history(); all.splice(i, 1); A.setHistory(all); hist(); }
-      if (ev.target.id === "hclear" && confirm("Удалить всю историю расчётов?")) { A.setHistory([]); hist(); }
+      if (ev.target.closest("#hclear") && confirm("Удалить всю историю расчётов?")) { A.setHistory([]); hist(); }
     };
     $("#hq").addEventListener("input", (ev) => {
       const w = norm(ev.target.value).split(/\s+/).filter(Boolean);

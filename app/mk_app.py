@@ -205,12 +205,14 @@ def fold(summary, inner, cls=""):
 def write_page(path, title, group, slug, kind, body, css, head_js, body_js, extra="", src_path=None, actbar=False):
     up = "../" * path.count("/")
     star = f'<button class="ib star" type="button" aria-label="В избранное" aria-pressed="false">{ICONS["star"]}</button>'
+    reset = f'<button class="ib" type="button" data-a="reset" aria-label="Сбросить значения">{ICONS["a_reset"]}</button>' if actbar else ""
     act = ""
     if actbar:
         b = lambda k, ic, t: f'<button type="button" data-a="{k}">{ICONS[ic]}<span>{t}</span></button>'
-        act = (f'<nav class="actbar" aria-label="Действия">{b("prof", "a_prof", "Профиль")}{b("reset", "a_reset", "Сбросить")}'
-               f'{b("copy", "a_copy", "Копировать")}{b("share", "a_share", "Поделиться")}{b("save", "a_save", "В историю")}</nav>')
-    src = f'<p class="src">На сайте: <a class="ext" href="{SITE}{src_path}" rel="noopener">drillharmony.com/{src_path}</a></p>' if src_path else ""
+        act = (f'<nav class="actbar" aria-label="Действия">{b("prof", "a_prof", "Из профиля")}'
+               f'{b("copy", "a_copy", "Копировать")}{b("share", "a_share", "Поделиться")}'
+               f'<button type="button" class="act-pri" data-a="save">{ICONS["a_save"]}<span>Сохранить</span></button></nav>')
+    src = f'<a class="srcrow ext" href="{SITE}{src_path}" rel="noopener"><span>Открыть на сайте</span><small>drillharmony.com/{src_path}</small></a>' if src_path else ""
     out = f'''<!doctype html>
 <html lang="ru" data-theme="dark"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -221,7 +223,7 @@ def write_page(path, title, group, slug, kind, body, css, head_js, body_js, extr
 <link rel="stylesheet" href="{up}app/app.css"><script src="{up}app/app.js"></script><script src="{up}app/fx.js"></script>
 </head><body class="in-app k-{kind}{" has-act" if actbar else ""}" data-slug="{slug}" data-path="{src_path or ""}" data-kind="{kind}" data-name="{esc(title)}">
 <header class="abar"><a class="ib" href="{up}index.html" data-back aria-label="Назад">{ICONS["back"]}</a>
-<div class="ttl"><small>{esc(group)}</small><span>{esc(title)}</span></div>{star}
+<div class="ttl"><small>{esc(group)}</small><span>{esc(title)}</span></div>{reset}{star}
 <button id="theme" type="button" hidden aria-hidden="true"></button></header>
 <main class="app-main">
 {body}
@@ -428,16 +430,16 @@ def home(items, groups, css_links):
 <header class="abar">{WORDMARK}<button class="wellchip" id="wellchip" type="button" data-go="prof"></button></header>
 <main class="home">
 <section data-pane="calc">
-<div class="srch">{ICONS["search"]}<input id="q" type="search" placeholder="Поиск: зенит, ЭЦП, барит…" autocomplete="off" enterkeyhint="search" aria-label="Поиск"><button type="button" id="q-x" class="hidden" aria-label="Очистить">×</button></div>
-<div id="quick" class="chips"></div>
 <div class="hero"><canvas id="hero3d" aria-label="3D-сцена: вышка, пласты и ствол скважины"></canvas><div class="hero-t"><small>DrillHarmony · 3D</small><b>Буровая в кармане</b><span>40 расчётов · 20 моделей · без интернета</span></div></div>
+<div class="srch hero-srch">{ICONS["search"]}<input id="q" type="search" placeholder="Поиск: зенит, ЭЦП, барит…" autocomplete="off" enterkeyhint="search" aria-label="Поиск"><button type="button" id="q-x" class="hidden" aria-label="Очистить">×</button></div>
+<div id="quick" class="chips"></div>
+<div id="grid" class="grid"></div>
+<div class="sec-h" id="feat-h">Подборка</div>
 <div class="slider" id="slider">
-<a class="slide s-game" href="game/index.html"><b>Вахта</b><span>RPG на буровой: выбери героя, выполняй задания, не опоздай в баню</span><em>Играть</em></a>
 <div class="slide s-live" role="button" tabindex="0" data-live><i class="pulse"></i><b>Онлайн-данные</b><span>WITS0 и WITSML с буровой: приборы, планшет, отклонитель</span><em>Открыть</em></div>
 <a class="slide" href="index.html#t=calc&amp;s=models"><b>3D-модели</b><span>Слайд-шит, прихват, stick-slip, газ в затрубье и ещё 16</span><em class="em2">Смотреть</em></a>
 <a class="slide" href="index.html#t=prof"><b>Профиль скважины</b><span>Конструкция и раствор один раз, дальше подставляются сами</span><em class="em2">Заполнить</em></a>
 </div><div class="dots" id="dots"></div>
-<div id="grid" class="grid"></div>
 <div id="sect" class="hidden"><div class="sect-h"><button type="button" class="ib" id="sect-back" aria-label="К разделам">{ICONS["back"]}</button><b id="sect-t"></b><small id="sect-n"></small></div><div class="list" id="sect-l"></div></div>
 <div id="found" class="list hidden"></div><p id="none" class="empty hidden">Ничего не нашлось. Попробуйте другое слово, например «зенит» или «ppg».</p>
 </section>
@@ -462,7 +464,7 @@ MORE = f'''
 <div class="card"><h2>Избранное</h2><div class="list" id="favs"></div><p id="fav-none" class="muted">Отметьте расчёт звёздочкой в его заголовке.</p></div>
 <div class="card"><h2>Данные</h2>
 <p>Приложение не собирает персональные данные и ничего не отправляет на сервер. Профили скважин, история, избранное и введённые значения хранятся только на этом устройстве.</p>
-<p class="btns"><button type="button" class="btn" id="clear">Очистить введённые значения</button><button type="button" class="btn" id="clear-all">Удалить всё</button></p></div>
+<div class="rows2"><button type="button" class="row" id="clear">Очистить введённые значения<small>профили и история останутся</small></button><button type="button" class="row danger" id="clear-all">Удалить все данные приложения<small>профили, история, избранное</small></button></div></div>
 <div class="card"><h2>Важно</h2><p>Расчёты справочные. Проектные решения принимаются по утверждённым методикам, программе на бурение и регламентам вашей компании.</p></div>
 <div class="card rows">
 <a href="{SITE}articles/" rel="noopener">Статьи по ННБ</a>

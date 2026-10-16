@@ -58,6 +58,12 @@
     document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand("copy"); } catch (e) {} ta.remove(); return ok;
   };
   window.dhApp.toast = toast;
+  const toastAct = (msg, label, fn) => {
+    let el = document.querySelector(".toast"); toast(msg); el = document.querySelector(".toast");
+    const b = document.createElement("button"); b.type = "button"; b.className = "toast-a"; b.textContent = label;
+    b.onclick = () => { fn(); el.classList.remove("on"); }; el.appendChild(b); el.classList.add("act"); clearTimeout(el._t);
+    el._t = setTimeout(() => { el.classList.remove("on", "act"); }, 4500);
+  };
   const modeQS = () => { const m = document.querySelector(".cmode"); const b = m && m.querySelector("[aria-pressed=true]"); return m && b ? m.dataset.mode + "=" + b.dataset.v : ""; };
   const pageQS = () => {
     let qs = ""; try { if (typeof calcQS === "function") qs = calcQS(); } catch (e) {}
@@ -231,7 +237,11 @@
         const n = fromProfile(true);
         toast(n ? `Из профиля «${w.name || "без названия"}»: ${n} ${n === 1 ? "поле" : n < 5 ? "поля" : "полей"}` : "В профиле нет данных для этих полей");
       },
-      reset() { ls.del(key); profLabels.forEach((l) => l.classList.remove("fromp")); const b = siteBtn("reset"); if (b) b.click(); toast("Значения по умолчанию"); },
+      reset() {
+        const before = Object.fromEntries(ins.map((i) => [i.id, i.value])), was = ls.get(key, null);
+        ls.del(key); profLabels.forEach((l) => l.classList.remove("fromp")); const b = siteBtn("reset"); if (b) b.click();
+        toastAct("Значения сброшены", "Вернуть", () => { ins.forEach((i) => { i.value = before[i.id]; }); if (was) ls.set(key, was); fire(ins[0]); });
+      },
       copy() { const b = siteBtn("copy"); if (b) b.click(); },
       share() { window.dhAppShare(); },
       save() {
@@ -249,8 +259,9 @@
     };
     const ab = document.querySelector(".actbar");
     if (ab) {
-      if (!profLabels.length) ab.querySelector('[data-a="prof"]').classList.add("dim");
+      if (!profLabels.length) ab.querySelector('[data-a="prof"]').remove();      // нечего подставлять — кнопки нет
       ab.addEventListener("click", (e) => { const b = e.target.closest("[data-a]"); if (b) actions[b.dataset.a](); });
     }
+    document.querySelectorAll('.abar [data-a="reset"]').forEach((b) => b.addEventListener("click", () => actions.reset()));
   });
 })();
