@@ -131,3 +131,21 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .final { text-align: center; } .final .rank { font: 900 28px "Inter"; letter-spacing: -.03em; margin: 6px 0; background: linear-gradient(180deg, #fff, #ffc163); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .final .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 12px 0; } .final .grid3 div { border-radius: 12px; padding: 8px; background: rgba(255,255,255,.06); }
 .final .grid3 b { display: block; font: 800 18px "JetBrains Mono", monospace; } .final .grid3 small { color: var(--muted); font-size: 10.5px; }
+
+/* вид от первого лица */
+.fpui { position: fixed; inset: 0; z-index: 8; pointer-events: none; }
+.fpui > * { pointer-events: auto; }
+.joy { position: absolute; left: 18px; bottom: calc(var(--sab) + 84px); width: 124px; height: 124px; border-radius: 50%; touch-action: none; }
+.joy i { position: absolute; left: 50%; top: 50%; width: 50px; height: 50px; margin: -25px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.55), rgba(242,165,65,.55)); box-shadow: 0 6px 18px -4px rgba(242,165,65,.8); transition: transform .06s; }
+.fpr { position: absolute; right: 14px; bottom: calc(var(--sab) + 88px); display: flex; flex-direction: column; align-items: flex-end; gap: 10px; pointer-events: none; }
+.fpr > * { pointer-events: auto; }
+.throw { width: 86px; height: 86px; border-radius: 50%; font-size: 34px; padding: 0; }
+.cross { position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; margin: -11px; pointer-events: none;
+  background: radial-gradient(circle, #fff 0 2px, transparent 3px), linear-gradient(#fff, #fff) center/2px 22px no-repeat, linear-gradient(#fff, #fff) center/22px 2px no-repeat; opacity: .7; }
+.splat { position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: radial-gradient(circle at 40% 45%, rgba(255,255,255,.95) 0 9%, rgba(255,255,255,.6) 14%, transparent 26%), radial-gradient(circle at 58% 55%, rgba(255,255,255,.9) 0 6%, transparent 15%), radial-gradient(circle at 47% 62%, rgba(255,255,255,.85) 0 4%, transparent 11%); }
+.splat.on { animation: splat 1.4s ease-out; }
+@keyframes splat { 0% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0; transform: scale(1) translateY(40px); } }
+.fpscore { position: absolute; left: 50%; top: calc(var(--sat) + 70px); transform: translateX(-50%); padding: 7px 14px; border-radius: 999px; font: 700 13px "JetBrains Mono", monospace; white-space: nowrap; }
+#fpenter { font-size: 14px; padding: 12px 16px; }

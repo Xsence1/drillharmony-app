@@ -157,6 +157,7 @@
     { id: "mud", t: "Утяжелить раствор", where: "rig", d: "Довести плотность до 1,25 г/см³. Нужен ключ со склада." , need: "key" },
     { id: "wc", t: "Зов природы", where: "wc", d: "Минус тридцать восемь. Туалет на улице. Дверь, говорят, примерзает.", from: 10 * 60 + 30, opt: 1 },
     { id: "alarm", t: "Учебная тревога", where: "rig", d: "Сирена! Бегом на буровую, закрыть превентор.", from: 14 * 60, timed: 1 },
+    { id: "snow", t: "Снежная битва", where: "store", d: "Жора собрал бригаду за складом. Шесть попаданий — и ты легенда куста.", from: 12 * 60, opt: 1 },
     { id: "bath", t: "Баня у Егорыча", where: "bath", d: "После смены святое дело. Егорыч уже затопил.", from: 17 * 60, opt: 1 },
     { id: "hand", t: "Сдать смену", where: "rig", d: "Передать смену ночной вахте и закрыть журнал.", from: 19 * 60 },
   ];
@@ -216,6 +217,7 @@
       me.walk += dt; if (me.walk > 0.32) { me.walk = 0; SFX.step(); prints.push({ x: me.x, y: me.y, a: 1 }); if (prints.length > 60) prints.shift(); }
       if (!me.path.length) { me.path = null; S.pos = { x: me.x, y: me.y }; save(); if (me.cb) { const cb = me.cb; me.cb = null; cb(); } }
     }
+    if (FP.on) { fpUpdate(dt); drawFP(); return; }
     cam.x += (me.x - cam.x) * Math.min(1, dt * 2.5); cam.y += (me.y - cam.y) * Math.min(1, dt * 2.5);
     drawScene(dt, false);
   };
@@ -304,7 +306,7 @@
       const qd = el.querySelector(".q"); if (has && !qd) { const i = document.createElement("i"); i.className = "q"; i.textContent = "!"; el.prepend(i); } else if (!has && qd) qd.remove(); });
   };
   cv.addEventListener("pointerdown", (e) => {        // касание здания на сцене
-    if (!S.hero || $(".sheet")) return; audio();
+    if (!S.hero || $(".sheet") || FP.on) return; audio();
     let best = null, bd = 1e9; Object.entries(LOC).forEach(([k, L]) => { const p = iso(L.x + L.w / 2, L.y + L.d / 2, L.h / 2), d = Math.hypot(p[0] - e.clientX, p[1] - e.clientY); if (d < bd) { bd = d; best = k; } });
     if (best && bd < TW * 1.6) goTo(best);
   });
@@ -352,7 +354,7 @@
 
   // ===================== перемещение =====================
   const goTo = (k) => {
-    if (S.done) return; close(); audio(); SFX.tap();
+    if (S.done) return; if (FP.on && !FP.fight) fpSet(false); close(); audio(); SFX.tap();
     const d = DOOR(k), dist = Math.hypot(d.x - me.x, d.y - me.y);
     const mid = { x: (me.x + d.x) / 2 + (Math.abs(d.x - me.x) > 3 ? 0 : 0.6), y: (me.y + d.y) / 2 };
     me.path = dist < 0.3 ? [] : [[mid.x, mid.y], [d.x, d.y]];
@@ -386,7 +388,8 @@
   const EXTRA = {
     dorm: [act("😴", "Вздремнуть 40 минут", "Силы вернутся. Если сосед не храпит.", async () => { close(); fade(); SFX.snore(); await wait(1400);
       if (Math.random() < 0.4) { gain({ min: 40, en: 15, mood: -5 }, "Сосед храпел"); toast("Сосед по вагону храпит как буровой насос"); } else gain({ min: 40, en: 30, mood: 5 }, "Выспался"); })],
-    canteen: [act("☕", "Чай с печеньем", "15 минут, немного сил и настроения", () => { SFX.spoon(); gain({ min: 15, en: 8, mood: 6 }, "Горячий чай"); close(); })],
+    canteen: [act("💪", "Армрестлинг", "Кто сильнее: ты или " + (S && S.hero === "mikh" ? "Петрович" : "Михалыч") + "?", () => armwrestle()),
+      act("☕", "Чай с печеньем", "15 минут, немного сил и настроения", () => { SFX.spoon(); gain({ min: 15, en: 8, mood: 6 }, "Горячий чай"); close(); })],
     nnb: [act("💻", "Посмотреть телеметрию", "Зенит, азимут, toolface в реальном времени", async () => { await talk(S.hero === "serg" ? "serg" : "radio", pick(["Зенит восемьдесят семь и три, азимут сто сорок два. Держим пласт.", "Toolface пляшет, реактивный момент гуляет. Нормально, это ВЗД.", "Сигнал есть, импульсы чистые. Сегодня насосы не шумят."])); gain({ min: 10, xp: 5 }); close(); })],
     gti: [act("🧪", "Глянуть газовые показания", "Суммарный газ и хромотограф", async () => { await talk(S.hero === "lena" ? "lena" : "radio", pick(["Фон спокойный, ноль целых три десятых процента. Можно бурить.", "Пачка газа на ста двадцати метрах выше. Уже прошла, но я записала."])); gain({ min: 10, xp: 5 }); close(); })],
     store: [act("🧤", "Попросить новые перчатки", "Жора обещал ещё в прошлую вахту", async () => { await talk("zhora", pick(["Перчатки? Были. Вчера. Приходи завтра, может, вертолёт привезёт.", "На, держи. Только не говори никому, а то все придут."])); gain({ min: 10, mood: 3 }); close(); })],
@@ -472,6 +475,10 @@
       const ok = await steamGame();
       if (ok) { SFX.splash(); await talk("egor", pick(["Вот теперь ты человек. А то ходил как замёрзший пингвин.", "Эх, хорошо! На большой земле так не попаришься."])); done("bath", { en: 45, mood: 30, min: 60, xp: 15 }, "С лёгким паром!"); }
       else { SFX.splash(); fail({ en: 10, mood: -2, min: 30 }, "Не выдержал пар"); await talk("egor", "Слабоват. Окунись в сугроб и приходи ещё."); }
+    },
+    async snow() {
+      await talk("zhora", "О, пришёл! Правила простые: в лицо не кидать, в мастера не кидать, шесть попаданий — победа. Поехали!");
+      close(); fpStart(true);
     },
     async hand() {
       const c = await talk(S.hero === "petr" ? "radio" : "boss", "Ночная вахта пришла. Сдаёшь?", ["Сдаю, журнал заполнен", "Подожди, ещё не всё сделал"]);
@@ -572,6 +579,176 @@
     go.onclick = () => { if (!sel) return; const h = HEROES.find((x) => x.id === sel); S = Object.assign(fresh(sel), { en: h.en, mood: h.mood, snd: S.snd, voice: S.voice }); ROLEQ.serg.where = "nnb";
       me.x = S.pos.x; me.y = S.pos.y; cam.x = me.x; cam.y = me.y; save(); p.remove(); SFX.jingle(); SFX.wind(S.snd); hud(); setTimeout(() => talk(sel, pick(["Восемь утра, минус тридцать восемь. Обычный вторник на кусту.", "Так, сначала к мастеру. Потом завтрак. Потом как пойдёт."]), ["Поехали"]).then(close), 500); };
     const cont = $(".cont", p); if (cont) cont.onclick = () => { if (S.f.tfRead) ROLEQ.serg.where = "rig"; me.x = S.pos.x; me.y = S.pos.y; cam.x = me.x; cam.y = me.y; p.remove(); audio(); SFX.wind(S.snd); hud(); };
+  };
+
+
+  // ===================== армрестлинг: перетягивание силой пальца =====================
+  const armwrestle = async () => {
+    const opp = S.hero === "mikh" ? "petr" : "mikh";
+    await talk(opp, pick(["Ну давай, садись. Только локоть со стола не убирай, я всё вижу.", "Руку ставь. Проиграешь — моешь кружки до конца вахты."]));
+    const ok = await new Promise((res) => {
+      const s = sheet(`<div class="mg"><h2>Армрестлинг</h2><p class="sub">Жмите быстро! Соперник давит без остановки.</p><div class="big" id="aw">0</div>
+        <div class="track"><i class="zone" style="left:85%;width:15%"></i><i class="mark" id="am" style="left:50%"></i></div><button class="mash glass" id="ab">💪</button></div>`);
+      let x = 0.5, fin = false, lt = performance.now(), n = 0; const am = $("#am", s), aw = $("#aw", s), t0 = lt, power = S.hero === "mikh" ? 0.05 : 0.04;
+      const loop = (t) => { if (fin) return; const dt = (t - lt) / 1000; lt = t; x -= dt * (0.11 + (t - t0) / 1000 * 0.012); am.style.left = clamp(x, 0, 1) * 100 + "%";
+        if (x >= 0.85) { fin = true; res(true); } else if (x <= 0.02) { fin = true; res(false); } else requestAnimationFrame(loop); };
+      requestAnimationFrame(loop);
+      $("#ab", s).addEventListener("pointerdown", (e) => { e.preventDefault(); if (fin) return; x += power; n++; aw.textContent = n; SFX.knock(); vib(10); });
+    });
+    if (ok) { SFX.jingle(); await talk(opp, "Ничего себе… Это всё котлеты тёти Вали. Ладно, твоя взяла."); gain({ mood: 12, xp: 15, min: 15, en: -6 }, "Чемпион столовой"); }
+    else { SFX.bad(); await talk(opp, "Ха! Рано тебе ещё. Иди кружки мой."); gain({ mood: -4, min: 15, en: -6 }, "Кружки ждут"); }
+    close();
+  };
+
+  // ===================== вид от первого лица: прогулка и снежная битва =====================
+  // Лучи по сетке куста (4 клетки на единицу карты), стены вагонов с окнами, спрайты людей и вышки,
+  // небо по времени смены, снег. Буфер низкого разрешения растягивается на экран.
+  const GR = 4, MW = 13 * GR, cells = new Int8Array(MW * MW), keys = Object.keys(LOC);
+  keys.forEach((k, i) => { const L = LOC[k]; for (let x = Math.floor(L.x * GR); x < Math.ceil((L.x + L.w) * GR); x++) for (let y = Math.floor(L.y * GR); y < Math.ceil((L.y + L.d) * GR); y++) if (x >= 0 && y >= 0 && x < MW && y < MW) cells[y * MW + x] = i + 1; });
+  const solid = (x, y) => x < 0.3 || y < 0.3 || x > 12.7 || y > 12.7 || cells[Math.floor(y * GR) * MW + Math.floor(x * GR)] > 0;
+  const FP = { on: false, a: -Math.PI / 2, jx: 0, jy: 0, fight: null, walked: 0, near: null };
+  const buf = document.createElement("canvas"), bg = buf.getContext("2d"); let RW = 300, RH = 600, zb = new Float32Array(300);
+  const SNOWMEN = [[4.9, 5.4], [8.6, 10.6], [1.2, 1.2]];
+  const fpEl = document.createElement("div"); fpEl.className = "fpui hidden";
+  fpEl.innerHTML = `<div class="joy glass" id="joy"><i></i></div><div class="cross hidden" id="cross"></div><div class="splat" id="splat"></div>
+    <div class="fpr"><button class="gbtn hidden" id="fpenter"></button><button class="gbtn pri throw hidden" id="fpthrow">❄️</button></div>
+    <div class="fpscore hidden glass" id="fpscore"></div>`;
+  document.body.appendChild(fpEl);
+  const fpBtn = document.createElement("button"); fpBtn.className = "snd glass"; fpBtn.id = "fpbtn"; fpBtn.type = "button"; fpBtn.setAttribute("aria-label", "Вид от первого лица"); fpBtn.textContent = "👁";
+  $("#hud").insertBefore(fpBtn, $("#snd"));
+  const fpSet = (on) => { FP.on = on; fpEl.classList.toggle("hidden", !on); tagsEl.style.display = on ? "none" : ""; fpBtn.textContent = on ? "🗺" : "👁"; me.path = null;
+    if (on) { RW = Math.round(clamp(innerWidth * 0.8, 240, 360)); RH = Math.round(RW * innerHeight / innerWidth); buf.width = RW; buf.height = RH; zb = new Float32Array(RW); toast("Левый палец — идти, правый — смотреть"); } };
+  fpBtn.onclick = () => { if (FP.fight) return toast("Сначала добейте снежную битву"); audio(); SFX.tap(); fpSet(!FP.on); };
+  // джойстик и обзор
+  const joy = $("#joy", fpEl), knob = joy.querySelector("i"); let jid = null, jc = null, lid = null, lx = 0;
+  joy.addEventListener("pointerdown", (e) => { e.stopPropagation(); jid = e.pointerId; joy.setPointerCapture(jid); const r = joy.getBoundingClientRect(); jc = [r.left + r.width / 2, r.top + r.height / 2]; jmove(e); });
+  const jmove = (e) => { if (e.pointerId !== jid) return; let dx = e.clientX - jc[0], dy = e.clientY - jc[1]; const m = Math.hypot(dx, dy), R = 46; if (m > R) { dx *= R / m; dy *= R / m; }
+    FP.jx = dx / R; FP.jy = dy / R; knob.style.transform = `translate(${dx}px,${dy}px)`; };
+  joy.addEventListener("pointermove", jmove);
+  const jend = (e) => { if (e.pointerId !== jid) return; jid = null; FP.jx = FP.jy = 0; knob.style.transform = ""; }; joy.addEventListener("pointerup", jend); joy.addEventListener("pointercancel", jend);
+  cv.addEventListener("pointerdown", (e) => { if (!FP.on) return; lid = e.pointerId; lx = e.clientX; cv.setPointerCapture(lid); });
+  cv.addEventListener("pointermove", (e) => { if (FP.on && e.pointerId === lid) { FP.a += (e.clientX - lx) * 0.0065; lx = e.clientX; } });
+  cv.addEventListener("pointerup", (e) => { if (e.pointerId === lid) lid = null; });
+  $("#fpenter", fpEl).onclick = () => { if (FP.near) { SFX.tap(); arrive(FP.near); } };
+  $("#fpthrow", fpEl).onclick = () => throwBall();
+
+  const fpUpdate = (dt) => {
+    if ($(".sheet") && !FP.fight) return;
+    const f = -FP.jy, st = FP.jx, sp = 1.7 * dt, ca = Math.cos(FP.a), sa = Math.sin(FP.a);
+    const nx = me.x + (ca * f - sa * st) * sp, ny = me.y + (sa * f + ca * st) * sp, r = 0.18;
+    const ox2 = me.x, oy2 = me.y;
+    if (!solid(nx + Math.sign(nx - me.x) * r, me.y)) me.x = nx; if (!solid(me.x, ny + Math.sign(ny - me.y) * r)) me.y = ny;
+    const moved = Math.hypot(me.x - ox2, me.y - oy2); FP.walked += moved; me.walk += moved;
+    if (me.walk > 0.42) { me.walk = 0; SFX.step(); }
+    if (FP.walked > 0.5 && !FP.fight) { const m = Math.round(FP.walked * 2.2); FP.walked = 0; S.t += m; S.en = clamp(S.en - m * 0.12, 0, 100); S.pos = { x: me.x, y: me.y }; save(); hud(); checkTime(); }
+    // ближайшая дверь
+    let near = null, nd = 0.95; keys.forEach((k) => { const d = DOOR(k), dd = Math.hypot(d.x - me.x, d.y - me.y); if (dd < nd) { nd = dd; near = k; } });
+    FP.near = FP.fight ? null : near; const eb = $("#fpenter", fpEl); eb.classList.toggle("hidden", !FP.near); if (FP.near) eb.textContent = "Войти: " + LOC[FP.near].ic + " " + LOC[FP.near].n;
+    if (FP.fight) fightUpdate(dt);
+  };
+
+  const drawFP = () => {
+    const t = S.t, [s1, s2, night] = sky(t), hz = RH * 0.5, focal = RW * 0.62, eye = 0.17, ca = Math.cos(FP.a), sa = Math.sin(FP.a);
+    // небо, сияние, земля
+    const sg = bg.createLinearGradient(0, 0, 0, hz); sg.addColorStop(0, s1); sg.addColorStop(1, s2); bg.fillStyle = sg; bg.fillRect(0, 0, RW, hz);
+    if (night > 0) { bg.fillStyle = "#fff"; for (let i = 0; i < 50; i++) { const x = ((i * 137.5 - FP.a * 80) % RW + RW) % RW, y = (i * 41.3) % (hz * 0.8); bg.globalAlpha = night * (0.4 + 0.6 * Math.abs(Math.sin(T + i))); bg.fillRect(x, y, 1, 1); }
+      for (let b = 0; b < 2; b++) { bg.globalAlpha = night * 0.32; const ag = bg.createLinearGradient(0, hz * 0.05, 0, hz * 0.55); const col = b ? "150,120,255" : "90,255,190";
+        ag.addColorStop(0, `rgba(${col},0)`); ag.addColorStop(0.45, `rgba(${col},.9)`); ag.addColorStop(1, `rgba(${col},0)`); bg.fillStyle = ag; bg.beginPath(); bg.moveTo(0, hz * 0.3);
+        for (let x = 0; x <= RW; x += 8) bg.lineTo(x, hz * (0.18 + 0.1 * Math.sin((x - FP.a * 120) / 40 + T * 0.5 + b * 2)) + b * 12); bg.lineTo(RW, hz * 0.56); bg.lineTo(0, hz * 0.56); bg.closePath(); bg.fill(); } bg.globalAlpha = 1; }
+    const gg = bg.createLinearGradient(0, hz, 0, RH); gg.addColorStop(0, shade("#b9c6d2", 0.95 - night * 0.45)); gg.addColorStop(1, shade("#f2f6f9", 1 - night * 0.5)); bg.fillStyle = gg; bg.fillRect(0, hz, RW, RH - hz);
+    const fogC = s2;
+    // стены
+    for (let c = 0; c < RW; c++) {
+      const cam = (2 * c / RW - 1) * (RW / 2 / focal), rx = ca - sa * cam, ry = sa + ca * cam;
+      let mx = Math.floor(me.x * GR), my = Math.floor(me.y * GR); const dX = Math.abs(1 / rx), dY = Math.abs(1 / ry);
+      let stX, stY, sX, sY, side = 0, hit = 0, steps = 0;
+      if (rx < 0) { stX = -1; sX = (me.x * GR - mx) * dX; } else { stX = 1; sX = (mx + 1 - me.x * GR) * dX; }
+      if (ry < 0) { stY = -1; sY = (me.y * GR - my) * dY; } else { stY = 1; sY = (my + 1 - me.y * GR) * dY; }
+      while (!hit && steps++ < 120) { if (sX < sY) { sX += dX; mx += stX; side = 0; } else { sY += dY; my += stY; side = 1; } if (mx < 0 || my < 0 || mx >= MW || my >= MW) break; hit = cells[my * MW + mx]; }
+      if (!hit) { zb[c] = 1e9; continue; }
+      const dist = ((side ? sY - dY : sX - dX) / GR) / Math.sqrt(1 + cam * cam) * Math.sqrt(1 + cam * cam), perp = Math.max(0.05, side ? (sY - dY) / GR : (sX - dX) / GR);
+      zb[c] = perp;
+      const k = keys[hit - 1], L = LOC[k], wh = (k === "rig" ? 0.55 : L.h * 0.5), bot = hz + eye * focal / perp, top = bot - wh * focal / perp;
+      const u = side ? me.x + perp * rx : me.y + perp * ry, uf = u - Math.floor(u * 1.4) / 1.4;
+      const fog = clamp(perp / 9, 0, 0.85), base = shade(L.c, (side ? 0.75 : 1) * (1 - night * 0.45));
+      bg.fillStyle = base; bg.fillRect(c, top, 1, bot - top);
+      // окна: днём голубые, ночью тёплые
+      if (k !== "rig" && k !== "wc" && uf > 0.18 && uf < 0.5) { bg.fillStyle = night > 0.3 ? `rgba(255,205,120,${0.75 + night * 0.25})` : "rgba(170,205,230,.9)"; bg.fillRect(c, top + (bot - top) * 0.25, 1, (bot - top) * 0.33); }
+      if (L.wood) { bg.fillStyle = "rgba(0,0,0,.18)"; if (Math.floor(u * 12) % 2) bg.fillRect(c, top, 1, bot - top); }
+      else { if (uf < 0.03) { bg.fillStyle = "rgba(0,0,0,.25)"; bg.fillRect(c, top, 1, bot - top); } bg.fillStyle = "rgba(0,0,0,.12)"; bg.fillRect(c, top + (bot - top) * 0.12, 1, Math.max(1, (bot - top) * 0.02)); }
+      bg.fillStyle = night > 0.5 ? "rgba(190,205,222,.95)" : "rgba(246,250,252,.97)"; bg.fillRect(c, bot - (bot - top) * 0.1, 1, (bot - top) * 0.1);
+      bg.fillStyle = night > 0.5 ? "rgba(205,220,235,.95)" : "rgba(255,255,255,.95)"; bg.fillRect(c, top - Math.max(1, 0.03 * focal / perp), 1, Math.max(1, 0.03 * focal / perp));
+      bg.globalAlpha = fog; bg.fillStyle = fogC; bg.fillRect(c, top - 2, 1, bot - top + 2); bg.globalAlpha = 1;
+    }
+    // спрайты: люди, вышка, снеговики, снежки
+    const sp = [];
+    if (!FP.fight) Object.values(NPC).forEach((n) => sp.push({ x: n.x, y: n.y, kind: "man", c: n }));
+    sp.push({ x: LOC.rig.x + LOC.rig.w / 2, y: LOC.rig.y + LOC.rig.d / 2, kind: "rig" });
+    SNOWMEN.forEach(([x, y]) => sp.push({ x, y, kind: "snowman" }));
+    if (FP.fight) { FP.fight.foes.forEach((f) => sp.push({ x: f.x, y: f.y, kind: "man", c: f, hit: f.hitT > 0 })); FP.fight.balls.forEach((b) => sp.push({ x: b.x, y: b.y, kind: "ball", z: b.z })); }
+    sp.forEach((o) => { const dx = o.x - me.x, dy = o.y - me.y; o.d = dx * ca + dy * sa; o.l = -dx * sa + dy * ca; });
+    sp.filter((o) => o.d > 0.12).sort((a, b) => b.d - a.d).forEach((o) => {
+      const sx = RW / 2 + o.l / o.d * focal, gy = hz + eye * focal / o.d, s = focal / o.d, col = Math.round(sx);
+      // перекрытие стенами: рисуем спрайт только в тех столбцах, где стена дальше него
+      const hw = (o.kind === "rig" ? 0.6 : o.kind === "man" ? 0.09 : o.kind === "snowman" ? 0.07 : 0.04) * s + 2, c0 = Math.max(0, Math.floor(sx - hw)), c1 = Math.min(RW - 1, Math.ceil(sx + hw));
+      if (c1 < 0 || c0 >= RW) return;
+      bg.save(); bg.beginPath(); let run = -1, any = false;
+      for (let x = c0; x <= c1 + 1; x++) { const vis = x <= c1 && zb[x] > o.d; if (vis && run < 0) run = x; if (!vis && run >= 0) { bg.rect(run, 0, x - run, RH); run = -1; any = true; } }
+      if (!any) { bg.restore(); return; } bg.clip();
+      const fog = clamp(o.d / 9, 0, 0.8);
+      if (o.kind === "man") { const c = o.c, h = 0.19 * s, w = 0.07 * s, bob = Math.sin(T * 6 + o.x) * 0.004 * s;
+        bg.fillStyle = "rgba(0,0,0,.25)"; bg.beginPath(); bg.ellipse(sx, gy, w * 1.1, w * 0.3, 0, 0, 7); bg.fill();
+        bg.fillStyle = "#1c242c"; bg.fillRect(sx - w * 0.6, gy - h * 0.42, w * 0.5, h * 0.42); bg.fillRect(sx + w * 0.1, gy - h * 0.42, w * 0.5, h * 0.42);
+        bg.fillStyle = o.hit ? "#ffffff" : c.jacket; bg.beginPath(); bg.roundRect(sx - w, gy - h * 0.85 + bob, w * 2, h * 0.47, w * 0.4); bg.fill();
+        bg.fillStyle = "#f2e85a"; bg.fillRect(sx - w, gy - h * 0.6 + bob, w * 2, h * 0.04);
+        bg.fillStyle = (FACE[c.k] || {}).skin || "#e2b08c"; bg.beginPath(); bg.arc(sx, gy - h * 0.93 + bob, w * 0.62, 0, 7); bg.fill();
+        bg.fillStyle = c.helm; bg.beginPath(); bg.arc(sx, gy - h * 0.97 + bob, w * 0.7, Math.PI, 0); bg.fill(); }
+      if (o.kind === "snowman") { const r = 0.05 * s; bg.fillStyle = "#f4f8fb"; [[0, r * 1.2], [r * 2.1, r * 0.9], [r * 3.6, r * 0.65]].forEach(([y, rr]) => { bg.beginPath(); bg.arc(sx, gy - rr - y, rr, 0, 7); bg.fill(); });
+        bg.fillStyle = "#ff8a3a"; bg.beginPath(); bg.moveTo(sx, gy - r * 4.3); bg.lineTo(sx + r * 0.9, gy - r * 4.2); bg.lineTo(sx, gy - r * 4.1); bg.fill(); bg.fillStyle = "#e8463a"; bg.fillRect(sx - r * 0.7, gy - r * 5.1, r * 1.4, r * 0.5); }
+      if (o.kind === "ball") { const r = Math.max(1.2, 0.03 * s), y = gy - (o.z || 0.1) * s; bg.fillStyle = "#fff"; bg.beginPath(); bg.arc(sx, y, r, 0, 7); bg.fill(); }
+      if (o.kind === "rig") { const H = 2.6 * s, B = 0.55 * s, base = gy - 0.55 * s; bg.strokeStyle = night > 0.3 ? "#ffb04a" : "#f2a541"; bg.lineWidth = Math.max(1, s * 0.012);
+        bg.beginPath(); bg.moveTo(sx - B, base); bg.lineTo(sx - B * 0.12, base - H); bg.moveTo(sx + B, base); bg.lineTo(sx + B * 0.12, base - H);
+        for (let i = 1; i < 10; i++) { const y = base - H * i / 10, w2 = B * (1 - 0.88 * i / 10), y2 = base - H * (i - 1) / 10, w1 = B * (1 - 0.88 * (i - 1) / 10); bg.moveTo(sx - w2, y); bg.lineTo(sx + w2, y); bg.moveTo(sx - w1, y2); bg.lineTo(sx + w2, y); }
+        bg.stroke(); const bl = Math.sin(T * 4) > 0 ? 1 : 0.3, rg = bg.createRadialGradient(sx, base - H, 0, sx, base - H, s * 0.15); rg.addColorStop(0, `rgba(255,60,50,${bl})`); rg.addColorStop(1, "rgba(255,60,50,0)"); bg.fillStyle = rg; bg.beginPath(); bg.arc(sx, base - H, s * 0.15, 0, 7); bg.fill(); }
+      bg.restore();
+    });
+    // падающий снег поверх
+    bg.fillStyle = "#fff"; snow.forEach((f) => { bg.globalAlpha = 0.4 + 0.5 * f.z; bg.fillRect(((f.x * RW - FP.a * 40 * f.z) % RW + RW) % RW, f.y * RH, f.z * 1.6, f.z * 1.6); }); bg.globalAlpha = 1;
+    g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = true; g.drawImage(buf, 0, 0, cv.width, cv.height);
+    g.setTransform(dpr, 0, 0, dpr, 0, 0); const vg = g.createRadialGradient(W / 2, Hh / 2, Hh * 0.25, W / 2, Hh / 2, Hh * 0.8); vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, `rgba(0,0,10,${0.4 + night * 0.3})`); g.fillStyle = vg; g.fillRect(0, 0, W, Hh);
+    // покачивание руки со снежком в битве
+    if (FP.fight) { const bob = Math.sin(T * 8) * (Math.abs(FP.jx) + Math.abs(FP.jy)) * 6; g.fillStyle = "#2f6db3"; g.beginPath(); g.ellipse(W * 0.78, Hh * 0.98 + bob, W * 0.12, Hh * 0.12, -0.4, 0, 7); g.fill();
+      g.fillStyle = "#f4f8fb"; g.beginPath(); g.arc(W * 0.74, Hh * 0.86 + bob, W * 0.05, 0, 7); g.fill(); }
+  };
+
+  // ---------- снежная битва ----------
+  const VOX = ["Ах ты ж!", "Ну, держись!", "Мимо, мазила!", "В валенок попал!", "Это нечестно, я не готов!", "Жора, прикрывай!"];
+  const fpStart = (fight) => {
+    fpSet(true);
+    if (!fight) return;
+    me.x = 8.6; me.y = 11.6; FP.a = -Math.PI / 2 - 0.3;
+    const mk = (x, y, k, jacket, helm) => ({ x, y, k, jacket, helm, cd: rnd(1.2, 2.4), tx: x, ty: y, hitT: 0 });
+    FP.fight = { got: 0, hit: 0, balls: [], foes: [mk(8.2, 9.6, "zhora", "#4c5a3a", "#3a4a3a"), mk(9.6, 10.2, "mikh", "#2f6db3", "#f2a541"), mk(7.2, 10.4, "serg", "#d9532c", "#2d8cff")] };
+    $("#cross", fpEl).classList.remove("hidden"); $("#fpthrow", fpEl).classList.remove("hidden"); $("#fpscore", fpEl).classList.remove("hidden"); score();
+    fpBtn.disabled = true; toast("Шесть попаданий до победы. Пять в тебя — проигрыш");
+  };
+  const score = () => { const f = FP.fight; $("#fpscore", fpEl).innerHTML = `🎯 ${f.hit} / 6 &nbsp;&nbsp; ❄️ в тебя ${f.got} / 5`; };
+  const throwBall = () => { const f = FP.fight; if (!f || f.cool > 0) return; f.cool = 0.45; SFX.tap(); noise("bandpass", 1200, 1, 0.12, 0.005, 0.12); vib(8);
+    f.balls.push({ x: me.x + Math.cos(FP.a) * 0.25, y: me.y + Math.sin(FP.a) * 0.25, vx: Math.cos(FP.a) * 5, vy: Math.sin(FP.a) * 5, z: 0.15, vz: 0.35, mine: 1, life: 1.6 }); };
+  const fightUpdate = (dt) => {
+    const f = FP.fight; f.cool = Math.max(0, (f.cool || 0) - dt);
+    f.foes.forEach((e) => { e.hitT = Math.max(0, e.hitT - dt);
+      if (Math.hypot(e.tx - e.x, e.ty - e.y) < 0.1) { e.tx = clamp(me.x + rnd(-2.2, 2.2), 6.6, 11.6); e.ty = clamp(me.y + rnd(-2.6, -0.8), 9, 12.4); }
+      const dx = e.tx - e.x, dy = e.ty - e.y, d = Math.hypot(dx, dy) || 1, nx = e.x + dx / d * 0.9 * dt, ny = e.y + dy / d * 0.9 * dt; if (!solid(nx, ny)) { e.x = nx; e.y = ny; } else { e.tx = e.x; e.ty = e.y; }
+      e.cd -= dt; if (e.cd <= 0) { e.cd = rnd(1.6, 2.8); const ax = me.x - e.x, ay = me.y - e.y, dd = Math.hypot(ax, ay) || 1, er = rnd(-0.25, 0.25);
+        f.balls.push({ x: e.x, y: e.y, vx: (ax / dd + er * -ay / dd) * 3.4, vy: (ay / dd + er * ax / dd) * 3.4, z: 0.16, vz: 0.25, life: 2 }); noise("bandpass", 900, 1, 0.06, 0.005, 0.1); } });
+    for (let i = f.balls.length - 1; i >= 0; i--) { const b = f.balls[i]; b.x += b.vx * dt; b.y += b.vy * dt; b.vz -= 0.5 * dt; b.z = Math.max(0.02, b.z + b.vz * dt); b.life -= dt;
+      let gone = b.life <= 0 || solid(b.x, b.y);
+      if (!gone && b.mine) f.foes.forEach((e) => { if (!gone && Math.hypot(e.x - b.x, e.y - b.y) < 0.22) { gone = true; e.hitT = 0.35; f.hit++; SFX.splash(); vib(15); say(pick(VOX), VOICE[e.k] || VOICE.zhora); score(); } });
+      if (!gone && !b.mine && Math.hypot(me.x - b.x, me.y - b.y) < 0.2) { gone = true; f.got++; SFX.splash(); vib(50); const sp = $("#splat", fpEl); sp.classList.remove("on"); void sp.offsetWidth; sp.classList.add("on"); score(); }
+      if (gone) f.balls.splice(i, 1); }
+    if (f.hit >= 6 || f.got >= 5) { const win = f.hit >= 6; FP.fight = null; ["#cross", "#fpthrow", "#fpscore"].forEach((q) => $(q, fpEl).classList.add("hidden")); fpBtn.disabled = false;
+      if (win) done("snow", { mood: 25, xp: 30, min: 30, en: -12 }, "Легенда снежной битвы"); else { fail({ mood: 5, min: 30, en: -12 }, "Засыпали снегом"); setTimeout(() => talk("zhora", "Ха-ха! Отряхнись. В следующий раз бери снежки покрепче.").then(close), 900); } }
   };
 
   showPick();

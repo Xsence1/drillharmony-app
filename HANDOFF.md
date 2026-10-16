@@ -79,3 +79,5 @@ cd tools && python3 mk_calcs.py && python3 mk_art2.py && python3 mk_tests.py && 
 - Игра «Вахта» (`app/shell/game.js`, `game.css`, `game.html`): 4 героя, 8 локаций, 9 заданий, мини-игры, звуки Web Audio,
   озвучка синтезом речи (@capacitor-community/text-to-speech). Сохранение в localStorage, данные не отправляются.
 - Приложение собирается из выложенного сайта (dist = drillharmony-site_18). Исходники в site/ старее: нет tools/live.
+- 1.3: в «Вахте» вид от первого лица (лучи по сетке куста, джойстик и обзор), снежная битва и армрестлинг.
+  Кулачных драк нет сознательно (репутационный риск бренда).
