@@ -587,3 +587,110 @@ html[data-theme=light] { --cell: #ffffff; --sep: rgba(60,60,67,.16); --fill: rgb
 @keyframes cubeSpin { from { transform: rotateX(-24deg) rotateY(0); } to { transform: rotateX(-24deg) rotateY(360deg); } }
 html:not(.fx) .cube, html:not(.fx) .g-arc, html:not(.fx) .g-needle, html:not(.fx) .aur, html:not(.fx) .snow, html:not(.fx) .well3d { animation: none !important; }
 .hs-t span { max-width: calc(100% - 112px); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* =================== 1.7: стиль сайта drillharmony.com — одна палитра, один акцент =================== */
+html[data-theme=dark] { --bg: #080d10; --bg2: #0b151a; --panel: #101b21; --panel2: #13212a; --line: #1f3038; --rim: #1f3038; --ink: #eef3f5; --muted: #9fb0b6;
+  --amber: #f5a524; --amber2: #ffbe4d; --teal: #e8eef1; --cell: #101b21; --sep: #1f3038; --fill: rgba(159,176,182,.14); --press: rgba(245,165,36,.08);
+  --glass-bg: linear-gradient(150deg, rgba(255,255,255,.05), rgba(255,255,255,.015) 60%), #101b21; --glass-br: #1f3038; --glass-hi: inset 0 1px 0 rgba(255,255,255,.05); }
+html[data-theme=light] { --bg: #f4f6f6; --bg2: #e8eff0; --panel: #ffffff; --panel2: #f4f7f7; --line: #d3dcdc; --rim: #d3dcdc; --ink: #10232a; --muted: #4d626a;
+  --amber: #c26f06; --amber2: #e08a12; --teal: #10232a; --cell: #ffffff; --sep: #d3dcdc; --fill: rgba(77,98,106,.1); --press: rgba(194,111,6,.07);
+  --glass-bg: #ffffff; --glass-br: #d3dcdc; --glass-hi: none; }
+/* фон — как на сайте: мягкое янтарное и холодное свечение, без фиолетового */
+.aurora i:nth-child(1) { background: radial-gradient(circle, #f5a524 0, transparent 62%) !important; opacity: .13 !important; }
+.aurora i:nth-child(2) { background: radial-gradient(circle, #5ec8d8 0, transparent 62%) !important; opacity: .07 !important; }
+.aurora i:nth-child(3) { display: none; }
+/* значки: янтарный знак на приглушённой подложке, без заливки и цветных теней */
+.ri, .t2i, .sci { background: color-mix(in srgb, var(--amber) 13%, transparent) !important; color: var(--amber) !important; box-shadow: none !important; }
+.ri .ab, .sci .ab { color: var(--amber) !important; }
+.tile2, .sc { background: var(--cell) !important; border: 1px solid var(--line) !important; box-shadow: none !important; }
+.tile2::after { background: color-mix(in srgb, var(--amber) 7%, transparent) !important; }
+.tile2:active, .sc:active { border-color: var(--amber) !important; }
+.cube i { border-color: color-mix(in srgb, var(--amber) 85%, transparent) !important; background: color-mix(in srgb, var(--amber) 10%, transparent) !important; }
+.scs { color: var(--amber) !important; }
+/* карусель: тёмные панели сайта с янтарным светом вместо разных цветов */
+.hs { border-color: var(--line) !important; box-shadow: 0 18px 40px -24px rgba(0,0,0,.9) !important; }
+.hs-rig { background: radial-gradient(120% 90% at 60% 0%, #15262e, #080d10 70%) !important; }
+.hs-live, .hs-well, .hs-game { background: radial-gradient(110% 120% at 88% 0%, rgba(245,165,36,.22), transparent 55%), linear-gradient(150deg, #101b21, #080d10) !important; }
+.g-arc { stroke: #f5a524 !important; }
+.hs-t small { color: var(--amber2) !important; }
+.hs-game .aur { background: linear-gradient(100deg, transparent 25%, rgba(245,165,36,.22) 45%, rgba(94,200,216,.14) 60%, transparent 78%) !important; }
+.well3d i { border-color: rgba(159,176,182,.55) !important; background: rgba(159,176,182,.05) !important; }
+.well3d i:nth-child(2), .well3d i:nth-child(4) { border-color: rgba(245,165,36,.85) !important; }
+.pulse { background: var(--amber) !important; }
+html[data-theme=light] .hs { color: #fff; }
+/* результаты: ключевые — янтарём, остальные — цветом текста, как на сайте */
+body.in-app .co > b { color: var(--ink) !important; }
+body.in-app .co.key > b { color: var(--amber) !important; }
+.hv em { color: var(--amber) !important; } .dl .en { color: var(--amber) !important; }
+.wellchip i { background: var(--amber) !important; }
+.tag { color: var(--amber) !important; }
+.hs-rig2 { width: 54px; height: 82px; font-size: 0; filter: drop-shadow(0 0 12px rgba(245,165,36,.45)) !important; }
+
+/* =================== 1.8: главный экран — ствол скважины =================== */
+.surface { position: relative; height: 168px; margin: 4px -16px 0; overflow: hidden;
+  background: radial-gradient(90% 120% at 10% 0%, rgba(245,165,36,.16), transparent 60%), linear-gradient(180deg, #0c1a22, var(--bg)); }
+html[data-theme=light] .surface { background: radial-gradient(90% 120% at 10% 0%, rgba(194,111,6,.14), transparent 60%), linear-gradient(180deg, #e3ebec, var(--bg)); }
+.surface canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: pan-y; }
+.surface-t { position: absolute; left: 92px; right: 16px; bottom: 18px; }
+.surface-t small { font: 600 10.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--amber); }
+.surface-t b { display: block; font: 800 22px/1.1 var(--body); letter-spacing: -.02em; margin: 3px 0 2px; }
+.surface-t span { font-size: 12.5px; color: var(--muted); }
+
+.well { position: relative; margin: 0 -16px; padding: 0 16px 0 58px; --p: 0px; }
+.well::before { content: ""; position: absolute; left: 35px; top: -10px; bottom: 40px; width: 4px; border-radius: 2px; background: var(--line); }
+.well::after { content: ""; position: absolute; left: 35px; top: -10px; width: 4px; height: var(--p); max-height: calc(100% - 30px); border-radius: 2px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--amber) 60%, transparent), var(--amber)); box-shadow: 0 0 14px color-mix(in srgb, var(--amber) 70%, transparent); }
+.st { position: relative; padding: 16px 0 18px; }
+.st::before { content: ""; position: absolute; left: -58px; right: -16px; top: 0; bottom: 0; z-index: -1; opacity: .55;
+  background: repeating-linear-gradient(135deg, transparent 0 9px, color-mix(in srgb, var(--line) 55%, transparent) 9px 10px); }
+.st:nth-child(odd)::before { background: repeating-linear-gradient(0deg, transparent 0 7px, color-mix(in srgb, var(--line) 50%, transparent) 7px 8px); }
+.st:nth-child(3n)::before { background: radial-gradient(circle at 3px 3px, color-mix(in srgb, var(--line) 70%, transparent) 1.2px, transparent 1.6px) 0 0 / 11px 11px; }
+.st + .st { border-top: 1px dashed color-mix(in srgb, var(--line) 80%, transparent); }
+.node { position: absolute; left: -29px; top: 20px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 3px solid var(--line); transition: all .3s; }
+.st.on .node { border-color: var(--amber); box-shadow: 0 0 0 4px color-mix(in srgb, var(--amber) 18%, transparent); }
+.depth { font: 600 11px var(--mono); letter-spacing: .06em; color: var(--muted); text-transform: uppercase; }
+.st.on .depth { color: var(--amber); }
+.st-h { display: flex; align-items: baseline; gap: 8px; width: 100%; margin: 4px 0 2px; padding: 0; border: 0; background: none; color: var(--ink); text-align: left; cursor: pointer; }
+.st-h b { font: 800 21px/1.15 var(--body); letter-spacing: -.02em; } .st-h span { font: 500 12px var(--mono); color: var(--muted); }
+.st-h .chev { margin-left: auto; align-self: center; width: 16px; height: 16px; }
+.st-s { margin: 0 0 9px; font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+.pills, .quick { display: flex; flex-wrap: wrap; gap: 6px; }
+.quick { margin-top: 10px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-right: -16px; padding-right: 16px; } .quick::-webkit-scrollbar { display: none; }
+.pill { flex: none; display: inline-flex; align-items: center; min-height: 36px; padding: 0 13px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel);
+  color: var(--ink); font: 500 13px var(--body); text-decoration: none; white-space: nowrap; cursor: pointer; position: relative; }
+.pill::after { content: ""; position: absolute; inset: -4px 0; }
+.pill:active { border-color: var(--amber); background: color-mix(in srgb, var(--amber) 10%, var(--panel)); }
+.pill.more { color: var(--amber); background: none; border-style: dashed; }
+.pill.star { color: var(--amber); }
+.console { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.cbtn { position: relative; display: grid; grid-template-columns: auto 1fr; column-gap: 9px; align-items: center; min-height: 58px; padding: 8px 12px; border-radius: 12px;
+  border: 1px solid var(--line); background: var(--panel); color: var(--ink); text-align: left; cursor: pointer; }
+.cbtn b { font: 700 14px var(--body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .cbtn small { grid-column: 2; font: 500 11px var(--mono); color: var(--muted); }
+.cbtn .led { grid-row: span 2; width: 9px; height: 9px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 10px var(--amber); animation: led 2s ease-in-out infinite; }
+.cbtn .led.off { background: var(--muted); box-shadow: none; animation: none; }
+@keyframes led { 50% { opacity: .35; } }
+.cbtn:active { border-color: var(--amber); }
+.game-b { display: block; position: relative; margin-top: 8px; padding: 14px 16px; border-radius: 14px; text-decoration: none; color: var(--ink); overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--amber) 45%, var(--line)); background: radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--amber) 22%, transparent), transparent 60%), var(--panel); }
+.game-b b { display: block; font: 800 20px var(--body); } .game-b span { display: block; font-size: 12.5px; color: var(--muted); margin: 2px 90px 0 0; }
+.game-b em { position: absolute; right: 14px; bottom: 14px; font: 700 13px var(--body); font-style: normal; padding: 8px 14px; border-radius: 10px; color: #1b1204;
+  background: linear-gradient(180deg, #ffc163, #f2a541 55%, #d98a1f); }
+.bitnode { border-color: var(--amber) !important; border-radius: 3px; transform: rotate(45deg); }
+/* долото на стволе */
+.bit { position: fixed; left: 26px; top: 42vh; z-index: 30; pointer-events: none; transform: translateY(-50%); transition: opacity .2s; }
+.bit i { display: block; width: 22px; height: 22px; border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; background: radial-gradient(circle at 40% 35%, #ffd38a, #f5a524 55%, #9a5a06);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--amber) 25%, transparent), 0 0 22px color-mix(in srgb, var(--amber) 80%, transparent); }
+.fx .bit i { animation: spinBit .8s linear infinite; } @keyframes spinBit { to { transform: rotate(360deg); } }
+.bit b { position: absolute; left: 30px; top: 50%; transform: translateY(-50%); padding: 3px 8px; border-radius: 7px; font: 700 11px var(--mono); white-space: nowrap;
+  color: #1b1204; background: var(--amber); }
+.bit.hidden { opacity: 0; }
+.fx .st { animation: dhIn .5s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--i, 0) * 50ms); }
+.home .foot { padding-left: 42px; }
+/* ничто не растягивает экран вширь: длинные названия обрезаются многоточием */
+.home, .app-main { overflow-x: clip; max-width: 100vw; }
+.pill { display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; line-height: 34px; min-height: 36px; box-sizing: border-box; }
+.pills { min-width: 0; }
+.console .cbtn b { white-space: normal; font-size: 13px; line-height: 1.2; overflow: visible; }
+.bit b { left: -4px; top: auto; bottom: 27px; transform: none; font-size: 10px; padding: 2px 6px; }
+.st-h { flex-wrap: wrap; row-gap: 0; padding-right: 22px; position: relative; } .st-h span { white-space: nowrap; }
+.st-h .chev { position: absolute; right: 0; top: 50%; transform: translateY(-50%); margin: 0; }
