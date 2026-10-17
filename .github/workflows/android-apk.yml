@@ -6,27 +6,59 @@ on:
   workflow_dispatch:
   push:
     paths: ["app/**", ".github/workflows/android-apk.yml"]
+permissions:
+  contents: write
 jobs:
   apk:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with: { node-version: 22 }
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with: { distribution: temurin, java-version: 21 }
-      - uses: android-actions/setup-android@v3
       - name: Проекты Android, иконки, версия
         working-directory: app
-        run: npm run setup
+        shell: bash
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          set -o pipefail
+          npm run setup 2>&1 | tee ../setup.log
       - name: Сборка APK
         working-directory: app/android
-        run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+        shell: bash
+        run: |
+          set -o pipefail
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee ../../gradle.log
       - name: Имя файла с версией
+        shell: bash
         run: |
           V=$(node -p "require('./app/package.json').version")
           cp app/android/app/build/outputs/apk/debug/app-debug.apk "DrillHarmony-$V.apk"
-      - uses: actions/upload-artifact@v4
+          ls -la DrillHarmony-*.apk
+      - uses: actions/upload-artifact@v5
         with:
           name: DrillHarmony-apk
           path: DrillHarmony-*.apk
+      - name: Выпуск на GitHub и ветка apk
+        shell: bash
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          V=$(node -p "require('./app/package.json').version")
+          TAG="v$V-build$GITHUB_RUN_NUMBER"
+          gh release create "$TAG" "DrillHarmony-$V.apk" --title "DrillHarmony $V (сборка $GITHUB_RUN_NUMBER)" \
+            --notes "Тестовая сборка для установки на телефон, подписана отладочным ключом." --prerelease
+          mkdir /tmp/apkb && cp "DrillHarmony-$V.apk" /tmp/apkb/ && cd /tmp/apkb
+          git init -q && git checkout -q -b apk && git add . \
+            && git -c user.name=github-actions -c user.email=actions@github.com commit -qm "APK $TAG"
+          git push -f "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY" apk
+      - name: Причина ошибки
+        if: failure()
+        shell: bash
+        run: |
+          for f in setup.log gradle.log; do
+            [ -f "$f" ] || continue
+            grep -n -i -E "error|failed|exception|what went wrong" "$f" | tail -25 | while IFS= read -r l; do echo "::error title=$f::${l:0:900}"; done
+            tail -15 "$f" | while IFS= read -r l; do echo "::warning title=$f tail::${l:0:900}"; done
+          done
