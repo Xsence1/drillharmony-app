@@ -43,10 +43,6 @@
   const dec = (v) => { const m = /[.,](\d+)/.exec(String(v || "")); return m ? m[1].length : 0; };
   const home = () => {
     const w = A.activeWell(), v = (w && w.v) || {}, f = A.fav().filter((s) => by[s]), r = A.recent().filter((s) => by[s] && !f.includes(s)).slice(0, 6);
-    $("#wc-l").textContent = w ? "Активная скважина" : "Профиль скважины";
-    $("#wc-n").textContent = w ? w.name || "Без названия" : "Задайте скважину";
-    $(".wcard").classList.toggle("empty", !w);
-    count($("#wc-1"), num(v.md), dec(v.md)); count($("#wc-2"), num(v.rho), dec(v.rho) || 2); count($("#wc-3"), num(v.q), dec(v.q));
     const calc = groups.filter((g) => ["traj", "survey", "drill", "hyd", "mud", "gti"].includes(g.k)), more = groups.filter((g) => ["tools", "models", "learn"].includes(g.k));
     grid.innerHTML =
       (f.length + r.length ? `<div class="h2">Недавние</div><div class="recent">${f.map((s) => `<a class="rc" href="${by[s].href}"><i>★</i>${esc(by[s].name)}</a>`).join("")}${r.map((s) => `<a class="rc" href="${by[s].href}">${esc(by[s].name)}</a>`).join("")}</div>` : "") +
@@ -56,7 +52,6 @@
       `<p class="foot">DrillHarmony.com · расчёты справочные</p>`;
   };
   const drill = () => {}; const coverflow = () => {};
-  $(".wcard").addEventListener("click", () => go("prof"));
   // поиск по кнопке в шапке
   document.addEventListener("click", (e) => { if (!e.target.closest("#sbtn")) return; const sb = $("#sbox"); sb.classList.toggle("open"); if (sb.classList.contains("open")) setTimeout(() => $("#q").focus(), 120); else { $("#q").value = ""; search(); } });
   grid.addEventListener("click", (e) => { const b = e.target.closest("[data-g]"); if (b) return go("calc", b.dataset.g); const p = e.target.closest("[data-go]"); if (p) go(p.dataset.go); });

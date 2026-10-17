@@ -804,3 +804,5 @@ body.in-app { padding-left: 0 !important; padding-right: 0 !important; }
 
 #heroes { margin: 4px 0 0 !important; }
 .recent { margin: 0 -10px !important; padding: 0 10px 2px !important; max-width: none !important; }
+/* 2.0.3 — без карточки скважины: главная начинается со строки онлайн-данных */
+#heroes .lrow { margin-top: 6px; }

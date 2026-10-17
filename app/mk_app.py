@@ -432,10 +432,7 @@ def home(items, groups, css_links):
 <h1 class="lt" id="lt"><span class="lt-brand">{MARK}<span>Drill<b>Harmony</b></span></span><button type="button" class="ib sbtn" id="sbtn" aria-label="Поиск">{ICONS["search"]}</button></h1>
 <section data-pane="calc">
 <div class="srch ios-srch" id="sbox">{ICONS["search"]}<input id="q" type="search" placeholder="Поиск: ЭЦП, барит, toolface…" autocomplete="off" enterkeyhint="search" aria-label="Поиск"><button type="button" id="q-x" class="hidden" aria-label="Очистить">×</button></div>
-<div id="heroes"><button type="button" class="wcard" data-go="prof"><canvas id="hero3d" data-cx="70" aria-hidden="true"></canvas><i class="scan"></i>
-<span class="wc-h"><span id="wc-l">Активная скважина</span></span><b class="wc-n" id="wc-n">Скважина не задана</b>
-<span class="wc-r"><span><b id="wc-1">—</b><small>забой, м</small></span><span><b id="wc-2">—</b><small>ρ, г/см³</small></span><span><b id="wc-3">—</b><small>Q, л/с</small></span></span></button>
-<button type="button" class="lrow" data-live><span class="led"></span><b>Онлайн-данные</b><span class="mono">WITS0 · WITSML</span>{ICONS["go"]}</button></div>
+<div id="heroes"><button type="button" class="lrow" data-live><span class="led"></span><b>Онлайн-данные</b><span class="mono">WITS0 · WITSML</span>{ICONS["go"]}</button></div>
 <div id="grid"></div>
 <div id="sect" class="hidden"><button type="button" class="nav-back" id="sect-back">{ICONS["back"]}<span>Расчёты</span></button><h2 class="lt-h" id="sect-t"></h2><p class="lt-sub" id="sect-n"></p><div class="glist" id="sect-l"></div></div>
 <div id="found" class="glist hidden"></div><p id="none" class="empty hidden">Ничего не нашлось. Попробуйте другое слово, например «зенит» или «ppg».</p>
