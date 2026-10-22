@@ -1,0 +1,11 @@
+const { chromium } = require('playwright');
+const D=__dirname+'/shots/'; require('fs').mkdirSync(D,{recursive:true});
+(async () => { const b = await chromium.launch();
+  const c = await b.newContext({ viewport: { width: 360, height: 780 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+  await c.addInitScript(() => { localStorage.setItem('dh-recent', JSON.stringify(['ecd','tank'])); localStorage.setItem('dh-wells', JSON.stringify([{ id: 'a', name: 'Куст 7, скв. 715', v: { md: '3200', rho: '1,22', q: '32' } }])); localStorage.setItem('dh-well', JSON.stringify('a')); });
+  const p = await c.newPage(); p.on('pageerror', e => console.log('ERR', e.message));
+  const shot = async (u, n) => { await p.goto('http://localhost:8765/' + u); await p.waitForTimeout(1100);
+    const w = await p.evaluate(() => [document.documentElement.scrollWidth, innerWidth]); console.log(n, w.join('/')); await p.screenshot({ path: D + 'w-' + n + '.png' }); };
+  await shot('index.html', 'home'); await shot('index.html#t=prof', 'prof'); await shot('index.html#t=hist', 'hist'); await shot('index.html#t=ref', 'ref'); await shot('index.html#t=more', 'more');
+  await shot('calculators/tank/index.html', 'tank'); await shot('calculators/ecd/index.html', 'ecd'); await shot('tools/units/index.html', 'units');
+  await b.close(); })();
