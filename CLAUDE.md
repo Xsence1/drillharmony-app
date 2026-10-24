@@ -26,7 +26,7 @@ Capacitor 8, `appId` `com.drillharmony.app`. Веб-часть `app/www/` ген
 | `app/mk_app.py` | сборщик `app/www/` из `dist/`: переносит расчёты сайта в макет приложения, строит главный экран, 20 моделей, справочник (`ref.js`), копирует `shell/` |
 | `app/shell/home.js` | главный экран и вкладки: Расчёты, Скважина (профиль), История, Справочник, Ещё. Навигация через hash `t=`/`s=` |
 | `app/shell/app.js` | общее: тема, размер текста, профиль скважины, история, копировать/поделиться/сохранить, InAppBrowser для онлайн-данных и форума |
-| `app/shell/fx.js` | анимации (переключатель «Анимации и 3D»), 3D-сцена, клавиатурная панель над полями ввода |
+| `app/shell/fx.js` | анимации (переключатель «Анимации и 3D»), 3D-сцена, клавиатурная панель над полями ввода и график чувствительности в ней (прогон 49 значений поля через расчёт, `window.__dhSamp` глушит анимацию цифр, ключ `dh-sens`) |
 | `app/shell/app.css` | все стили. Файл слоями по версиям, **последнее правило выигрывает**: новые правки дописывать в конец отдельным блоком с комментарием версии |
 | `app/shell/newcalcs.js` | 18 расчётов только для приложения, у каждого текст `how` с источниками |
 | `app/shell/game.*` | игра «Вахта» |
@@ -38,7 +38,7 @@ Capacitor 8, `appId` `com.drillharmony.app`. Веб-часть `app/www/` ген
 Один акцентный цвет, без радужных плиток.
 
 localStorage: `dh-theme`, `dh-size`, `dh-fx`, `dh-in:{slug}`, `dh-mode:{slug}`, `dh-wells`, `dh-well`, `dh-hist`,
-`dh-fav`, `dh-recent`, `dh-game`.
+`dh-fav`, `dh-recent`, `dh-game`, `dh-sens`.
 
 ## Порядок работы
 1. Правки в `app/shell/*` или `app/mk_app.py`.
@@ -46,7 +46,7 @@ localStorage: `dh-theme`, `dh-size`, `dh-fx`, `dh-in:{slug}`, `dh-mode:{slug}`, 
 3. Проверить в браузере с экраном телефона: `cd app/www && python3 -m http.server 8765`, затем
    `node tests-app/screens.js` (Playwright, 360×780). Смотреть скриншоты и что `scrollWidth == innerWidth`
    на всех экранах: горизонтальный вылет текста вправо уже был больной темой.
-4. Поднять версию в `app/package.json` (сейчас 2.0.3, каждый выпуск +1 в последней цифре).
+4. Поднять версию в `app/package.json` (сейчас 2.1.0, каждый выпуск +1 в последней цифре).
 5. Коммит и push в `main`. Workflow `.github/workflows/android-apk.yml` сам собирает debug-APK при изменениях
    в `app/**`, публикует pre-release `v{версия}-build{N}` и кладёт APK в ветку `apk`.
    Забрать файл: `git fetch --depth 1 origin apk && git archive FETCH_HEAD | tar -x`.

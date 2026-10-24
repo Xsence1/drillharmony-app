@@ -55,6 +55,7 @@
       let last = num(b.textContent), busy = false, raf = 0;
       new MutationObserver(() => {
         if (busy) return;
+        if (window.__dhSamp) { last = num(b.textContent); return; }   /* прогон для графика: без вспышек и докрутки */
         const txt = b.textContent, n = num(txt), co = b.parentElement;
         co.classList.remove("flash"); void co.offsetWidth; co.classList.add("flash");
         if (!D.classList.contains("fx") || !n || !last || n.v === last.v) { last = n; return; }
@@ -142,7 +143,9 @@
   function keypad() {
     const fields = [...document.querySelectorAll(".calc .ci input, .pf-grid input")];
     const bar = document.createElement("div"); bar.className = "kpad"; bar.hidden = true;
-    bar.innerHTML = '<button type="button" data-k="-" aria-label="Меньше">−</button><div class="kp-track" role="slider" aria-label="Ползунок значения"><i class="kp-fill"></i><b class="kp-thumb"></b><span class="kp-val"></span></div><button type="button" data-k="+" aria-label="Больше">+</button><button type="button" class="kp-next" data-k="next">Далее</button>';
+    bar.innerHTML = '<div class="ks" hidden><div class="ks-h"><span class="ks-t"></span><b class="ks-v"></b></div><canvas class="ks-c" aria-hidden="true"></canvas><p class="ks-n" hidden>Этот параметр на результат не влияет</p></div>' +
+      '<div class="kp-row"><button type="button" data-k="-" aria-label="Меньше">−</button><div class="kp-track" role="slider" aria-label="Ползунок значения"><i class="kp-fill"></i><b class="kp-thumb"></b><span class="kp-val"></span></div><button type="button" data-k="+" aria-label="Больше">+</button>' +
+      '<button type="button" class="kp-g" data-k="sens" aria-label="График" aria-pressed="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M4 16c3-1 4-9 8-9s5 6 8 4"/></svg></button><button type="button" class="kp-next" data-k="next">Далее</button></div>';
     document.body.appendChild(bar);
     let inp = null, rng = null;
     const parse = (v) => { const t = String(v).replace(",", ".").replace(/\s/g, ""); return t === "" ? NaN : +t; };
@@ -163,8 +166,72 @@
     const put = (val) => {
       const r = rng; let v = Math.round(Math.min(r.hi, Math.max(r.lo, val)) / r.st) * r.st;
       inp.value = v.toFixed(r.d).replace(".", ",");
-      const ev = new Event("input", { bubbles: true }); ev.dhUser = true; inp.dispatchEvent(ev); draw();
+      const ev = new Event("input", { bubbles: true }); ev.dhUser = true; inp.dispatchEvent(ev); draw(); sdraw();
     };
+    /* ---- график чувствительности: как главный результат зависит от параметра в фокусе ---- */
+    const ks = bar.querySelector(".ks"), kc = bar.querySelector(".ks-c"), kg = bar.querySelector(".kp-g");
+    let sOn = true; try { sOn = localStorage.getItem("dh-sens") !== "0"; } catch (e) {}
+    let tgt = null, pts = null;
+    const rnum = (t) => { const x = String(t || "").replace(/−/g, "-").replace(/[\s\u00a0\u202f]/g, "").replace(",", "."); return /^-?\d+(\.\d+)?$/.test(x) ? +x : NaN; };
+    const outs = () => [...document.querySelectorAll(".calc .cout .co")].filter((c) => c.offsetParent && c.querySelector(":scope > b"));
+    const pick = () => { const o = outs().filter((c) => isFinite(rnum(c.querySelector(":scope > b").textContent)));
+      return (tgt && o.includes(tgt)) ? tgt : o.find((c) => c.classList.contains("key")) || o[0] || null; };
+    const sample = () => {
+      pts = null; if (!inp || !inp.closest(".calc")) return; const co = pick(); if (!co) return; tgt = co;
+      const b = co.querySelector(":scope > b"), keep = inp.value, N = 48, r = rng; window.__dhSamp = true;
+      pts = [];
+      for (let j = 0; j <= N; j++) { const x = r.lo + (r.hi - r.lo) * j / N; inp.value = String(+x.toFixed(6)).replace(".", ",");
+        inp.dispatchEvent(new Event("input", { bubbles: true })); pts.push([x, rnum(b.textContent)]); }
+      inp.value = keep; inp.dispatchEvent(new Event("input", { bubbles: true }));
+      setTimeout(() => { window.__dhSamp = false; }, 0);
+      document.querySelectorAll(".calc .co.ks-on").forEach((c) => c.classList.remove("ks-on")); co.classList.add("ks-on");
+    };
+    const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+    const sdraw = () => {
+      const show = sOn && !!pts && pts.filter((p) => isFinite(p[1])).length > 2;
+      ks.hidden = !show; document.body.classList.toggle("ks-show", show); kg.hidden = !inp || !inp.closest(".calc") || !pts; kg.setAttribute("aria-pressed", String(sOn));
+      if (!show) return;
+      const co = tgt, b = co.querySelector(":scope > b"), u = ((co.querySelector(":scope > small") || {}).textContent || "").split(" ")[0];
+      ks.querySelector(".ks-t").textContent = co.querySelector(":scope > span").textContent + (u ? ", " + u : "");
+      ks.querySelector(".ks-v").textContent = b.textContent;
+      const W = kc.clientWidth, H = kc.clientHeight, dpr = Math.min(3, devicePixelRatio || 1);
+      if (kc.width !== Math.round(W * dpr) || kc.height !== Math.round(H * dpr)) { kc.width = Math.round(W * dpr); kc.height = Math.round(H * dpr); }
+      const g = kc.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+      const ys = pts.map((p) => p[1]).filter(isFinite); let y0 = Math.min(...ys), y1 = Math.max(...ys);
+      const flat = y1 - y0 <= Math.abs(y1) * 1e-6 + 1e-12; const kn = ks.querySelector(".ks-n"); kn.hidden = !flat; kn.textContent = outs().length > 1 ? "На этот результат не влияет. Нажмите другой результат вверху" : "Этот параметр на результат не влияет"; kc.style.opacity = flat ? ".35" : "1";
+      if (flat) { y0 -= 1; y1 += 1; } const pad = (y1 - y0) * 0.12; y0 -= pad; y1 += pad;
+      const L = 4, R = W - 4, T = 6, B = H - 16;
+      const X = (x) => L + (R - L) * (x - rng.lo) / (rng.hi - rng.lo || 1), Y = (y) => B - (B - T) * (y - y0) / (y1 - y0 || 1);
+      const ac = css("--amber") || "#f5a524", mu = css("--muted") || "#9fb0b6", ln = css("--line") || "#1f3038";
+      g.strokeStyle = ln; g.lineWidth = 1; g.beginPath(); for (let k = 1; k < 4; k++) { const yy = T + (B - T) * k / 4; g.moveTo(L, yy); g.lineTo(R, yy); } g.stroke();
+      const seg = []; let cur = []; pts.forEach((p) => { if (isFinite(p[1])) cur.push(p); else if (cur.length) { seg.push(cur); cur = []; } }); if (cur.length) seg.push(cur);
+      seg.forEach((sg) => {
+        const gr = g.createLinearGradient(0, T, 0, B); gr.addColorStop(0, ac + "55"); gr.addColorStop(1, ac + "00");
+        g.beginPath(); sg.forEach((p, i) => (i ? g.lineTo : g.moveTo).call(g, X(p[0]), Y(p[1]))); g.lineTo(X(sg[sg.length - 1][0]), B); g.lineTo(X(sg[0][0]), B); g.closePath(); g.fillStyle = gr; g.fill();
+        g.beginPath(); sg.forEach((p, i) => (i ? g.lineTo : g.moveTo).call(g, X(p[0]), Y(p[1]))); g.strokeStyle = ac; g.lineWidth = 2; g.lineJoin = "round"; g.stroke();
+      });
+      const xv = parse(inp.value), yv = rnum(b.textContent);
+      g.font = "600 10px " + (css("--mono") || "monospace"); g.fillStyle = mu; g.textBaseline = "alphabetic";
+      const fx2 = (v) => String(+v.toFixed(rng.d)).replace(".", ",");
+      g.textAlign = "left"; g.fillText(fx2(rng.lo), L, H - 3); g.textAlign = "right"; g.fillText(fx2(rng.hi), R, H - 3);
+      if (isFinite(xv) && xv >= rng.lo && xv <= rng.hi) {
+        const cx = X(xv); g.strokeStyle = mu; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(cx, T); g.lineTo(cx, B); g.stroke(); g.setLineDash([]);
+        if (isFinite(yv) && !flat) { const cy = Math.max(T, Math.min(B, Y(yv))); g.shadowColor = ac; g.shadowBlur = 10; g.fillStyle = ac; g.beginPath(); g.arc(cx, cy, 4.5, 0, 7); g.fill(); g.shadowBlur = 0;
+          g.fillStyle = css("--bg") || "#080d10"; g.beginPath(); g.arc(cx, cy, 2, 0, 7); g.fill(); }
+      }
+    };
+    let cdrag = false;
+    const cat = (e) => { const r = kc.getBoundingClientRect(); put(rng.lo + (rng.hi - rng.lo) * Math.max(0, Math.min(1, (e.clientX - r.left - 4) / (r.width - 8)))); };
+    kc.addEventListener("pointerdown", (e) => { if (!inp) return; cdrag = true; kc.setPointerCapture(e.pointerId); cat(e); });
+    kc.addEventListener("pointermove", (e) => { if (cdrag) cat(e); });
+    kc.addEventListener("pointerup", () => { cdrag = false; tick(5); }); kc.addEventListener("pointercancel", () => { cdrag = false; });
+    /* нажатие на карточку результата при открытом графике выбирает, что рисовать; фокус и клавиатура остаются */
+    const cout = document.querySelector(".calc .cout");
+    if (cout) {
+      cout.addEventListener("pointerdown", (e) => { if (!document.body.classList.contains("kp-on") || ks.hidden) return; e.preventDefault(); });
+      cout.addEventListener("click", (e) => { const c = e.target.closest(".co"); if (!c || !document.body.classList.contains("kp-on") || ks.hidden) return;
+        if (!isFinite(rnum((c.querySelector(":scope > b") || {}).textContent))) return; tgt = c; sample(); sdraw(); tick(4); });
+    }
     const draw = () => {
       if (!inp) return; const v = parse(inp.value), k = isFinite(v) ? (v - rng.lo) / (rng.hi - rng.lo || 1) : 0;
       bar.style.setProperty("--k", Math.max(0, Math.min(1, k)).toFixed(4));
@@ -173,16 +240,19 @@
     const place = () => {
       const vv = window.visualViewport; if (!vv || bar.hidden) return;
       bar.style.transform = `translateY(${-(innerHeight - vv.height - vv.offsetTop)}px)`;
+      requestAnimationFrame(() => { if (!inp || bar.hidden) return;      /* поле не должно прятаться под панелью с графиком */
+        const top = bar.getBoundingClientRect().top, r = inp.getBoundingClientRect(), lab = inp.closest("label"), rt = lab ? lab.getBoundingClientRect().top : r.top;
+        if (r.bottom > top - 8) window.scrollBy({ top: r.bottom - top + 14, behavior: "smooth" }); else { const ab = document.querySelector(".abar"), hb = ab ? ab.getBoundingClientRect().bottom : 0; if (rt < hb + 8) window.scrollBy({ top: rt - hb - 12, behavior: "smooth" }); } });
     };
     if (window.visualViewport) { visualViewport.addEventListener("resize", place); visualViewport.addEventListener("scroll", place); }
     const vis = () => fields.filter((f) => !f.closest("label[hidden]") && f.offsetParent);
     fields.forEach((f) => {
-      f.addEventListener("focus", () => { inp = f; rng = range(f); bar.hidden = false; document.body.classList.add("kp-on"); draw(); place();
+      f.addEventListener("focus", () => { inp = f; rng = range(f); bar.hidden = false; document.body.classList.add("kp-on"); draw(); sample(); sdraw(); place();
         bar.querySelector(".kp-next").textContent = vis().indexOf(f) < vis().length - 1 ? "Далее" : "Готово"; });
-      f.addEventListener("blur", () => setTimeout(() => { if (document.activeElement !== inp) { bar.hidden = true; document.body.classList.remove("kp-on"); } }, 120));
+      f.addEventListener("blur", () => setTimeout(() => { if (document.activeElement !== inp) { bar.hidden = true; document.body.classList.remove("kp-on", "ks-show"); document.querySelectorAll(".calc .co.ks-on").forEach((c) => c.classList.remove("ks-on")); } }, 120));
       f.addEventListener("input", () => { const lab = f.closest("label"); if (!lab) return; const v = f.value.trim();
         const bad = v !== "" && !isFinite(parse(v)); lab.classList.toggle("bad", bad); if (bad) { lab.classList.remove("shake"); void lab.offsetWidth; lab.classList.add("shake"); }
-        lab.classList.toggle("chg", f.dataset.def != null && f.value !== f.dataset.def); if (f === inp) draw(); });
+        lab.classList.toggle("chg", f.dataset.def != null && f.value !== f.dataset.def); if (f === inp && !window.__dhSamp) { draw(); sdraw(); } });
       const lab = f.closest("label"); if (lab && f.dataset.def != null) lab.classList.toggle("chg", f.value !== f.dataset.def);
     });
     // кнопки панели не забирают фокус у поля, клавиатура остаётся
@@ -191,6 +261,7 @@
     const bump = (s) => { if (!inp) return; const v = parse(inp.value); put((isFinite(v) ? v : rng.lo) + s * rng.st); tick(4); };
     bar.querySelectorAll("[data-k]").forEach((b) => {
       const k = b.dataset.k;
+      if (k === "sens") return b.addEventListener("click", () => { sOn = !sOn; try { localStorage.setItem("dh-sens", sOn ? "1" : "0"); } catch (e) {} if (sOn && !pts) sample(); sdraw(); place(); tick(4); });
       if (k === "next") return b.addEventListener("click", () => { const v = vis(), n = v.indexOf(inp); n >= 0 && n < v.length - 1 ? v[n + 1].focus() : inp && inp.blur(); tick(6); });
       const s = k === "+" ? 1 : -1;
       b.addEventListener("pointerdown", () => { bump(s); let d = 380; const go = () => { bump(s); d = Math.max(40, d * 0.8); rep = setTimeout(go, d); }; rep = setTimeout(go, d); });

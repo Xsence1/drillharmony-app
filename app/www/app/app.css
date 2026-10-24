@@ -806,3 +806,26 @@ body.in-app { padding-left: 0 !important; padding-right: 0 !important; }
 .recent { margin: 0 -10px !important; padding: 0 10px 2px !important; max-width: none !important; }
 /* 2.0.3 — без карточки скважины: главная начинается со строки онлайн-данных */
 #heroes .lrow { margin-top: 6px; }
+
+/* 2.1.0 — график чувствительности над клавиатурой */
+.kpad { flex-direction: column; align-items: stretch !important; gap: 6px !important; }
+.kp-row { display: flex; align-items: center; gap: 6px; }
+.kp-row > button { flex: none; width: 44px; height: 40px; border-radius: 11px; border: 1px solid var(--glass-br); background: var(--glass-bg); color: var(--ink);
+  font: 600 22px/1 var(--body); box-shadow: var(--glass-hi); display: grid; place-items: center; padding: 0; transition: transform .12s; }
+.kp-row > button:active { transform: scale(.92); }
+.kp-row .kp-next { width: auto; padding: 0 14px; font-size: 14px; font-weight: 700; }
+.kp-row .kp-g { color: var(--muted); }
+.kp-row .kp-g[aria-pressed="true"] { color: var(--amber); border-color: color-mix(in srgb, var(--amber) 45%, transparent); }
+.kp-row .kp-g svg { width: 20px; height: 20px; }
+.ks { position: relative; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); padding: 7px 9px 4px; }
+.ks-h { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; min-width: 0; }
+.ks-t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 12px var(--body); color: var(--muted); }
+.ks-v { flex: none; font: 700 15px var(--mono); color: var(--amber); }
+.ks-c { display: block; width: 100%; height: 92px; margin-top: 2px; touch-action: none; cursor: ew-resize; transition: opacity .2s; }
+.ks-n { position: absolute; left: 0; right: 0; top: 50%; margin: 0; text-align: center; font: 500 12.5px var(--body); color: var(--muted); }
+body.in-app .calc .co.ks-on { box-shadow: inset 0 0 0 1.5px var(--amber) !important; }
+.kp-on .calc .cout .co { cursor: pointer; }
+body.kp-on .app-main { padding-bottom: 300px !important; }
+.ks-n { padding: 0 14px; line-height: 1.35; }
+/* пока открыт график, результаты не закреплены: значение видно в заголовке графика, а поле ввода не прячется */
+body.in-app.ks-show .cout { position: relative !important; top: auto !important; }
