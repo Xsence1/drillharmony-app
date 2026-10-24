@@ -26,8 +26,8 @@ from calc import CNAV  # noqa: E402  названия калькуляторов
 
 # ---------- разделы главного экрана ----------
 GROUPS = [
-    ("traj", "Траектория", ["minimum-curvature", "toolface", "projection", "dogleg", "landing", "plan-dev", "closure"]),
-    ("survey", "Инклинометрия и телесистемы", ["raw-survey", "survey-axes", "short-collar", "sag", "nmdc", "mwd-pulse", "mwd-rate", "em-skin", "sensor-lag", "mwd-battery"]),
+    ("traj", "Траектория", ["minimum-curvature", "toolface", "slide-yield", "projection", "dogleg", "landing", "plan-dev", "closure"]),
+    ("survey", "Инклинометрия и телесистемы", ["raw-survey", "survey-axes", "short-collar", "sag", "nmdc", "sensor-lag", "mwd-battery"]),
     ("drill", "Бурение и КНБК", ["mse", "bit-hydraulics", "motor", "hookload", "critical-rpm", "buoyancy"]),
     ("hyd", "Гидравлика · БРД", ["circ-loss", "ecd", "hydrostatic", "annular-velocity", "well-volume"]),
     ("mud", "Буровые растворы", ["barite", "mud-dilution", "mud-mix", "kill-mud", "rheology", "owr", "solids", "solids-eff", "moisture", "chem", "tank", "pump", "trip-fill"]),

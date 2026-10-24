@@ -55,6 +55,7 @@
       let last = num(b.textContent), busy = false, raf = 0;
       new MutationObserver(() => {
         if (busy) return;
+        cancelAnimationFrame(raf);           /* новое значение отменяет недокрученное старое, иначе оно затрёт «—» */
         if (window.__dhSamp) { last = num(b.textContent); return; }   /* прогон для графика: без вспышек и докрутки */
         const txt = b.textContent, n = num(txt), co = b.parentElement;
         co.classList.remove("flash"); void co.offsetWidth; co.classList.add("flash");
